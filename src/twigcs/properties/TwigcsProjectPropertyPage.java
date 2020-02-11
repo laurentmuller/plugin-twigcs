@@ -14,11 +14,11 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.dialogs.PropertyPage;
-import org.eclipse.ui.dialogs.ResourceListSelectionDialog;
 import org.osgi.service.prefs.BackingStoreException;
 
 import twigcs.core.IConstants;
 import twigcs.core.ProjectPreferences;
+import twigcs.ui.SelectResourceDialog;
 
 /**
  * Twigcs project properties page.
@@ -112,8 +112,8 @@ public class TwigcsProjectPropertyPage extends PropertyPage
 		bars.setLayout(layout);
 
 		createBarButton(bars, "Add...", e -> {
-			final IResource[] resources = selectResources(null);
-			for (final IResource resource : resources) {
+			final IResource resource = selectResource(null);
+			if (resource != null) {
 				final String path = resource.getProjectRelativePath()
 						.toPortableString();
 				final TableItem item = new TableItem(table, SWT.LEFT);
@@ -128,7 +128,7 @@ public class TwigcsProjectPropertyPage extends PropertyPage
 			}
 		});
 
-		final Button editButton = createBarButton(bars, "Change...", e -> {
+		final Button editButton = createBarButton(bars, "Edit...", e -> {
 
 		});
 
@@ -209,22 +209,16 @@ public class TwigcsProjectPropertyPage extends PropertyPage
 		super.performDefaults();
 	}
 
-	IResource[] selectResources(IResource selection) {
+	IResource selectResource(IResource selection) {
 		final IProject project = getProject();
-		final ResourceListSelectionDialog dlg = new ResourceListSelectionDialog(
-				getShell(), project, IResource.FOLDER | IResource.FILE);
-		dlg.setAllowUserToToggleDerived(false);
+		final SelectResourceDialog dlg = new SelectResourceDialog(getShell(),
+				project);
 
 		if (Window.OK == dlg.open()) {
-			final Object[] result = dlg.getResult();
-			final IResource[] resources = new IResource[result.length];
-			for (int i = 0; i < result.length; i++) {
-				resources[i] = (IResource) result[i];
-			}
-			return resources;
+			return dlg.getSelection();
 		}
 
-		return new IResource[] {};
+		return null;
 	}
 
 	void setPaths(Table table, String... paths) {
