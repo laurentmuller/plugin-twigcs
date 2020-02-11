@@ -1,0 +1,22 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Plugin Twigcs
+Bundle-SymbolicName: plugin-twigcs;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Vendor: bibi.nu
+Automatic-Module-Name: plugin-twigcs
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-ActivationPolicy: lazy
+Require-Bundle: org.eclipse.core.resources,
+ org.eclipse.core.runtime,
+ org.eclipse.ui,
+ com.google.gson,
+ org.eclipse.ui.ide
+Export-Package: twigcs,
+ twigcs.core,
+ twigcs.gson,
+ twigcs.io,
+ twigcs.model,
+ twigcs.preferences,
+ twigcs.properties
+Bundle-Activator: twigcs.TwigcsPlugin

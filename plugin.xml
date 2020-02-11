@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+    <extension
+        id="twigcs"
+        name="Twigcs Project Builder"
+        point="org.eclipse.core.resources.builders">
+        <builder
+            hasNature="true">
+            <run
+                class="twigcs.core.TwigcsBuilder" />
+        </builder>
+    </extension>
+    <extension
+        id="twigcs"
+        name="Twigcs Project Nature"
+        point="org.eclipse.core.resources.natures">
+        <runtime>
+            <run
+                class="twigcs.core.TwigcsNature" />
+        </runtime>
+        <builder
+            id="plugin-twigcs.twigcs" />
+    </extension>
+    <extension
+        point="org.eclipse.ui.commands">
+        <category
+            id="twigcs.category"
+            name="Twigcs" />
+        <command
+            categoryId="twigcs.category"
+            defaultHandler="twigcs.core.TwigcsNatureHandler"
+            id="twigcs.addRemovesNature"
+            name="Add/Remove Twigcs Project Nature" />
+    </extension>
+    <extension
+        point="org.eclipse.ui.menus">
+        <menuContribution
+            locationURI="popup:org.eclipse.ui.projectConfigure?after=additions">
+            <command
+                commandId="twigcs.addRemovesNature"
+                label="Disable Twigcs builder"
+                style="push">
+                <visibleWhen
+                    checkEnabled="false">
+                    <with
+                        variable="selection">
+                        <count
+                            value="1" />
+                        <iterate>
+                            <adapt
+                                type="org.eclipse.core.resources.IProject">
+                                <test
+                                    property="org.eclipse.core.resources.projectNature"
+                                    value="plugin-twigcs.twigcs" />
+                            </adapt>
+                        </iterate>
+                    </with>
+                </visibleWhen>
+            </command>
+            <command
+                commandId="twigcs.addRemovesNature"
+                label="Enable Twigcs builder"
+                style="push">
+                <visibleWhen
+                    checkEnabled="false">
+                    <with
+                        variable="selection">
+                        <count
+                            value="1" />
+                        <iterate>
+                            <adapt
+                                type="org.eclipse.core.resources.IProject">
+                                <not>
+                                    <test
+                                        property="org.eclipse.core.resources.projectNature"
+                                        value="plugin-twigcs.twigcs" />
+                                </not>
+                            </adapt>
+                        </iterate>
+                    </with>
+                </visibleWhen>
+            </command>
+        </menuContribution>
+    </extension>
+    <extension
+        id="twigcs"
+        name="Twigcs Problem"
+        point="org.eclipse.core.resources.markers">
+        <super
+            type="org.eclipse.core.resources.problemmarker" />
+        <persistent
+            value="true" />
+    </extension>
+    <extension
+        point="org.eclipse.core.runtime.preferences">
+        <initializer
+            class="twigcs.preferences.TwigcsPreferencesInitializer" />
+    </extension>
+    <extension
+        point="org.eclipse.ui.preferencePages">
+        <page
+            class="twigcs.preferences.TwigcsPreferencesPage"
+            id="twigcs.preferences.TwigcsPreferencePage"
+            name="Twigcs" />
+    </extension>
+    <extension
+        point="org.eclipse.ui.propertyPages">
+        <page
+            class="twigcs.properties.TwigcsProjectPropertyPage"
+            id="twigcs.properties.TwigcsProjectPropertyPage"
+            name="Twigcs">
+            <filter
+                name="open"
+                value="true" />
+            <enabledWhen>
+                <and>
+                    <adapt
+                        type="org.eclipse.core.resources.IProject" />
+                    <test
+                          property="org.eclipse.core.resources.projectNature"
+                          value="plugin-twigcs.twigcs">
+                    </test>
+                </and>
+            </enabledWhen>
+        </page>
+    </extension>
+</plugin>
