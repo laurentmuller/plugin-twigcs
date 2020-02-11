@@ -18,7 +18,7 @@ public class IOStream implements Runnable {
 	private final InputStream input;
 
 	/*
-	 *  the output stream
+	 * the output stream
 	 */
 	private final ByteArrayOutputStream output;
 

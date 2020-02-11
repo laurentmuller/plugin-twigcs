@@ -1,8 +1,10 @@
 package twigcs.core;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.osgi.service.prefs.BackingStoreException;
@@ -35,14 +37,20 @@ public class ProjectPreferences implements IConstants {
 	 */
 	private final IEclipsePreferences preferences;
 
+	/*
+	 * the handled project
+	 */
+	private final IProject project;
+
 	/**
 	 * Creates a new instance of this class.
 	 *
 	 * @param project
 	 *            the project to get or set preferences.
 	 */
-	public ProjectPreferences(IProject project) {
+	public ProjectPreferences(final IProject project) {
 		preferences = new ProjectScope(project).getNode(PLUGIN_ID);
+		this.project = project;
 	}
 
 	/**
@@ -58,21 +66,21 @@ public class ProjectPreferences implements IConstants {
 	}
 
 	/**
-	 * Gets the exclude directories and files.
+	 * Gets the exclude resources.
 	 *
 	 * @return the exclude paths.
 	 */
-	public String[] getExcludePaths() {
-		return getList(KEY_EXCLUDE);
+	public List<IResource> getExcludeResources() {
+		return getResources(KEY_EXCLUDE);
 	}
 
 	/**
-	 * Gets the include directories and files.
+	 * Gets the include resources.
 	 *
 	 * @return the include paths.
 	 */
-	public String[] getIncludePaths() {
-		return getList(KEY_INCLUDE);
+	public List<IResource> getIncludeResources() {
+		return getResources(KEY_INCLUDE);
 	}
 
 	/**
@@ -85,59 +93,78 @@ public class ProjectPreferences implements IConstants {
 	}
 
 	/**
-	 * Sets the exclude directories and files.
+	 * Sets the exclude resources.
 	 *
-	 * @param paths
-	 *            the paths to exclude.
+	 * @param resources
+	 *            the resources to exclude.
 	 */
-	public void setExcludePaths(String[] paths) {
-		putList(KEY_EXCLUDE, paths);
+	public void setExcludeResources(final List<IResource> resources) {
+		putResources(KEY_EXCLUDE, resources);
 	}
 
 	/**
-	 * Sets the include directories and files.
+	 * Sets the include resources.
 	 *
-	 * @param paths
-	 *            the paths to include.
+	 * @param resources
+	 *            the resources to include.
 	 */
-	public void setIncludePaths(String[] paths) {
-		putList(KEY_INCLUDE, paths);
+	public void setIncludeResources(final List<IResource> resources) {
+		putResources(KEY_INCLUDE, resources);
 	}
 
 	/**
-	 * Gets the paths.
+	 * Gets the resources.
 	 *
 	 * @param key
-	 *            the key whose associated paths is to be returned.
-	 * @return an array, maybe empty, of paths.
+	 *            the key whose associated resources is to be returned.
+	 * @return a list, maybe empty, of resources.
 	 */
-	private String[] getList(String key) {
+	private List<IResource> getResources(final String key) {
 		final String value = preferences.get(key, ""); //$NON-NLS-1$
-		final String[] values = value.split(SEPARATOR);
-		Arrays.sort(values, String.CASE_INSENSITIVE_ORDER);
+		if (value.isEmpty()) {
+			return new ArrayList<>();
+		}
 
-		return values;
+		final String[] paths = value.split("\\" + SEPARATOR); //$NON-NLS-1$
+		final List<IResource> list = new ArrayList<>(paths.length);
+		for (final String path : paths) {
+			final IResource resource = project.findMember(path);
+			if (resource != null && resource.exists()) {
+				list.add(resource);
+			}
+		}
+
+		return list;
 	}
 
 	/**
-	 * Saves the paths. The <code>null</code> or empty paths are not saved.
+	 * Saves the resources. The <code>null</code> resources not saved.
 	 *
 	 * @param key
-	 *            the key with which the specified paths is to be associated.
-	 * @param paths
-	 *            the paths to be associated with the specified key.
+	 *            the key with which the specified resources is to be
+	 *            associated.
+	 * @param resources
+	 *            the resources to be associated with the specified key.
 	 */
-	private void putList(String key, String[] paths) {
+	private void putResources(final String key,
+			final List<IResource> resources) {
+		String path;
 		final StringBuffer buffer = new StringBuffer();
-		for (final String path : paths) {
-			if (path != null && !path.isEmpty()) {
+		for (final IResource resource : resources) {
+			if (resource != null) {
 				if (buffer.length() > 0) {
 					buffer.append(SEPARATOR);
 				}
+				path = resource.getProjectRelativePath().toPortableString();
 				buffer.append(path);
 			}
 		}
 
-		preferences.put(key, buffer.toString());
+		final String value = buffer.toString();
+		if (value.isEmpty()) {
+			preferences.remove(key);
+		} else {
+			preferences.put(key, buffer.toString());
+		}
 	}
 }

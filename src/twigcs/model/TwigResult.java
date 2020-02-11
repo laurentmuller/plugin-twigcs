@@ -16,7 +16,7 @@ import com.google.gson.annotations.SerializedName;
 public class TwigResult implements Iterable<TwigFile> {
 
 	/*
-	 *  the number of violations
+	 * the number of violations
 	 */
 	@SerializedName("failures")
 	private int violations;

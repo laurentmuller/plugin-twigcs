@@ -52,7 +52,8 @@ public class TwigcsBuilder extends IncrementalProjectBuilder
 	 */
 	protected void fullBuild(final IProgressMonitor monitor)
 			throws CoreException {
-		getProject().accept(new ResourceVisitor());
+		final ProjectPreferences preferences = getPreferences();
+		getProject().accept(new ResourceVisitor(preferences));
 	}
 
 	/**
@@ -65,6 +66,12 @@ public class TwigcsBuilder extends IncrementalProjectBuilder
 	 */
 	protected void incrementalBuild(final IResourceDelta delta,
 			final IProgressMonitor monitor) throws CoreException {
-		delta.accept(new ResourceVisitor());
+		final ProjectPreferences preferences = getPreferences();
+		delta.accept(new ResourceVisitor(preferences));
+	}
+
+	private ProjectPreferences getPreferences() {
+		final IProject project = getProject();
+		return new ProjectPreferences(project);
 	}
 }

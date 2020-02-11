@@ -16,16 +16,16 @@ public class TwigViolation implements Comparable<TwigViolation> {
 	private int line;
 
 	/*
-	 *  the column offset (zero index based)
+	 * the column offset (zero index based)
 	 */
 	private int column;
 	/*
-	 *  the severity
+	 * the severity
 	 */
 	private TwigSeverity severity;
 
 	/*
-	 *  the message
+	 * the message
 	 */
 	private String message;
 

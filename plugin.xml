@@ -39,7 +39,7 @@
             locationURI="popup:org.eclipse.ui.projectConfigure?after=additions">
             <command
                 commandId="twigcs.addRemovesNature"
-                label="Disable Twigcs builder"
+                label="Disable Twigcs validation"
                 style="push">
                 <visibleWhen
                     checkEnabled="false">
@@ -60,7 +60,7 @@
             </command>
             <command
                 commandId="twigcs.addRemovesNature"
-                label="Enable Twigcs builder"
+                label="Enable Twigcs validation"
                 style="push">
                 <visibleWhen
                     checkEnabled="false">

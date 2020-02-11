@@ -1,5 +1,7 @@
 package twigcs.core;
 
+import java.util.List;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
@@ -20,11 +22,15 @@ import twigcs.model.TwigSeverity;
 public class ResourceVisitor
 		implements IResourceVisitor, IResourceDeltaVisitor, IConstants {
 
+	private final List<IResource> includeResources;
+	private final List<IResource> excludeResources;
+
 	/**
 	 * Creates a new instance of this class.
 	 */
-	public ResourceVisitor() {
-
+	public ResourceVisitor(final ProjectPreferences preferences) {
+		includeResources = preferences.getIncludeResources();
+		excludeResources = preferences.getExcludeResources();
 	}
 
 	/**
@@ -64,15 +70,17 @@ public class ResourceVisitor
 	private void check(final IResource resource) throws CoreException {
 		if (isTwigFile(resource)) {
 			final IFile file = (IFile) resource;
-			final IPath path = file.getFullPath();
-			if (path.toFile().exists()) {
-				// remove markers
-				deleteMarkers(file);
+			if (!isFiltered(file)) {
+				final IPath path = file.getFullPath();
+				if (path.toFile().exists()) {
+					// remove markers
+					deleteMarkers(file);
 
-				// parse
+					// parse
 
+				}
+				// final String realPath = path.toPortableString();
 			}
-			// final String realPath = path.toPortableString();
 		}
 	}
 
@@ -88,6 +96,32 @@ public class ResourceVisitor
 		file.deleteMarkers(MARKER_TYPE, false, IResource.DEPTH_ZERO);
 	}
 
+	private boolean isFiltered(final IFile file) {
+		if (includeResources.isEmpty() && excludeResources.isEmpty()) {
+			return false;
+		}
+
+		for (final IResource resource : includeResources) {
+			if (file == resource) {
+				return false;
+			}
+		}
+
+		for (final IResource resource : excludeResources) {
+			if (file == resource) {
+				return true;
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * Returns if the given resource is a Twig file.
+	 *
+	 * @param resource
+	 *            the resource to validate.
+	 * @return <code>true</code> if a Twig file.
+	 */
 	private boolean isTwigFile(final IResource resource) {
 		return resource instanceof IFile
 				&& resource.getFileExtension().equalsIgnoreCase(TWIG_EXTENSION);
