@@ -1,6 +1,9 @@
 package twigcs.core;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
@@ -11,7 +14,17 @@ import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
+
+import twigcs.TwigcsPlugin;
+import twigcs.gson.SeverityDeserializer;
+import twigcs.io.IOExecutor;
+import twigcs.model.TwigFile;
+import twigcs.model.TwigResult;
 import twigcs.model.TwigSeverity;
+import twigcs.model.TwigViolation;
 
 /**
  * Resource visitor.
@@ -22,15 +35,47 @@ import twigcs.model.TwigSeverity;
 public class ResourceVisitor
 		implements IResourceVisitor, IResourceDeltaVisitor, IConstants {
 
-	private final List<IResource> includeResources;
-	private final List<IResource> excludeResources;
+	/*
+	 * the include paths
+	 */
+	private final List<IPath> includePaths;
+
+	/*
+	 * the exclude paths
+	 */
+	private final List<IPath> excludePaths;
+
+	/*
+	 * no filter to apply
+	 */
+	private final boolean noFilter;
+
+	/*
+	 * the Twigcs processor
+	 */
+	private TwigcsProcessor processor;
+
+	/*
+	 * the Gson parser
+	 */
+	private Gson gson;
 
 	/**
 	 * Creates a new instance of this class.
 	 */
 	public ResourceVisitor(final ProjectPreferences preferences) {
-		includeResources = preferences.getIncludeResources();
-		excludeResources = preferences.getExcludeResources();
+		// get include paths
+		includePaths = preferences.getIncludeResources().stream()
+				.map(IResource::getProjectRelativePath)
+				.collect(Collectors.toList());
+
+		// get exclude paths
+		excludePaths = preferences.getExcludeResources().stream()
+				.map(IResource::getProjectRelativePath)
+				.collect(Collectors.toList());
+
+		// no filter state
+		noFilter = includePaths.isEmpty() && excludePaths.isEmpty();
 	}
 
 	/**
@@ -38,8 +83,11 @@ public class ResourceVisitor
 	 */
 	@Override
 	public boolean visit(final IResource resource) throws CoreException {
-		check(resource);
-		return true;
+		if (!isFiltered(resource)) {
+			check(resource);
+			return true;
+		}
+		return false;
 	}
 
 	/**
@@ -50,13 +98,66 @@ public class ResourceVisitor
 		final IResource resource = delta.getResource();
 		switch (delta.getKind()) {
 		case IResourceDelta.ADDED:
-			check(resource);
-			break;
 		case IResourceDelta.CHANGED:
-			check(resource);
-			break;
+			if (!isFiltered(resource)) {
+				check(resource);
+				return true;
+			}
+			return false;
+		default:
+			return !isFiltered(resource);
 		}
-		return true;
+	}
+
+	/**
+	 * Creates and returns the marker for the given violation.
+	 *
+	 * @param file
+	 *            the file to update.
+	 * @param violation
+	 *            the violation to get values from.
+	 * @return the new marker.
+	 * @throws CoreException
+	 *             if an exception occurs while creating the marker.
+	 */
+	private IMarker addMarker(final IFile file, ResourceText text,
+			TwigViolation violation) throws CoreException {
+		// get values
+		final int severity = violation.getSeverity().getMarkerSeverity();
+		final String message = violation.getMessage();
+		final int line = violation.getLine();
+		final int offset = text.getOffset(line - 1) + violation.getColumn();
+
+		// create
+		final IMarker marker = file.createMarker(MARKER_TYPE);
+		marker.setAttribute(IMarker.MESSAGE, message);
+		marker.setAttribute(IMarker.SEVERITY, severity);
+		marker.setAttribute(IMarker.LINE_NUMBER, line);
+		marker.setAttribute(IMarker.CHAR_START, offset);
+		marker.setAttribute(IMarker.CHAR_END, offset + 1);
+
+		return marker;
+	}
+
+	/**
+	 * Builds the execution command.
+	 *
+	 * @param file
+	 *            the file process.
+	 * @return a string array containing the Twigcs program and its arguments.
+	 * @throws CoreException
+	 *             if some parameters are missing or invalid.
+	 */
+	private String[] buildCommand(IFile file) throws CoreException {
+		if (processor == null) {
+			processor = TwigcsProcessor.instance();
+		}
+
+		// update
+		processor.clearPaths();
+		processor.addSearchPath(file.getLocation().toPortableString());
+
+		return processor.buildCommand();
 	}
 
 	/**
@@ -70,17 +171,16 @@ public class ResourceVisitor
 	private void check(final IResource resource) throws CoreException {
 		if (isTwigFile(resource)) {
 			final IFile file = (IFile) resource;
-			if (!isFiltered(file)) {
-				final IPath path = file.getFullPath();
-				if (path.toFile().exists()) {
-					// remove markers
-					deleteMarkers(file);
+			file.getProjectRelativePath();
+			// remove markers
+			deleteMarkers(file);
 
-					// parse
+			// process
+			process(file);
 
-				}
-				// final String realPath = path.toPortableString();
-			}
+			// for test
+			// System.out.println(path.toString());
+			// final String realPath = path.toPortableString();
 		}
 	}
 
@@ -96,23 +196,56 @@ public class ResourceVisitor
 		file.deleteMarkers(MARKER_TYPE, false, IResource.DEPTH_ZERO);
 	}
 
-	private boolean isFiltered(final IFile file) {
-		if (includeResources.isEmpty() && excludeResources.isEmpty()) {
+	/**
+	 * gets the GSON parser.
+	 *
+	 * @return the GSON parser.
+	 */
+	private Gson getGson() {
+		if (gson == null) {
+			final GsonBuilder builder = new GsonBuilder();
+			gson = builder.registerTypeAdapter(TwigSeverity.class,
+					new SeverityDeserializer()).create();
+		}
+		return gson;
+	}
+
+	/**
+	 * Returns if the given resource is filtered.
+	 *
+	 * @param resource
+	 *            the resource to be tested.
+	 * @return <code>true</code> if filtered; <code>false</code> to visit.
+	 */
+	private boolean isFiltered(final IResource resource) {
+		// filter?
+		if (noFilter) {
 			return false;
 		}
 
-		for (final IResource resource : includeResources) {
-			if (file == resource) {
-				return false;
-			}
+		// relative path
+		final IPath path = resource.getProjectRelativePath();
+
+		// predicate
+		final Predicate<IPath> isPrefixOf = current -> current.isPrefixOf(path);
+
+		// include
+		if (includePaths.contains(path)) {
+			return false;
+		} else if (includePaths.stream().anyMatch(isPrefixOf)) {
+			return false;
 		}
 
-		for (final IResource resource : excludeResources) {
-			if (file == resource) {
-				return true;
-			}
+		// exclude
+		if (excludePaths.contains(path)) {
+			return true;
+		} else if (excludePaths.stream().anyMatch(isPrefixOf)) {
+			return true;
 		}
-		return true;
+
+		// ??
+		// !includePaths.isEmpty();
+		return false;
 	}
 
 	/**
@@ -128,57 +261,62 @@ public class ResourceVisitor
 	}
 
 	/**
-	 * Creates and returns the marker with the specified type on this resource.
+	 * Parses the execution result.
 	 *
-	 * @param file
-	 *            the file to update.
-	 * @param severity
-	 *            the severity marker attribute
-	 * @param message
-	 *            the message marker attribute.
-	 * @param lineNumber
-	 *            the line number marker attribute. An integer value indicating
-	 *            the line number for a text marker. This attribute is
-	 *            1-relative.
-	 * @return the new marker.
-	 * @throws CoreException
-	 *             if an exception occurs while creating the marker.
+	 * @param data
+	 *            the output data of the execution.
+	 * @return the file result, if any; <code>null</code> otherwise.
 	 */
-	IMarker addMarker(final IFile file, final int severity,
-			final String message, int lineNumber) throws CoreException {
-		// check line number
-		if (lineNumber == -1) {
-			lineNumber = 1;
-		}
-
-		final IMarker marker = file.createMarker(MARKER_TYPE);
-		marker.setAttribute(IMarker.MESSAGE, message);
-		marker.setAttribute(IMarker.SEVERITY, severity);
-		marker.setAttribute(IMarker.LINE_NUMBER, lineNumber);
-
-		return marker;
+	private TwigFile parseResult(String data) {
+		final Gson gson = getGson();
+		final TwigResult result = gson.fromJson(data, TwigResult.class);
+		return result.first();
 	}
 
 	/**
-	 * Creates and returns the marker with the specified type on this resource.
+	 * Validate the given file with the Twigcs.
 	 *
 	 * @param file
-	 *            the file to update.
-	 * @param severity
-	 *            the severity marker attribute
-	 * @param message
-	 *            the message marker attribute.
-	 * @param lineNumber
-	 *            the line number marker attribute. An integer value indicating
-	 *            the line number for a text marker. This attribute is
-	 *            1-relative.
-	 * @return the new marker.
+	 *            the file to validate.
 	 * @throws CoreException
-	 *             if an exception occurs while creating the marker.
+	 *             if an error occurs while processing the file.
 	 */
-	IMarker addMarker(final IFile file, final TwigSeverity severity,
-			final String message, final int lineNumber) throws CoreException {
-		final int markerSeverity = severity.getMarkerSeverity();
-		return addMarker(file, markerSeverity, message, lineNumber);
+	private void process(IFile file) throws CoreException {
+		try {
+			// run
+			final String[] command = buildCommand(file);
+			final IOExecutor executor = new IOExecutor();
+			final int exitCode = executor.run(command);
+
+			// output?
+			final String output = executor.getOutput();
+			if (output != null && !output.isEmpty()) {
+				// convert
+				final TwigFile twigFile = parseResult(output);
+				if (twigFile != null) {
+					// add violations
+					final ResourceText text = new ResourceText(file);
+					for (final TwigViolation violation : twigFile) {
+						addMarker(file, text, violation);
+					}
+				}
+
+			} else if (exitCode != 0) { // error?
+				IOException e = null;
+				final String error = executor.getError();
+				if (error != null && !error.isEmpty()) {
+					e = new IOException(error);
+				}
+				final String msg = String.format(
+						"Unable to process the resource '%s' (code: %d).",
+						file.getName(), exitCode);
+				throw TwigcsPlugin.createCoreException(msg, e);
+			}
+
+		} catch (IOException | InterruptedException | JsonSyntaxException e) {
+			final String msg = String.format(
+					"Unable to process the resource '%s'.", file.getName());
+			throw TwigcsPlugin.createCoreException(msg, e);
+		}
 	}
 }

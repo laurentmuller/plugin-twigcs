@@ -7,6 +7,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.ui.dialogs.ISelectionStatusValidator;
 
+import twigcs.TwigcsPlugin;
 import twigcs.core.IConstants;
 
 /**
@@ -21,8 +22,8 @@ public class ResourceValidator
 	public IStatus validate(final Object[] selection) {
 		final IResource resource = getResource(selection);
 		if (resource == null) {
-			return new Status(IStatus.ERROR, PLUGIN_ID, IStatus.ERROR,
-					"A folder or a file must be selected.", null);
+			return TwigcsPlugin
+					.createErrorStatus("A folder or a file must be selected.");
 		}
 		return Status.OK_STATUS;
 	}

@@ -1,11 +1,15 @@
 package twigcs.core;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ProjectScope;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.osgi.service.prefs.BackingStoreException;
 
@@ -30,7 +34,7 @@ public class ProjectPreferences implements IConstants {
 	/*
 	 * the paths separators
 	 */
-	private static final String SEPARATOR = "|"; //$NON-NLS-1$
+	private static final String SEPARATOR = ":"; //$NON-NLS-1$
 
 	/*
 	 * the project's preferences
@@ -68,7 +72,7 @@ public class ProjectPreferences implements IConstants {
 	/**
 	 * Gets the exclude resources.
 	 *
-	 * @return the exclude paths.
+	 * @return the exclude resources.
 	 */
 	public List<IResource> getExcludeResources() {
 		return getResources(KEY_EXCLUDE);
@@ -77,7 +81,7 @@ public class ProjectPreferences implements IConstants {
 	/**
 	 * Gets the include resources.
 	 *
-	 * @return the include paths.
+	 * @return the include resources.
 	 */
 	public List<IResource> getIncludeResources() {
 		return getResources(KEY_INCLUDE);
@@ -125,16 +129,13 @@ public class ProjectPreferences implements IConstants {
 			return new ArrayList<>();
 		}
 
-		final String[] paths = value.split("\\" + SEPARATOR); //$NON-NLS-1$
-		final List<IResource> list = new ArrayList<>(paths.length);
-		for (final String path : paths) {
-			final IResource resource = project.findMember(path);
-			if (resource != null && resource.exists()) {
-				list.add(resource);
-			}
-		}
+		// split
+		final String[] paths = value.split(SEPARATOR);
 
-		return list;
+		// build
+		return Arrays.stream(paths).map(path -> project.findMember(path))
+				.filter(Objects::nonNull).filter(IResource::exists)
+				.collect(Collectors.toList());
 	}
 
 	/**
@@ -148,23 +149,16 @@ public class ProjectPreferences implements IConstants {
 	 */
 	private void putResources(final String key,
 			final List<IResource> resources) {
-		String path;
-		final StringBuffer buffer = new StringBuffer();
-		for (final IResource resource : resources) {
-			if (resource != null) {
-				if (buffer.length() > 0) {
-					buffer.append(SEPARATOR);
-				}
-				path = resource.getProjectRelativePath().toPortableString();
-				buffer.append(path);
-			}
-		}
+		// build
+		final String value = resources.stream().filter(Objects::nonNull)
+				.map(IResource::getProjectRelativePath)
+				.map(IPath::toPortableString)
+				.collect(Collectors.joining(SEPARATOR));
 
-		final String value = buffer.toString();
 		if (value.isEmpty()) {
 			preferences.remove(key);
 		} else {
-			preferences.put(key, buffer.toString());
+			preferences.put(key, value);
 		}
 	}
 }

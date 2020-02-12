@@ -18,6 +18,9 @@ import org.eclipse.core.runtime.IProgressMonitor;
 public class TwigcsBuilder extends IncrementalProjectBuilder
 		implements IConstants {
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	protected IProject[] build(final int kind, final Map<String, String> args,
 			final IProgressMonitor monitor) throws CoreException {
@@ -52,8 +55,7 @@ public class TwigcsBuilder extends IncrementalProjectBuilder
 	 */
 	protected void fullBuild(final IProgressMonitor monitor)
 			throws CoreException {
-		final ProjectPreferences preferences = getPreferences();
-		getProject().accept(new ResourceVisitor(preferences));
+		getProject().accept(new ResourceVisitor(getPreferences()));
 	}
 
 	/**
@@ -66,12 +68,17 @@ public class TwigcsBuilder extends IncrementalProjectBuilder
 	 */
 	protected void incrementalBuild(final IResourceDelta delta,
 			final IProgressMonitor monitor) throws CoreException {
-		final ProjectPreferences preferences = getPreferences();
-		delta.accept(new ResourceVisitor(preferences));
+		delta.accept(new ResourceVisitor(getPreferences()));
 	}
 
+	/**
+	 * Gets the project preferences.
+	 *
+	 * @return the project preferences.
+	 */
 	private ProjectPreferences getPreferences() {
 		final IProject project = getProject();
 		return new ProjectPreferences(project);
 	}
+
 }

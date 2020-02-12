@@ -1,6 +1,7 @@
 package twigcs.properties;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.core.resources.IProject;
@@ -8,8 +9,14 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.ViewerDropAdapter;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.dnd.DND;
+import org.eclipse.swt.dnd.DragSourceAdapter;
+import org.eclipse.swt.dnd.DragSourceEvent;
+import org.eclipse.swt.dnd.Transfer;
+import org.eclipse.swt.dnd.TransferData;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -17,12 +24,13 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.ui.dialogs.PropertyPage;
+import org.eclipse.ui.part.ResourceTransfer;
 import org.osgi.service.prefs.BackingStoreException;
 
 import twigcs.core.IConstants;
 import twigcs.core.ProjectPreferences;
+import twigcs.ui.ResourceSelectionDialog;
 import twigcs.ui.ResourceTableViewer;
-import twigcs.ui.SelectionResourceDialog;
 
 /**
  * Properties page for Twigcs project.
@@ -47,7 +55,7 @@ public class TwigcsProjectPropertyPage extends PropertyPage
 	public TwigcsProjectPropertyPage() {
 		super();
 		setDescription(
-				"By default, all twig files are validate. Select the resources to include or to exclude.");
+				"By default, all Twig files (*.twig) are validate. Select the resources to include or to exclude.");
 	}
 
 	/**
@@ -82,6 +90,138 @@ public class TwigcsProjectPropertyPage extends PropertyPage
 	}
 
 	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected Composite createContents(final Composite parent) {
+		// get lists
+		final ProjectPreferences preferences = getPreferences();
+		includeList = preferences.getIncludeResources();
+		excludeList = preferences.getExcludeResources();
+
+		// container
+		final Composite container = createComposite(parent, 1);
+
+		// include viewer
+		includeViewer = createViewer(container, includeList,
+				"Folders and files to &validate:");
+
+		// exclude viewer
+		excludeViewer = createViewer(container, excludeList,
+				"Folders and files to e&xclude:");
+
+		// note label
+		final Label label = createLabel(container,
+				"Note: Included folders and files have priority over excluded folders and files.",
+				1);
+		((GridData) label.getLayoutData()).widthHint = 250;
+
+		// drag and drop
+		addDragDropSupport(includeViewer, includeList, excludeViewer,
+				excludeList);
+
+		return container;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected void performDefaults() {
+		// clear
+		includeList = new ArrayList<>();
+		excludeList = new ArrayList<>();
+		includeViewer.setInput(includeList);
+		excludeViewer.setInput(excludeList);
+
+		super.performDefaults();
+	}
+
+	/**
+	 * Adds drag and drop support between the 2 viewers.
+	 *
+	 * @param sourceViewer
+	 *            the source viewer.
+	 * @param targetViewer
+	 *            the target viewer.
+	 */
+	private void addDragDropSupport(ResourceTableViewer sourceViewer,
+			List<IResource> sourceList, ResourceTableViewer targetViewer,
+			List<IResource> targetList) {
+
+		final int operations = DND.DROP_MOVE;
+		final ResourceTransfer transfer = ResourceTransfer.getInstance();
+		final Transfer[] types = new Transfer[] { transfer };
+
+		final DragSourceAdapter dragAdapter = new DragSourceAdapter() {
+			@Override
+			public void dragSetData(DragSourceEvent event) {
+				final IResource[] resources = getResources();
+				if (resources != null) {
+					event.data = resources;
+				} else {
+					event.doit = false;
+				}
+			}
+
+			private IResource[] getResources() {
+				final Object[] data = sourceViewer.getStructuredSelection()
+						.toArray();
+				if (data.length != 0) {
+					final IResource[] resources = new IResource[data.length];
+					System.arraycopy(data, 0, resources, 0, data.length);
+					return resources;
+				}
+				return null;
+			}
+		};
+		sourceViewer.addDragSupport(operations, types, dragAdapter);
+
+		// add drop
+		final ViewerDropAdapter dropAdapter = new ViewerDropAdapter(
+				targetViewer) {
+			@Override
+			public boolean performDrop(Object data) {
+				final List<IResource> list = getResources(data);
+				if (list != null) {
+					// move
+					sourceList.removeAll(list);
+					targetList.addAll(list);
+
+					// update viewers
+					sourceViewer.refresh();
+					targetViewer.refresh();
+
+					// select
+					targetViewer.setSelection(new StructuredSelection(list));
+
+					return true;
+				}
+				return false;
+			}
+
+			@Override
+			public boolean validateDrop(Object target, int operation,
+					TransferData transferType) {
+				if (!transfer.isSupportedType(transferType)) {
+					return false;
+				}
+				return true;
+			}
+
+			private List<IResource> getResources(Object data) {
+				if (data instanceof IResource[]) {
+					final IResource[] resources = (IResource[]) data;
+					return Arrays.asList(resources);
+				}
+				return null;
+			}
+		};
+		dropAdapter.setFeedbackEnabled(false);
+		targetViewer.addDropSupport(operations, types, dropAdapter);
+	}
+
+	/**
 	 * Adds a resource.
 	 *
 	 * @param viewer
@@ -92,12 +232,10 @@ public class TwigcsProjectPropertyPage extends PropertyPage
 	private void addResources(final ResourceTableViewer viewer,
 			final List<IResource> list) {
 		final IResource resource = selectResource(null);
-		if (resource == null || list.contains(resource)) {
-			return;
+		if (resource != null && !list.contains(resource)) {
+			list.add(resource);
+			viewer.refresh();
 		}
-
-		list.add(resource);
-		viewer.refresh();
 		viewer.setSelection(new StructuredSelection(resource));
 	}
 
@@ -123,6 +261,30 @@ public class TwigcsProjectPropertyPage extends PropertyPage
 	}
 
 	/**
+	 * Creates a label control.
+	 *
+	 * @param parent
+	 *            the parent composite.
+	 * @param text
+	 *            the label's text.
+	 * @return the newly created label.
+	 */
+	private Label createLabel(final Composite parent, String text,
+			int columns) {
+		final Label label = new Label(parent, SWT.WRAP);
+		if (text != null) {
+			label.setText(text);
+		}
+		final GridData gd = new GridData(GridData.FILL_HORIZONTAL);
+		if (columns > 1) {
+			gd.horizontalSpan = columns;
+		}
+		label.setLayoutData(gd);
+
+		return label;
+	}
+
+	/**
 	 * Creates a resource viewer.
 	 *
 	 * @param parent
@@ -139,35 +301,35 @@ public class TwigcsProjectPropertyPage extends PropertyPage
 		final Composite container = createComposite(parent, 2);
 
 		// label
-		final Label label = new Label(container, SWT.LEFT);
-		if (text != null) {
-			label.setText(text);
-		}
-		final GridData gd = new GridData(GridData.FILL_HORIZONTAL);
-		gd.horizontalSpan = 2;
-		label.setLayoutData(gd);
+		createLabel(container, text, 2);
 
 		// table viewer
 		final ResourceTableViewer viewer = new ResourceTableViewer(container);
-		viewer.setLayoutData(new GridData(GridData.FILL_BOTH));
+		final GridData gd = new GridData(GridData.FILL_BOTH);
+		gd.widthHint = convertHorizontalDLUsToPixels(120);
+		gd.heightHint = viewer.getTable().getItemHeight() * 5;
+		viewer.setLayoutData(gd);
 
-		// buttons bar
-		final Composite bars = new Composite(container, SWT.NONE);
-		bars.setLayoutData(new GridData(GridData.FILL_VERTICAL));
+		// button bar
+		final Composite buttonBar = new Composite(container, SWT.NONE);
+		buttonBar.setLayoutData(new GridData(GridData.FILL_VERTICAL));
 		final GridLayout layout = new GridLayout();
 		layout.marginWidth = layout.marginHeight = 0;
-		bars.setLayout(layout);
+		buttonBar.setLayout(layout);
 
 		// buttons
-		createViewerButton(bars, "Add...", e -> {
-			addResources(viewer, list);
-		});
-		final Button deleteButton = createViewerButton(bars, "Remove", e -> {
-			deleteResource(viewer, list);
-		});
-		final Button editButton = createViewerButton(bars, "Edit...", e -> {
-			editResources(viewer, list);
-		});
+		createViewerButton(buttonBar, "Add...", //
+				e -> {
+					addResources(viewer, list);
+				});
+		final Button deleteButton = createViewerButton(buttonBar, "Remove",
+				e -> {
+					deleteResource(viewer, list);
+				});
+		final Button editButton = createViewerButton(buttonBar, "Edit...",
+				e -> {
+					editResources(viewer, list);
+				});
 
 		viewer.addSelectionChangedListener(e -> {
 			final boolean enabled = !e.getSelection().isEmpty();
@@ -228,6 +390,7 @@ public class TwigcsProjectPropertyPage extends PropertyPage
 		if (selection.isEmpty()) {
 			return;
 		}
+
 		list.removeAll(selection.toList());
 		viewer.refresh();
 	}
@@ -247,7 +410,7 @@ public class TwigcsProjectPropertyPage extends PropertyPage
 			return;
 		}
 
-		final IResource element = (IResource) selection.getFirstElement();
+		final Object element = selection.getFirstElement();
 		final IResource resource = selectResource(element);
 		if (resource == null || resource == element) {
 			return;
@@ -278,9 +441,9 @@ public class TwigcsProjectPropertyPage extends PropertyPage
 	 *            the current selection or <code>null</code> if none.
 	 * @return the selected resource, if any; <code>null</code> otherwise.
 	 */
-	private IResource selectResource(final IResource selection) {
+	private IResource selectResource(final Object selection) {
 		final IProject project = getElement();
-		final SelectionResourceDialog dlg = new SelectionResourceDialog(
+		final ResourceSelectionDialog dlg = new ResourceSelectionDialog(
 				getShell(), project);
 
 		if (selection != null) {
@@ -293,43 +456,4 @@ public class TwigcsProjectPropertyPage extends PropertyPage
 
 		return null;
 	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected Composite createContents(final Composite parent) {
-		// get lists
-		final ProjectPreferences preferences = getPreferences();
-		includeList = preferences.getIncludeResources();
-		excludeList = preferences.getExcludeResources();
-
-		// container
-		final Composite container = createComposite(parent, 1);
-
-		// include viewer
-		includeViewer = createViewer(container, includeList,
-				"Folders and files to &validate:");
-
-		// exclude viewer
-		excludeViewer = createViewer(container, excludeList,
-				"Folders and files to e&xclude:");
-
-		return container;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected void performDefaults() {
-		// clear
-		includeList = new ArrayList<>();
-		excludeList = new ArrayList<>();
-		includeViewer.setInput(includeList);
-		excludeViewer.setInput(excludeList);
-
-		super.performDefaults();
-	}
-
 }

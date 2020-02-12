@@ -24,16 +24,16 @@ public class MainTest {
 		try {
 			final TwigcsProcessor processor = new TwigcsProcessor();
 			processor.setExec(
-					"C:/Users/muller/AppData/Roaming/Composer/vendor/bin/twigcs.bat");
+					"C:\\Users\\muller\\AppData\\Roaming\\Composer\\vendor\\bin\\twigcs.bat");
 			processor.setTwigVersion(TwigVersion.V2);
 			processor.setSeverity(TwigSeverity.ignore);
 			// processor.addSearchPath("D:/GitHub/calculation/templates/user");
 			processor.addSearchPath(
 					"D:/GitHub/calculation/templates/user/user_rights.html.twig");
-			processor.addSearchPath(
-					"D:/GitHub/calculation/templates/user/user_theme.html.twig");
-			processor.addSearchPath(
-					"D:/GitHub/calculation/templates/user/user_card.html.twig");
+			// processor.addSearchPath(
+			// "D:/GitHub/calculation/templates/user/user_theme.html.twig");
+			// processor.addSearchPath(
+			// "D:/GitHub/calculation/templates/user/user_card.html.twig");
 
 			// processor.addExcludePath("D:/GitHub/calculation/templates/user");
 

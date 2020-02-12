@@ -3,6 +3,9 @@ package twigcs.preferences;
 import org.eclipse.jface.preference.ComboFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.FileFieldEditor;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
@@ -34,25 +37,10 @@ public class TwigcsPreferencesPage extends FieldEditorPreferencePage
 	 */
 	@Override
 	public void createFieldEditors() {
-		// executable
-		final FileFieldEditor execEditor = new FileFieldEditor(
-				P_EXECUTABLE_PATH, "Twigcs Path", //
-				true, getFieldEditorParent());
-		execEditor.setErrorMessage("The executable path must be defined.");
-		execEditor.setEmptyStringAllowed(false);
-		addField(execEditor);
-
-		// twig version
-		addField(new ComboFieldEditor(P_TWIG_VERSION, "Twig-version",
-				getEnumNames(TwigVersion.class), getFieldEditorParent()));
-
-		// severity
-		addField(new ComboFieldEditor(P_SEVERITY, "Severity",
-				getEnumNames(TwigSeverity.class), getFieldEditorParent()));
-
-		// reporter
-		addField(new ComboFieldEditor(P_REPORTER, "Reporter",
-				getEnumNames(TwigReporter.class), getFieldEditorParent()));
+		addFileEditor();
+		addEnumEditor(P_TWIG_VERSION, "&Twig-version", TwigVersion.class);
+		addEnumEditor(P_SEVERITY, "&Severity", TwigSeverity.class);
+		addEnumEditor(P_REPORTER, "&Reporter", TwigReporter.class);
 	}
 
 	/**
@@ -60,6 +48,42 @@ public class TwigcsPreferencesPage extends FieldEditorPreferencePage
 	 */
 	@Override
 	public void init(final IWorkbench workbench) {
+	}
+
+	/**
+	 * Adds a combo field editor for the given enumeration class
+	 *
+	 * @param key
+	 *            the name of the preference this field editor works on.
+	 * @param label
+	 *            the label text of the field editor.
+	 * @param clazz
+	 *            the enumeration class.
+	 */
+	private void addEnumEditor(String key, String labelText,
+			Class<? extends Enum<?>> clazz) {
+		addField(new ComboFieldEditor(key, labelText, getEnumNames(clazz),
+				getFieldEditorParent()));
+	}
+
+	/**
+	 * Adds the file field editor for the executable path.
+	 */
+	private void addFileEditor() {
+		final FileFieldEditor editor = new FileFieldEditor(P_EXECUTABLE_PATH,
+				"Twigcs &Path", true, getFieldEditorParent()) {
+			@Override
+			protected Text createTextWidget(Composite parent) {
+				final Text text = super.createTextWidget(parent);
+				text.addListener(SWT.FocusIn, e -> {
+					((Text) e.widget).selectAll();
+				});
+				return text;
+			}
+		};
+		editor.setErrorMessage("The executable path must be defined.");
+		editor.setEmptyStringAllowed(false);
+		addField(editor);
 	}
 
 	/**
@@ -73,8 +97,20 @@ public class TwigcsPreferencesPage extends FieldEditorPreferencePage
 		final Enum<?>[] values = clazz.getEnumConstants();
 		final String[][] result = new String[values.length][2];
 		for (int i = 0; i < values.length; i++) {
-			result[i][0] = result[i][1] = values[i].name();
+			result[i][0] = toProperCase(values[i].name());
+			result[i][1] = values[i].name();
 		}
 		return result;
+	}
+
+	/**
+	 * Convert the given string to proper case.
+	 *
+	 * @param text
+	 *            the string to convert.
+	 * @return the converted string.
+	 */
+	private String toProperCase(String text) {
+		return Character.toUpperCase(text.charAt(0)) + text.substring(1);
 	}
 }

@@ -21,8 +21,6 @@ public class TwigResult implements Iterable<TwigFile> {
 	@SerializedName("failures")
 	private int violations;
 
-	private String path;
-
 	/*
 	 * the parsed files
 	 */
@@ -36,16 +34,24 @@ public class TwigResult implements Iterable<TwigFile> {
 	}
 
 	/**
+	 * Gets the first file (if any).
+	 *
+	 * @return the first file, if not empty; <code>null</code> otherwise.
+	 */
+	public TwigFile first() {
+		if (!files.isEmpty()) {
+			return files.get(0);
+		}
+		return null;
+	}
+
+	/**
 	 * Gets the parsed files.
 	 *
 	 * @return the parsed files.
 	 */
 	public List<TwigFile> getFiles() {
 		return files;
-	}
-
-	public String getPath() {
-		return path;
 	}
 
 	/**
@@ -72,10 +78,6 @@ public class TwigResult implements Iterable<TwigFile> {
 	@Override
 	public Iterator<TwigFile> iterator() {
 		return files.iterator();
-	}
-
-	public void setPath(final String path) {
-		this.path = path;
 	}
 
 	/**

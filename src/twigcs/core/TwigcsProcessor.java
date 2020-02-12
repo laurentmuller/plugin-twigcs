@@ -4,20 +4,35 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 
+import twigcs.TwigcsPlugin;
 import twigcs.model.TwigReporter;
 import twigcs.model.TwigSeverity;
 import twigcs.model.TwigVersion;
+import twigcs.preferences.TwigcsPreferencesInitializer;
 
 /**
- * This class contains properties used run Twigcs.
+ * This class contains properties used to build command arguments for Twigcs.
  *
  * @author Laurent Muller
  * @version 1.0
  */
 public class TwigcsProcessor implements IConstants {
+
+	/**
+	 * Creates an instance of processor from the preference store.
+	 *
+	 * @return the processor,.
+	 */
+	public static TwigcsProcessor instance() {
+		final TwigcsProcessor processor = new TwigcsProcessor();
+		processor.setExec(TwigcsPreferencesInitializer.getTwigExecutable());
+		processor.setSeverity(TwigcsPreferencesInitializer.getTwigSeverity());
+		processor.setReporter(TwigcsPreferencesInitializer.getTwigReporter());
+		processor.setTwigVersion(TwigcsPreferencesInitializer.getTwigVersion());
+
+		return processor;
+	}
 
 	/*
 	 * the Twigcs executable
@@ -101,12 +116,12 @@ public class TwigcsProcessor implements IConstants {
 	public String[] buildCommand() throws CoreException {
 		// check values
 		if (exec == null || exec.isEmpty()) {
-			throw new CoreException(
-					createStatus("The Twigcs executable is not defined."));
+			throw TwigcsPlugin.createCoreException( //
+					"The Twigcs executable is not defined.");
 		}
 		if (searchPaths.isEmpty()) {
-			throw new CoreException(//
-					createStatus("The search paths are empty."));
+			throw TwigcsPlugin.createCoreException( //
+					"The search paths are empty.");
 		}
 
 		// build
@@ -239,16 +254,5 @@ public class TwigcsProcessor implements IConstants {
 	 */
 	public void setTwigVersion(final TwigVersion twigVersion) {
 		this.twigVersion = twigVersion;
-	}
-
-	/**
-	 * Creates an error status.
-	 *
-	 * @param message
-	 *            the status message.
-	 * @return the status.
-	 */
-	private IStatus createStatus(final String message) {
-		return new Status(IStatus.ERROR, PLUGIN_ID, message);
 	}
 }

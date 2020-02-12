@@ -19,7 +19,6 @@ public class IOExecutor {
 	 * the output exception
 	 */
 	private IOException outputException;
-
 	/*
 	 * the error message
 	 */
@@ -29,6 +28,11 @@ public class IOExecutor {
 	 * the output exception
 	 */
 	private IOException errorException;
+
+	/*
+	 * the exit code
+	 */
+	private int exitCode;
 
 	/**
 	 * Gets the error message.
@@ -46,6 +50,16 @@ public class IOExecutor {
 	 */
 	public IOException getErrorException() {
 		return errorException;
+	}
+
+	/**
+	 * Gets the exit code. By convention, the value 0 indicates normal
+	 * termination.
+	 * 
+	 * @return the exit code.
+	 */
+	public int getExitCode() {
+		return exitCode;
 	}
 
 	/**
@@ -71,7 +85,7 @@ public class IOExecutor {
 	 *
 	 * @param command
 	 *            a string array containing the program and its arguments.
-	 * @return the exit value. By convention, the value 0 indicates normal
+	 * @return the exit code. By convention, the value 0 indicates normal
 	 *         termination.
 	 * @throws IOException
 	 *             if I/O exception occurs.
@@ -102,7 +116,7 @@ public class IOExecutor {
 		errorThread.start();
 
 		// wait
-		final int exitCode = process.waitFor();
+		exitCode = process.waitFor();
 
 		// Handle condition where the process ends before the threads finish
 		outputThread.join();

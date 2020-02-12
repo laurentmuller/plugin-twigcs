@@ -1,13 +1,13 @@
 package twigcs.ui;
 
-import java.text.Collator;
-
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.jface.viewers.ViewerComparator;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.dialogs.ElementTreeSelectionDialog;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
@@ -18,7 +18,7 @@ import org.eclipse.ui.model.WorkbenchLabelProvider;
  * @author Laurent Muller
  * @version 1.0
  */
-public class SelectionResourceDialog extends ElementTreeSelectionDialog {
+public class ResourceSelectionDialog extends ElementTreeSelectionDialog {
 
 	/**
 	 * Creates a new instance of this class.
@@ -28,10 +28,10 @@ public class SelectionResourceDialog extends ElementTreeSelectionDialog {
 	 * @param project
 	 *            the root project.
 	 */
-	public SelectionResourceDialog(final Shell parent, final IProject project) {
+	public ResourceSelectionDialog(final Shell parent, final IProject project) {
 		super(parent, new WorkbenchLabelProvider(),
 				new ResourceContentProvider(project));
-		setComparator(new ViewerComparator(Collator.getInstance()));
+		setComparator(new ResourceViewerComparator());
 		setValidator(new ResourceValidator());
 		setDoubleClickSelects(false);
 		setHelpAvailable(false);
@@ -46,9 +46,30 @@ public class SelectionResourceDialog extends ElementTreeSelectionDialog {
 		setTitle("Resource selection");
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public IResource getFirstResult() {
 		final Object result = super.getFirstResult();
 		return result instanceof IResource ? (IResource) result : null;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected TreeViewer doCreateTreeViewer(Composite parent, int style) {
+		final TreeViewer viewer = super.doCreateTreeViewer(parent, style);
+		viewer.setAutoExpandLevel(2);
+		return viewer;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected void updateStatus(IStatus status) {
+		super.updateStatus(status);
 	}
 }
