@@ -19,6 +19,5 @@ Export-Package: twigcs,
  twigcs.io,
  twigcs.model,
  twigcs.preferences,
- twigcs.properties,
  twigcs.ui
 Bundle-Activator: twigcs.TwigcsPlugin

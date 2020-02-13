@@ -107,7 +107,7 @@
     <extension
         point="org.eclipse.ui.propertyPages">
         <page
-            class="twigcs.properties.TwigcsProjectPropertyPage"
+            class="twigcs.preferences.TwigcsProjectPropertyPage"
             id="twigcs.properties.TwigcsProjectPropertyPage"
             name="Twigcs">
             <filter

@@ -10,6 +10,7 @@ package twigcs.core;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.eclipse.core.resources.IFile;
@@ -21,6 +22,7 @@ import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -67,10 +69,26 @@ public class ResourceVisitor
 	 */
 	private Gson gson;
 
+	/*
+	 * the progress monitor
+	 */
+	private final IProgressMonitor monitor;
+
 	/**
 	 * Creates a new instance of this class.
+	 *
+	 * @param project
+	 *            the project to visit.
+	 * @param monitor
+	 *            the progress monitor.
 	 */
-	public ResourceVisitor(final ProjectPreferences preferences) {
+	public ResourceVisitor(final IProject project,
+			final IProgressMonitor monitor) throws CoreException {
+		this.monitor = monitor;
+
+		// get preferences
+		final ProjectPreferences preferences = new ProjectPreferences(project);
+
 		// get include paths
 		includePaths = preferences.getIncludeResources().stream()
 				.map(IResource::getProjectRelativePath)
@@ -90,11 +108,22 @@ public class ResourceVisitor
 	 */
 	@Override
 	public boolean visit(final IResource resource) throws CoreException {
-		if (!isFiltered(resource)) {
-			check(resource);
-			return true;
+		if (resource.exists()) {
+			final IPath path = resource.getFullPath();
+			System.out.println("Visit   : " + path);
+			if (resource instanceof IFile) {
+				final IFile file = (IFile) resource;
+				if (isTwigFile(file)) {
+					deleteMarkers(file);
+					if (!isFiltered(file)) {
+						System.out.println("Validate: " + path);
+						validate(file);
+					}
+				}
+			}
 		}
-		return false;
+
+		return !monitor.isCanceled();
 	}
 
 	/**
@@ -102,18 +131,29 @@ public class ResourceVisitor
 	 */
 	@Override
 	public boolean visit(final IResourceDelta delta) throws CoreException {
-		final IResource resource = delta.getResource();
-		if (!isFiltered(resource)) {
-			switch (delta.getKind()) {
-			case IResourceDelta.ADDED:
-			case IResourceDelta.CHANGED:
-				check(resource);
-				break;
-			}
-			return true;
-		}
-		return false;
+		return visit(delta.getResource());
 	}
+
+	// /**
+	// * Validate the given resource.
+	// *
+	// * @param resource
+	// * the resource to verify.
+	// * @throws CoreException
+	// * if an exception occurs while validating the resource.
+	// */
+	// private void check(final IResource resource) throws CoreException {
+	// if (isTwigFile(resource)) {
+	// // convert
+	// final IFile file = (IFile) resource;
+	//
+	// // remove markers
+	// // deleteMarkers(file);
+	//
+	// // process
+	// validate(file);
+	// }
+	// }
 
 	/**
 	 * Creates and returns the marker for the given violation.
@@ -169,27 +209,6 @@ public class ResourceVisitor
 	}
 
 	/**
-	 * Validate the given resource.
-	 *
-	 * @param resource
-	 *            the resource to verify.
-	 * @throws CoreException
-	 *             if an exception occurs while validating the resource.
-	 */
-	private void check(final IResource resource) throws CoreException {
-		if (isTwigFile(resource)) {
-			// convert
-			final IFile file = (IFile) resource;
-
-			// remove markers
-			deleteMarkers(file);
-
-			// process
-			processFile(file);
-		}
-	}
-
-	/**
 	 * Delete all marker of the given file.
 	 *
 	 * @param file
@@ -216,32 +235,33 @@ public class ResourceVisitor
 	}
 
 	/**
-	 * Returns if the given resource is filtered.
+	 * Returns if the given file is filtered.
 	 *
-	 * @param resource
-	 *            the resource to be tested.
+	 * @param file
+	 *            the file to be tested.
 	 * @return <code>true</code> if filtered; <code>false</code> to visit.
 	 */
-	private boolean isFiltered(final IResource resource) {
+	private boolean isFiltered(final IFile file) {
 		// filter?
-		if (noFilter || resource instanceof IProject) {
+		if (noFilter) {
 			return false;
 		}
 
-		// relative path
-		final IPath path = resource.getProjectRelativePath();
+		// predicate
+		final IPath path = file.getProjectRelativePath();
+		final Predicate<IPath> isPrefixOf = p -> p.isPrefixOf(path);
 
 		// include validation
 		if (includePaths.contains(path)) {
 			return false;
-		} else if (includePaths.stream().anyMatch(p -> p.isPrefixOf(path))) {
+		} else if (includePaths.stream().anyMatch(isPrefixOf)) {
 			return false;
 		}
 
 		// exclude validation
 		if (excludePaths.contains(path)) {
 			return true;
-		} else if (excludePaths.stream().anyMatch(p -> p.isPrefixOf(path))) {
+		} else if (excludePaths.stream().anyMatch(isPrefixOf)) {
 			return true;
 		}
 
@@ -250,15 +270,14 @@ public class ResourceVisitor
 	}
 
 	/**
-	 * Returns if the given resource is a Twig file.
+	 * Returns if the given file is a Twig file.
 	 *
-	 * @param resource
-	 *            the resource to validate.
+	 * @param file
+	 *            the file to validate.
 	 * @return <code>true</code> if a Twig file.
 	 */
-	private boolean isTwigFile(final IResource resource) {
-		return resource instanceof IFile
-				&& resource.getFileExtension().equalsIgnoreCase(TWIG_EXTENSION);
+	private boolean isTwigFile(final IFile file) {
+		return file.getFileExtension().equalsIgnoreCase(TWIG_EXTENSION);
 	}
 
 	/**
@@ -285,7 +304,7 @@ public class ResourceVisitor
 	 * @throws CoreException
 	 *             if an error occurs while processing the file.
 	 */
-	private void processFile(final IFile file) throws CoreException {
+	private void validate(final IFile file) throws CoreException {
 		try {
 			// run
 			final List<String> command = buildCommand(file);

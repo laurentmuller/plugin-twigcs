@@ -8,6 +8,9 @@
  */
 package twigcs.ui;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
@@ -20,15 +23,30 @@ import org.eclipse.ui.dialogs.ElementTreeSelectionDialog;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
 
 /**
- * Dialog to select a single folder or file.
+ * Dialog to select a single folder or eventually a file from a project.
  *
  * @author Laurent Muller
  * @version 1.0
  */
 public class ResourceSelectionDialog extends ElementTreeSelectionDialog {
 
+	/*
+	 * the display files option
+	 */
+	private boolean displayFiles = false;
+
+	/*
+	 * the excluded resources
+	 */
+	private List<IResource> excludeResources = new ArrayList<>();
+
+	/*
+	 * the content provider
+	 */
+	private ResourceContentProvider provider;
+
 	/**
-	 * Creates a new instance of this class.
+	 * Creates a new instance of this class. The files are not displayed.
 	 *
 	 * @param parent
 	 *            the parent shell.
@@ -39,8 +57,27 @@ public class ResourceSelectionDialog extends ElementTreeSelectionDialog {
 	 */
 	public ResourceSelectionDialog(final Shell parent, final IProject project,
 			final Object selection) {
+		this(parent, project, selection, false);
+	}
+
+	/**
+	 * Creates a new instance of this class.
+	 *
+	 * @param parent
+	 *            the parent shell.
+	 * @param project
+	 *            the root project.
+	 * @param selection
+	 *            the initial selection.
+	 * @param displayFiles
+	 *            <code>true</code> to display files; <code>false</code> to
+	 *            hide.
+	 */
+	public ResourceSelectionDialog(final Shell parent, final IProject project,
+			final Object selection, final boolean displayFiles) {
 		super(parent, new WorkbenchLabelProvider(),
 				new ResourceContentProvider(project));
+
 		setComparator(new ResourceViewerComparator());
 		setValidator(new ResourceValidator());
 		setDoubleClickSelects(false);
@@ -59,8 +96,17 @@ public class ResourceSelectionDialog extends ElementTreeSelectionDialog {
 		final IWorkspaceRoot root = workspace.getRoot();
 		setInput(root);
 
-		setMessage("&Choose a folder or a file:");
 		setTitle("Resource selection");
+		setDisplayFiles(displayFiles);
+	}
+
+	/**
+	 * Gets the resources to excludes.
+	 *
+	 * @return the resources to excludes.
+	 */
+	public List<IResource> getExcludeResources() {
+		return excludeResources;
 	}
 
 	/**
@@ -70,6 +116,65 @@ public class ResourceSelectionDialog extends ElementTreeSelectionDialog {
 	public IResource getFirstResult() {
 		final Object result = super.getFirstResult();
 		return result instanceof IResource ? (IResource) result : null;
+	}
+
+	/**
+	 * Returns if the files are displayed. The default value <code>false</code>.
+	 *
+	 * @return <code>true</code> to display files; <code>false</code> to hide.
+	 */
+	public boolean isDisplayFiles() {
+		return displayFiles;
+	}
+
+	/**
+	 * Sets if the files are display. This property must be set before opening
+	 * this dialog.
+	 *
+	 * @param displayFiles
+	 *            <code>true</code> to display files; <code>false</code> to
+	 *            hide.
+	 */
+	public void setDisplayFiles(final boolean displayFiles) {
+		if (displayFiles) {
+			setMessage("&Choose a folder or a file:");
+		} else {
+			setMessage("&Choose a folder:");
+		}
+		if (provider != null) {
+			provider.setDisplayFiles(displayFiles);
+			getTreeViewer().refresh();
+		}
+		this.displayFiles = displayFiles;
+	}
+
+	/**
+	 * Sets the resources to exclude. This property must be set before opening
+	 * this dialog.
+	 *
+	 * @param excludeResources
+	 *            the resources to exclude.
+	 */
+	public void setExcludeResources(final List<IResource> excludeResources) {
+		if (excludeResources == null) {
+			this.excludeResources = new ArrayList<>();
+		} else {
+			this.excludeResources = excludeResources;
+		}
+		if (provider != null) {
+			provider.setExcludeResources(this.excludeResources);
+			getTreeViewer().refresh();
+		}
+	}
+
+	@Override
+	protected TreeViewer createTreeViewer(final Composite parent) {
+		final TreeViewer viewer = super.createTreeViewer(parent);
+		provider = (ResourceContentProvider) viewer.getContentProvider();
+		provider.setExcludeResources(excludeResources);
+		provider.setDisplayFiles(displayFiles);
+		viewer.refresh();
+		return viewer;
 	}
 
 	/**

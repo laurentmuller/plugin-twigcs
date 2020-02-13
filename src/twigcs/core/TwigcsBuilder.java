@@ -44,7 +44,7 @@ public class TwigcsBuilder extends IncrementalProjectBuilder
 	}
 
 	/**
-	 * Invokes the build method of the this builder for all accessible project.
+	 * Invokes the build method of the this builder for all accessible projects.
 	 *
 	 * @param kind
 	 *            the kind of build being requested. Valid values are:
@@ -63,12 +63,38 @@ public class TwigcsBuilder extends IncrementalProjectBuilder
 	public static void triggerBuild(final int kind) throws CoreException {
 		final List<IProject> projects = getProjects();
 		for (final IProject project : projects) {
+			triggerBuild(project, kind);
+		}
+	}
+
+	/**
+	 * Invokes the build method of the this builder for the given project.
+	 *
+	 * @param project
+	 *            the project to build.
+	 * @param kind
+	 *            the kind of build being requested. Valid values are:
+	 *            <ul>
+	 *            <li>{@link IncrementalProjectBuilder#FULL_BUILD}- indicates a
+	 *            full build.</li>
+	 *            <li>{@link IncrementalProjectBuilder#INCREMENTAL_BUILD}-
+	 *            indicates a incremental build.</li>
+	 *            <li>{@link IncrementalProjectBuilder#CLEAN_BUILD}- indicates a
+	 *            clean request. Clean does not actually build anything, but
+	 *            rather discards all problems and build states.</li>
+	 *            </ul>
+	 * @throws CoreException
+	 *             if the build fails.
+	 */
+	public static void triggerBuild(final IProject project, final int kind)
+			throws CoreException {
+		if (project.isAccessible()) {
 			project.build(kind, BUILDER_ID, null, null);
 		}
 	}
 
 	/**
-	 * Trigger a clean build for all accessible project.
+	 * Trigger a clean build for all accessible projects.
 	 *
 	 * @throws CoreException
 	 *             if the build fails.
@@ -79,7 +105,21 @@ public class TwigcsBuilder extends IncrementalProjectBuilder
 	}
 
 	/**
-	 * Trigger a full build for all accessible project.
+	 * Trigger a clean build for the given project.
+	 *
+	 * @param project
+	 *            the project to build.
+	 * @throws CoreException
+	 *             if the build fails.
+	 * @see IncrementalProjectBuilder#CLEAN_BUILD
+	 */
+	public static void triggerCleanBuild(final IProject project)
+			throws CoreException {
+		triggerBuild(project, IncrementalProjectBuilder.CLEAN_BUILD);
+	}
+
+	/**
+	 * Trigger a full build for all accessible projects.
 	 *
 	 * @throws CoreException
 	 *             if the build fails.
@@ -87,6 +127,20 @@ public class TwigcsBuilder extends IncrementalProjectBuilder
 	 */
 	public static void triggerFullBuild() throws CoreException {
 		triggerBuild(IncrementalProjectBuilder.FULL_BUILD);
+	}
+
+	/**
+	 * Trigger a full build for the given project.
+	 *
+	 * @param project
+	 *            the project to build.
+	 * @throws CoreException
+	 *             if the build fails.
+	 * @see IncrementalProjectBuilder#FULL_BUILD
+	 */
+	public static void triggerFullBuild(final IProject project)
+			throws CoreException {
+		triggerBuild(project, IncrementalProjectBuilder.FULL_BUILD);
 	}
 
 	/**
@@ -124,9 +178,13 @@ public class TwigcsBuilder extends IncrementalProjectBuilder
 	 * @throws CoreException
 	 *             if an exception occurs.
 	 */
-	protected void fullBuild(final IProgressMonitor monitor)
+	private void fullBuild(final IProgressMonitor monitor)
 			throws CoreException {
-		getProject().accept(new ResourceVisitor(getPreferences()));
+		final IProject project = getProject();
+		System.out.println("Start full build: " + project.getFullPath());
+		project.accept(new ResourceVisitor(project, monitor));
+		System.out.println("End full build");
+		System.out.println();
 	}
 
 	/**
@@ -137,18 +195,13 @@ public class TwigcsBuilder extends IncrementalProjectBuilder
 	 * @throws CoreException
 	 *             if an exception occurs.
 	 */
-	protected void incrementalBuild(final IResourceDelta delta,
+	private void incrementalBuild(final IResourceDelta delta,
 			final IProgressMonitor monitor) throws CoreException {
-		delta.accept(new ResourceVisitor(getPreferences()));
-	}
-
-	/**
-	 * Gets the project preferences.
-	 *
-	 * @return the project preferences.
-	 */
-	private ProjectPreferences getPreferences() {
 		final IProject project = getProject();
-		return new ProjectPreferences(project);
+		System.out.println(
+				"Start incremental build:" + delta.getResource().getFullPath());
+		delta.accept(new ResourceVisitor(project, monitor));
+		System.out.println("End incremental build");
+		System.out.println();
 	}
 }

@@ -6,13 +6,14 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-package twigcs.properties;
+package twigcs.preferences;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -27,8 +28,10 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.ui.dialogs.PropertyPage;
 import org.osgi.service.prefs.BackingStoreException;
 
+import twigcs.TwigcsPlugin;
 import twigcs.core.IConstants;
 import twigcs.core.ProjectPreferences;
+import twigcs.core.TwigcsBuilder;
 import twigcs.ui.DragDropViewer;
 import twigcs.ui.ResourceSelectionDialog;
 import twigcs.ui.ResourceTableViewer;
@@ -46,7 +49,11 @@ public class TwigcsProjectPropertyPage extends PropertyPage
 	private ResourceTableViewer includeViewer;
 	private ResourceTableViewer excludeViewer;
 
-	// lists
+	// original lists
+	private List<IResource> oldIncludeList;
+	private List<IResource> oldExcludeList;
+
+	// modified lists
 	private List<IResource> includeList;
 	private List<IResource> excludeList;
 
@@ -78,12 +85,24 @@ public class TwigcsProjectPropertyPage extends PropertyPage
 	@Override
 	public boolean performOk() {
 		try {
-			// save
-			final ProjectPreferences preferences = getPreferences();
-			preferences.setIncludeResources(includeList);
-			preferences.setExcludeResources(excludeList);
-			preferences.flush();
+			// change?
+			if (!oldIncludeList.equals(includeList)
+					|| !oldExcludeList.equals(excludeList)) {
+				// save
+				final ProjectPreferences preferences = getPreferences();
+				preferences.setIncludeResources(includeList);
+				preferences.setExcludeResources(excludeList);
+				preferences.flush();
+
+				// build
+				TwigcsBuilder.triggerCleanBuild(getElement());
+			}
 		} catch (final BackingStoreException e) {
+			TwigcsPlugin.handleError(
+					createErrorStatus("Failed to save preferences", e));
+			return false;
+		} catch (final CoreException e) {
+			TwigcsPlugin.handleError(e.getStatus());
 			return false;
 		}
 
@@ -97,19 +116,22 @@ public class TwigcsProjectPropertyPage extends PropertyPage
 	protected Composite createContents(final Composite parent) {
 		// get lists
 		final ProjectPreferences preferences = getPreferences();
-		includeList = preferences.getIncludeResources();
-		excludeList = preferences.getExcludeResources();
+		oldIncludeList = preferences.getIncludeResources();
+		oldExcludeList = preferences.getExcludeResources();
+
+		includeList = new ArrayList<IResource>(oldIncludeList);
+		excludeList = new ArrayList<IResource>(oldExcludeList);
 
 		// container
 		final Composite container = createComposite(parent, 1);
 
 		// include viewer
 		includeViewer = createViewer(container, includeList,
-				"Folders and files to &include:");
+				"Folders to &include:");
 
 		// exclude viewer
 		excludeViewer = createViewer(container, excludeList,
-				"Folders and files to e&xclude:");
+				"Folders to e&xclude:");
 
 		// note label
 		final Label label = createLabel(container,
@@ -130,10 +152,19 @@ public class TwigcsProjectPropertyPage extends PropertyPage
 	@Override
 	protected void performDefaults() {
 		// clear
-		includeList = new ArrayList<>();
-		excludeList = new ArrayList<>();
-		includeViewer.setInput(includeList);
-		excludeViewer.setInput(excludeList);
+		includeList.clear();
+		excludeList.clear();
+
+		// find templates folder
+		final IResource templates = getElement().findMember("templates");
+		if (templates != null) {
+			includeList.add(templates);
+			includeViewer.refresh();
+		}
+
+		// update
+		includeViewer.refresh();
+		excludeViewer.refresh();
 
 		super.performDefaults();
 	}
@@ -188,8 +219,8 @@ public class TwigcsProjectPropertyPage extends PropertyPage
 	 *            the label's text.
 	 * @return the newly created label.
 	 */
-	private Label createLabel(final Composite parent, String text,
-			int columns) {
+	private Label createLabel(final Composite parent, final String text,
+			final int columns) {
 		final Label label = new Label(parent, SWT.WRAP);
 		if (text != null) {
 			label.setText(text);
@@ -362,8 +393,15 @@ public class TwigcsProjectPropertyPage extends PropertyPage
 	 */
 	private IResource selectResource(final Object selection) {
 		final IProject project = getElement();
+		final List<IResource> list = new ArrayList<>();
+		list.addAll(includeList);
+		list.addAll(excludeList);
+		list.remove(selection);
+
 		final ResourceSelectionDialog dlg = new ResourceSelectionDialog(
 				getShell(), project, selection);
+		dlg.setExcludeResources(list);
+
 		if (Window.OK == dlg.open()) {
 			return dlg.getFirstResult();
 		}

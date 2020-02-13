@@ -85,7 +85,8 @@ public class TwigcsPreferencesPage extends FieldEditorPreferencePage implements
 				store.save();
 
 				// rebuild
-				TwigcsBuilder.triggerFullBuild();
+				// TwigcsBuilder.triggerFullBuild();
+				TwigcsBuilder.triggerCleanBuild();
 
 			} catch (final IOException e) {
 				TwigcsPlugin.handleError(
