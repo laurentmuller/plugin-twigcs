@@ -1,7 +1,14 @@
+/**
+ * This file is part of the twigcs-plugin package.
+ *
+ * (c) Laurent Muller <bibi@bibi.nu>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 package twigcs.properties;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.core.resources.IProject;
@@ -9,14 +16,8 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.viewers.ViewerDropAdapter;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.dnd.DND;
-import org.eclipse.swt.dnd.DragSourceAdapter;
-import org.eclipse.swt.dnd.DragSourceEvent;
-import org.eclipse.swt.dnd.Transfer;
-import org.eclipse.swt.dnd.TransferData;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -24,11 +25,11 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.ui.dialogs.PropertyPage;
-import org.eclipse.ui.part.ResourceTransfer;
 import org.osgi.service.prefs.BackingStoreException;
 
 import twigcs.core.IConstants;
 import twigcs.core.ProjectPreferences;
+import twigcs.ui.DragDropViewer;
 import twigcs.ui.ResourceSelectionDialog;
 import twigcs.ui.ResourceTableViewer;
 
@@ -104,7 +105,7 @@ public class TwigcsProjectPropertyPage extends PropertyPage
 
 		// include viewer
 		includeViewer = createViewer(container, includeList,
-				"Folders and files to &validate:");
+				"Folders and files to &include:");
 
 		// exclude viewer
 		excludeViewer = createViewer(container, excludeList,
@@ -116,8 +117,8 @@ public class TwigcsProjectPropertyPage extends PropertyPage
 				1);
 		((GridData) label.getLayoutData()).widthHint = 250;
 
-		// drag and drop
-		addDragDropSupport(includeViewer, includeList, excludeViewer,
+		// add drag and drop support
+		new DragDropViewer<IResource>(includeViewer, includeList, excludeViewer,
 				excludeList);
 
 		return container;
@@ -138,90 +139,6 @@ public class TwigcsProjectPropertyPage extends PropertyPage
 	}
 
 	/**
-	 * Adds drag and drop support between the 2 viewers.
-	 *
-	 * @param sourceViewer
-	 *            the source viewer.
-	 * @param targetViewer
-	 *            the target viewer.
-	 */
-	private void addDragDropSupport(ResourceTableViewer sourceViewer,
-			List<IResource> sourceList, ResourceTableViewer targetViewer,
-			List<IResource> targetList) {
-
-		final int operations = DND.DROP_MOVE;
-		final ResourceTransfer transfer = ResourceTransfer.getInstance();
-		final Transfer[] types = new Transfer[] { transfer };
-
-		final DragSourceAdapter dragAdapter = new DragSourceAdapter() {
-			@Override
-			public void dragSetData(DragSourceEvent event) {
-				final IResource[] resources = getResources();
-				if (resources != null) {
-					event.data = resources;
-				} else {
-					event.doit = false;
-				}
-			}
-
-			private IResource[] getResources() {
-				final Object[] data = sourceViewer.getStructuredSelection()
-						.toArray();
-				if (data.length != 0) {
-					final IResource[] resources = new IResource[data.length];
-					System.arraycopy(data, 0, resources, 0, data.length);
-					return resources;
-				}
-				return null;
-			}
-		};
-		sourceViewer.addDragSupport(operations, types, dragAdapter);
-
-		// add drop
-		final ViewerDropAdapter dropAdapter = new ViewerDropAdapter(
-				targetViewer) {
-			@Override
-			public boolean performDrop(Object data) {
-				final List<IResource> list = getResources(data);
-				if (list != null) {
-					// move
-					sourceList.removeAll(list);
-					targetList.addAll(list);
-
-					// update viewers
-					sourceViewer.refresh();
-					targetViewer.refresh();
-
-					// select
-					targetViewer.setSelection(new StructuredSelection(list));
-
-					return true;
-				}
-				return false;
-			}
-
-			@Override
-			public boolean validateDrop(Object target, int operation,
-					TransferData transferType) {
-				if (!transfer.isSupportedType(transferType)) {
-					return false;
-				}
-				return true;
-			}
-
-			private List<IResource> getResources(Object data) {
-				if (data instanceof IResource[]) {
-					final IResource[] resources = (IResource[]) data;
-					return Arrays.asList(resources);
-				}
-				return null;
-			}
-		};
-		dropAdapter.setFeedbackEnabled(false);
-		targetViewer.addDropSupport(operations, types, dropAdapter);
-	}
-
-	/**
 	 * Adds a resource.
 	 *
 	 * @param viewer
@@ -232,11 +149,13 @@ public class TwigcsProjectPropertyPage extends PropertyPage
 	private void addResources(final ResourceTableViewer viewer,
 			final List<IResource> list) {
 		final IResource resource = selectResource(null);
-		if (resource != null && !list.contains(resource)) {
-			list.add(resource);
-			viewer.refresh();
+		if (resource != null) {
+			if (!list.contains(resource)) {
+				list.add(resource);
+				viewer.refresh();
+			}
+			viewer.setSelection(new StructuredSelection(resource));
 		}
-		viewer.setSelection(new StructuredSelection(resource));
 	}
 
 	/**
@@ -444,12 +363,7 @@ public class TwigcsProjectPropertyPage extends PropertyPage
 	private IResource selectResource(final Object selection) {
 		final IProject project = getElement();
 		final ResourceSelectionDialog dlg = new ResourceSelectionDialog(
-				getShell(), project);
-
-		if (selection != null) {
-			dlg.setInitialSelection(selection);
-		}
-
+				getShell(), project, selection);
 		if (Window.OK == dlg.open()) {
 			return dlg.getFirstResult();
 		}

@@ -1,3 +1,11 @@
+/**
+ * This file is part of the twigcs-plugin package.
+ *
+ * (c) Laurent Muller <bibi@bibi.nu>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 package twigcs.ui;
 
 import org.eclipse.core.resources.IProject;
@@ -5,7 +13,6 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
@@ -27,8 +34,11 @@ public class ResourceSelectionDialog extends ElementTreeSelectionDialog {
 	 *            the parent shell.
 	 * @param project
 	 *            the root project.
+	 * @param selection
+	 *            the initial selection.
 	 */
-	public ResourceSelectionDialog(final Shell parent, final IProject project) {
+	public ResourceSelectionDialog(final Shell parent, final IProject project,
+			final Object selection) {
 		super(parent, new WorkbenchLabelProvider(),
 				new ResourceContentProvider(project));
 		setComparator(new ResourceViewerComparator());
@@ -36,6 +46,13 @@ public class ResourceSelectionDialog extends ElementTreeSelectionDialog {
 		setDoubleClickSelects(false);
 		setHelpAvailable(false);
 		setAllowMultiple(false);
+
+		// selection
+		if (selection != null) {
+			setInitialSelection(selection);
+		} else {
+			setInitialSelection(project);
+		}
 
 		// input
 		final IWorkspace workspace = ResourcesPlugin.getWorkspace();
@@ -59,17 +76,10 @@ public class ResourceSelectionDialog extends ElementTreeSelectionDialog {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected TreeViewer doCreateTreeViewer(Composite parent, int style) {
+	protected TreeViewer doCreateTreeViewer(final Composite parent,
+			final int style) {
 		final TreeViewer viewer = super.doCreateTreeViewer(parent, style);
 		viewer.setAutoExpandLevel(2);
 		return viewer;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected void updateStatus(IStatus status) {
-		super.updateStatus(status);
 	}
 }

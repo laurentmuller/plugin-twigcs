@@ -1,3 +1,11 @@
+/**
+ * This file is part of the twigcs-plugin package.
+ *
+ * (c) Laurent Muller <bibi@bibi.nu>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 package twigcs.ui;
 
 import java.util.ArrayList;
@@ -11,19 +19,32 @@ import org.eclipse.ui.model.BaseWorkbenchContentProvider;
 import twigcs.core.IConstants;
 
 /**
- * Extends the workbench content provider by filtering folders and files.
+ * Extends the workbench content provider by displaying only folders and Twig
+ * files.
  *
  * @author Laurent Muller
  */
 public class ResourceContentProvider extends BaseWorkbenchContentProvider
 		implements IConstants {
 
+	/*
+	 *  the root project
+	 */
 	private final IProject project;
 
+	/**
+	 * Creates a new instance of this class.
+	 *
+	 * @param project
+	 *            the root project
+	 */
 	public ResourceContentProvider(final IProject project) {
 		this.project = project;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public Object[] getChildren(final Object element) {
 		final Object[] children = super.getChildren(element);

@@ -1,5 +1,16 @@
+/**
+ * This file is part of the twigcs-plugin package.
+ *
+ * (c) Laurent Muller <bibi@bibi.nu>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 package twigcs.preferences;
 
+import java.io.IOException;
+
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.preference.ComboFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.FileFieldEditor;
@@ -8,8 +19,11 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
+import org.eclipse.ui.preferences.ScopedPreferenceStore;
 
 import twigcs.TwigcsPlugin;
+import twigcs.core.IConstants;
+import twigcs.core.TwigcsBuilder;
 import twigcs.model.TwigReporter;
 import twigcs.model.TwigSeverity;
 import twigcs.model.TwigVersion;
@@ -20,16 +34,16 @@ import twigcs.model.TwigVersion;
  * @author Laurent Muller
  * @version 1.0
  */
-public class TwigcsPreferencesPage extends FieldEditorPreferencePage
-		implements IWorkbenchPreferencePage, TwigcsPreferencesConstants {
+public class TwigcsPreferencesPage extends FieldEditorPreferencePage implements
+		IWorkbenchPreferencePage, TwigcsPreferencesConstants, IConstants {
 
 	/**
 	 * Creates a new instance of this class.
 	 */
 	public TwigcsPreferencesPage() {
 		super(GRID);
-		setPreferenceStore(TwigcsPlugin.getDefault().getPreferenceStore());
 		setDescription("Sets the default values to use for running Twigcs.");
+		setPreferenceStore(TwigcsPlugin.getDefault().getPreferenceStore());
 	}
 
 	/**
@@ -47,7 +61,42 @@ public class TwigcsPreferencesPage extends FieldEditorPreferencePage
 	 * {@inheritDoc}
 	 */
 	@Override
+	public ScopedPreferenceStore getPreferenceStore() {
+		return (ScopedPreferenceStore) super.getPreferenceStore();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public void init(final IWorkbench workbench) {
+	}
+
+	@Override
+	public boolean performOk() {
+		// default
+		final boolean result = super.performOk();
+
+		// changes?
+		final ScopedPreferenceStore store = getPreferenceStore();
+		if (store.needsSaving()) {
+			try {
+				// save
+				store.save();
+
+				// rebuild
+				TwigcsBuilder.triggerFullBuild();
+
+			} catch (final IOException e) {
+				TwigcsPlugin.handleError(
+						createErrorStatus("Failed to save preferences", e));
+				return false;
+			} catch (final CoreException e) {
+				TwigcsPlugin.handleError(e.getStatus());
+				return false;
+			}
+		}
+		return result;
 	}
 
 	/**
@@ -60,8 +109,8 @@ public class TwigcsPreferencesPage extends FieldEditorPreferencePage
 	 * @param clazz
 	 *            the enumeration class.
 	 */
-	private void addEnumEditor(String key, String labelText,
-			Class<? extends Enum<?>> clazz) {
+	private void addEnumEditor(final String key, final String labelText,
+			final Class<? extends Enum<?>> clazz) {
 		addField(new ComboFieldEditor(key, labelText, getEnumNames(clazz),
 				getFieldEditorParent()));
 	}
@@ -73,7 +122,7 @@ public class TwigcsPreferencesPage extends FieldEditorPreferencePage
 		final FileFieldEditor editor = new FileFieldEditor(P_EXECUTABLE_PATH,
 				"Twigcs &Path", true, getFieldEditorParent()) {
 			@Override
-			protected Text createTextWidget(Composite parent) {
+			protected Text createTextWidget(final Composite parent) {
 				final Text text = super.createTextWidget(parent);
 				text.addListener(SWT.FocusIn, e -> {
 					((Text) e.widget).selectAll();
@@ -93,7 +142,7 @@ public class TwigcsPreferencesPage extends FieldEditorPreferencePage
 	 *            the enumeration class.
 	 * @return an array with the enumeration names.
 	 */
-	private String[][] getEnumNames(Class<? extends Enum<?>> clazz) {
+	private String[][] getEnumNames(final Class<? extends Enum<?>> clazz) {
 		final Enum<?>[] values = clazz.getEnumConstants();
 		final String[][] result = new String[values.length][2];
 		for (int i = 0; i < values.length; i++) {
@@ -110,7 +159,18 @@ public class TwigcsPreferencesPage extends FieldEditorPreferencePage
 	 *            the string to convert.
 	 * @return the converted string.
 	 */
-	private String toProperCase(String text) {
-		return Character.toUpperCase(text.charAt(0)) + text.substring(1);
+	private String toProperCase(final String text) {
+		return Character.toUpperCase(text.charAt(0))
+				+ text.substring(1).replace('_', ' ').toLowerCase();
+	}
+
+	/**
+	 * Trigger a clean build for all accessible projects.
+	 *
+	 * @throws CoreException
+	 *             if the build fails.
+	 */
+	void triggerCleanBuild() throws CoreException {
+		TwigcsBuilder.triggerCleanBuild();
 	}
 }

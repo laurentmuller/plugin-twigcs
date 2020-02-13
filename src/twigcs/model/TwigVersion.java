@@ -1,3 +1,11 @@
+/**
+ * This file is part of the twigcs-plugin package.
+ *
+ * (c) Laurent Muller <bibi@bibi.nu>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 package twigcs.model;
 
 /**
@@ -8,9 +16,20 @@ package twigcs.model;
  */
 public enum TwigVersion {
 
-	V1("1"), //
-	V2("2"), //
-	V3("3");
+	/**
+	 * The version 1.0.
+	 */
+	VERSION_1("1"),
+
+	/**
+	 * The version 2.0.
+	 */
+	VERSION_2("2"),
+
+	/**
+	 * The version 3.0.
+	 */
+	VERSION_3("3");
 
 	private final String version;
 
@@ -26,5 +45,4 @@ public enum TwigVersion {
 	public String version() {
 		return version;
 	}
-
 }

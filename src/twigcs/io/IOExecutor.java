@@ -1,6 +1,15 @@
+/**
+ * This file is part of the twigcs-plugin package.
+ *
+ * (c) Laurent Muller <bibi@bibi.nu>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 package twigcs.io;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * Class to execute a process.
@@ -19,13 +28,14 @@ public class IOExecutor {
 	 * the output exception
 	 */
 	private IOException outputException;
+
 	/*
 	 * the error message
 	 */
 	private String error;
 
 	/*
-	 * the output exception
+	 * the error exception
 	 */
 	private IOException errorException;
 
@@ -55,7 +65,7 @@ public class IOExecutor {
 	/**
 	 * Gets the exit code. By convention, the value 0 indicates normal
 	 * termination.
-	 * 
+	 *
 	 * @return the exit code.
 	 */
 	public int getExitCode() {
@@ -84,18 +94,30 @@ public class IOExecutor {
 	 * Runs the given command.
 	 *
 	 * @param command
+	 *            a string list containing the program and its arguments.
+	 * @return the exit code. By convention, the value 0 indicates normal
+	 *         termination.
+	 * @throws IOException
+	 *             if I/O exception occurs.
+	 */
+	public int run(final List<String> command) throws IOException {
+		return this.run(command.toArray(new String[command.size()]));
+	}
+
+	/**
+	 * Runs the given command.
+	 *
+	 * @param command
 	 *            a string array containing the program and its arguments.
 	 * @return the exit code. By convention, the value 0 indicates normal
 	 *         termination.
 	 * @throws IOException
 	 *             if I/O exception occurs.
-	 * @throws InterruptedException
-	 *             if any thread has interrupted the current thread.
 	 */
-	public int run(final String... command)
-			throws IOException, InterruptedException {
+	public int run(final String... command) throws IOException {
 
 		// clear
+		exitCode = 0;
 		output = error = null;
 		outputException = errorException = null;
 
@@ -115,19 +137,25 @@ public class IOExecutor {
 		outputThread.start();
 		errorThread.start();
 
-		// wait
-		exitCode = process.waitFor();
+		try {
+			// wait
+			exitCode = process.waitFor();
 
-		// Handle condition where the process ends before the threads finish
-		outputThread.join();
-		errorThread.join();
+			// Handle condition where the process ends before the threads finish
+			outputThread.join();
+			errorThread.join();
 
-		// save
-		output = outputStream.toString();
-		outputException = outputStream.getException();
-		error = errorStream.toString();
-		errorException = errorStream.getException();
+			// save
+			output = outputStream.toString();
+			outputException = outputStream.getException();
+			error = errorStream.toString();
+			errorException = errorStream.getException();
 
-		return exitCode;
+			return exitCode;
+
+		} catch (final InterruptedException e) {
+			throw new IOException(
+					"A thread has interrupted the current thread.", e);
+		}
 	}
 }

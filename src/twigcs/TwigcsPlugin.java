@@ -1,12 +1,18 @@
+/**
+ * This file is part of the twigcs-plugin package.
+ *
+ * (c) Laurent Muller <bibi@bibi.nu>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 package twigcs;
 
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.eclipse.ui.preferences.ScopedPreferenceStore;
+import org.eclipse.ui.statushandlers.StatusManager;
 import org.osgi.framework.BundleContext;
-
-import twigcs.core.IConstants;
 
 /**
  * The Twigcs Plugin.
@@ -14,63 +20,12 @@ import twigcs.core.IConstants;
  * @author Laurent Muller
  * @version 1.0
  */
-public class TwigcsPlugin extends AbstractUIPlugin implements IConstants {
+public class TwigcsPlugin extends AbstractUIPlugin {
 
 	/*
 	 * The shared instance
 	 */
 	private static TwigcsPlugin plugin;
-
-	/**
-	 * Creates a core exception.
-	 *
-	 * @param message
-	 *            the status message.
-	 * @return the core exception.
-	 */
-	public static CoreException createCoreException(String message) {
-		return createCoreException(message, null);
-	}
-
-	/**
-	 * Creates a core exception.
-	 *
-	 * @param message
-	 *            the status message.
-	 * @param exception
-	 *            a low-level exception, or <code>null</code> if not applicable.
-	 * @return the core exception.
-	 */
-	public static CoreException createCoreException(String message,
-			Throwable exception) {
-		final IStatus status = createErrorStatus(message, exception);
-		return new CoreException(status);
-	}
-
-	/**
-	 * Creates an error status.
-	 *
-	 * @param message
-	 *            the status message.
-	 * @return the error status.
-	 */
-	public static IStatus createErrorStatus(String message) {
-		return createErrorStatus(message, null);
-	}
-
-	/**
-	 * Creates an error status.
-	 *
-	 * @param message
-	 *            the status message.
-	 * @param exception
-	 *            a low-level exception, or <code>null</code> if not applicable.
-	 * @return the error status.
-	 */
-	public static IStatus createErrorStatus(String message,
-			Throwable exception) {
-		return new Status(IStatus.ERROR, PLUGIN_ID, message, exception);
-	}
 
 	/**
 	 * Gets the shared instance.
@@ -82,9 +37,26 @@ public class TwigcsPlugin extends AbstractUIPlugin implements IConstants {
 	}
 
 	/**
+	 * Handles the given error status.
+	 *
+	 * @param status
+	 *            the status to handle.
+	 */
+	public static void handleError(final IStatus status) {
+		if (status != null) {
+			StatusManager.getManager().handle(status);
+		}
+	}
+
+	/**
 	 * Creates a new instance of this class.
 	 */
 	public TwigcsPlugin() {
+	}
+
+	@Override
+	public ScopedPreferenceStore getPreferenceStore() {
+		return (ScopedPreferenceStore) super.getPreferenceStore();
 	}
 
 	/**

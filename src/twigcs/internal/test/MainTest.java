@@ -1,12 +1,13 @@
-package twigcs;
+package twigcs.internal.test;
 
-import java.io.BufferedInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
+import java.util.List;
+
+import org.eclipse.core.runtime.CoreException;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
 
 import twigcs.core.TwigcsProcessor;
 import twigcs.gson.SeverityDeserializer;
@@ -19,14 +20,12 @@ import twigcs.model.TwigViolation;
 
 public class MainTest {
 
+	static final String EXEC_PATH = "C:/Users/muller/AppData/Roaming/Composer/vendor/bin/twigcs.bat";
+
 	public static void main(final String[] args) {
 		int exitCode = 1;
 		try {
-			final TwigcsProcessor processor = new TwigcsProcessor();
-			processor.setExec(
-					"C:\\Users\\muller\\AppData\\Roaming\\Composer\\vendor\\bin\\twigcs.bat");
-			processor.setTwigVersion(TwigVersion.V2);
-			processor.setSeverity(TwigSeverity.ignore);
+			final TwigcsProcessor processor = getProcessor();
 			// processor.addSearchPath("D:/GitHub/calculation/templates/user");
 			processor.addSearchPath(
 					"D:/GitHub/calculation/templates/user/user_rights.html.twig");
@@ -34,11 +33,9 @@ public class MainTest {
 			// "D:/GitHub/calculation/templates/user/user_theme.html.twig");
 			// processor.addSearchPath(
 			// "D:/GitHub/calculation/templates/user/user_card.html.twig");
-
 			// processor.addExcludePath("D:/GitHub/calculation/templates/user");
 
-			final String[] command = processor.buildCommand();
-
+			final List<String> command = processor.buildCommand();
 			final IOExecutor exec = new IOExecutor();
 			exitCode = exec.run(command);
 
@@ -75,7 +72,7 @@ public class MainTest {
 				}
 			}
 
-		} catch (final Exception e) {
+		} catch (final CoreException | IOException | JsonSyntaxException e) {
 			e.printStackTrace();
 		} finally {
 			System.out.println("Exit Code: " + exitCode);
@@ -90,15 +87,11 @@ public class MainTest {
 		return gsonBuilder.create();
 	}
 
-	static String readStream(final InputStream stream) throws IOException {
-		int len;
-		final byte[] bytes = new byte[8192];
-		final ByteArrayOutputStream output = new ByteArrayOutputStream(8192);
-		final BufferedInputStream buffer = new BufferedInputStream(stream);
-		while ((len = buffer.read(bytes)) != -1) {
-			output.write(bytes, 0, len);
-		}
-		return output.toString();
+	static TwigcsProcessor getProcessor() {
+		final TwigcsProcessor processor = new TwigcsProcessor();
+		processor.setProgramPath(EXEC_PATH);
+		processor.setSeverity(TwigSeverity.error);
+		processor.setTwigVersion(TwigVersion.VERSION_2);
+		return processor;
 	}
-
 }

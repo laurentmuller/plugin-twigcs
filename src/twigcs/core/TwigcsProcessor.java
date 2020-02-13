@@ -1,11 +1,25 @@
+/**
+ * This file is part of the twigcs-plugin package.
+ *
+ * (c) Laurent Muller <bibi@bibi.nu>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 package twigcs.core;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 
-import twigcs.TwigcsPlugin;
 import twigcs.model.TwigReporter;
 import twigcs.model.TwigSeverity;
 import twigcs.model.TwigVersion;
@@ -26,7 +40,8 @@ public class TwigcsProcessor implements IConstants {
 	 */
 	public static TwigcsProcessor instance() {
 		final TwigcsProcessor processor = new TwigcsProcessor();
-		processor.setExec(TwigcsPreferencesInitializer.getTwigExecutable());
+		processor.setProgramPath(
+				TwigcsPreferencesInitializer.getTwigExecutable());
 		processor.setSeverity(TwigcsPreferencesInitializer.getTwigSeverity());
 		processor.setReporter(TwigcsPreferencesInitializer.getTwigReporter());
 		processor.setTwigVersion(TwigcsPreferencesInitializer.getTwigVersion());
@@ -35,14 +50,14 @@ public class TwigcsProcessor implements IConstants {
 	}
 
 	/*
-	 * the Twigcs executable
+	 * the Twigcs executable path
 	 */
-	private String exec;
+	private String programPath;
 
 	/*
 	 * the twig version
 	 */
-	private TwigVersion twigVersion = TwigVersion.V3;
+	private TwigVersion twigVersion = TwigVersion.VERSION_3;
 
 	/*
 	 * the minimum severity level
@@ -113,22 +128,18 @@ public class TwigcsProcessor implements IConstants {
 	 * @throws CoreException
 	 *             if some parameters are missing or invalid.
 	 */
-	public String[] buildCommand() throws CoreException {
-		// check values
-		if (exec == null || exec.isEmpty()) {
-			throw TwigcsPlugin.createCoreException( //
-					"The Twigcs executable is not defined.");
-		}
-		if (searchPaths.isEmpty()) {
-			throw TwigcsPlugin.createCoreException( //
-					"The search paths are empty.");
+	public List<String> buildCommand() throws CoreException {
+		// check status
+		final IStatus status = validate();
+		if (!status.isOK()) {
+			throw new CoreException(status);
 		}
 
 		// build
 		final List<String> command = new ArrayList<>();
 
 		// executable
-		command.add(exec);
+		command.add(toRealPath());
 
 		// search paths
 		command.addAll(searchPaths);
@@ -151,8 +162,7 @@ public class TwigcsProcessor implements IConstants {
 		command.add("-s"); //$NON-NLS-1$
 		command.add(severity.name());
 
-		// convert
-		return command.toArray(new String[command.size()]);
+		return command;
 	}
 
 	/**
@@ -172,12 +182,12 @@ public class TwigcsProcessor implements IConstants {
 	}
 
 	/**
-	 * Gets the Twigcs executable.
+	 * Gets the Twigcs executable path.
 	 *
-	 * @return the Twigcs executable.
+	 * @return the Twigcs executable path.
 	 */
-	public String getExec() {
-		return exec;
+	public String getProgramPath() {
+		return programPath;
 	}
 
 	/**
@@ -217,13 +227,13 @@ public class TwigcsProcessor implements IConstants {
 	}
 
 	/**
-	 * Sets the Twigcs executable.
+	 * Sets the Twigcs executable path.
 	 *
-	 * @param exec
-	 *            the Twigcs executable to set.
+	 * @param programPath
+	 *            the Twigcs executable path to set.
 	 */
-	public void setExec(final String exec) {
-		this.exec = exec;
+	public void setProgramPath(final String programPath) {
+		this.programPath = programPath;
 	}
 
 	/**
@@ -254,5 +264,47 @@ public class TwigcsProcessor implements IConstants {
 	 */
 	public void setTwigVersion(final TwigVersion twigVersion) {
 		this.twigVersion = twigVersion;
+	}
+
+	/**
+	 * Check validity of this properties.
+	 *
+	 * @return An <code>ERROR</code> status if not valid; an <code>OK</code>
+	 *         status otherwise.
+	 */
+	public IStatus validate() {
+		// executable?
+		if (programPath == null || programPath.isEmpty()) {
+			return createErrorStatus("The executable is not defined.", null);
+		}
+
+		// valid?
+		final Path path = Paths.get(programPath);
+		if (!Files.exists(path, LinkOption.NOFOLLOW_LINKS)
+				|| !Files.isRegularFile(path, LinkOption.NOFOLLOW_LINKS)) {
+			return createErrorStatus("The executable does not exist.", null);
+		}
+
+		// search paths?
+		if (searchPaths.isEmpty()) {
+			return createErrorStatus("The search paths are not defined.", null);
+		}
+		return Status.OK_STATUS;
+	}
+
+	/**
+	 * Gets the real path of Twigcs executable.
+	 *
+	 * @return the real path.
+	 * @throws IOException
+	 *             if the file does not exist or an I/O error occurs.
+	 */
+	private String toRealPath() throws CoreException {
+		try {
+			return Paths.get(programPath).toRealPath().toString();
+		} catch (final IOException e) {
+			throw createCoreException(
+					"Unable to get the real path of executable.", e);
+		}
 	}
 }

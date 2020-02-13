@@ -1,3 +1,11 @@
+/**
+ * This file is part of the twigcs-plugin package.
+ *
+ * (c) Laurent Muller <bibi@bibi.nu>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 package twigcs.model;
 
 import java.util.ArrayList;
@@ -34,7 +42,7 @@ public class TwigResult implements Iterable<TwigFile> {
 	}
 
 	/**
-	 * Gets the first file (if any).
+	 * Gets the first file result.
 	 *
 	 * @return the first file, if not empty; <code>null</code> otherwise.
 	 */

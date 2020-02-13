@@ -1,3 +1,11 @@
+/**
+ * This file is part of the twigcs-plugin package.
+ *
+ * (c) Laurent Muller <bibi@bibi.nu>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 package twigcs.core;
 
 import java.util.Arrays;
@@ -30,10 +38,8 @@ public class TwigcsNature implements IProjectNature, IConstants {
 		ICommand[] cmds = desc.getBuildSpec();
 
 		// already set?
-		for (final ICommand command : cmds) {
-			if (match(command)) {
-				return;
-			}
+		if (Arrays.stream(cmds).anyMatch(this::match)) {
+			return;
 		}
 
 		// add
@@ -49,16 +55,14 @@ public class TwigcsNature implements IProjectNature, IConstants {
 	@Override
 	public void deconfigure() throws CoreException {
 		final IProjectDescription description = getProject().getDescription();
-		final ICommand[] cmds = description.getBuildSpec();
-		for (int i = 0; i < cmds.length; ++i) {
-			if (match(cmds[i])) {
-				final ICommand[] newCmds = new ICommand[cmds.length - 1];
-				System.arraycopy(cmds, 0, newCmds, 0, i);
-				System.arraycopy(cmds, i + 1, newCmds, i, cmds.length - i - 1);
-				description.setBuildSpec(newCmds);
-				project.setDescription(description, null);
-				return;
-			}
+		final ICommand[] oldCmds = description.getBuildSpec();
+		final ICommand[] newCmds = Arrays.stream(oldCmds).filter(c -> !match(c))
+				.toArray(ICommand[]::new);
+
+		// set?
+		if (oldCmds.length != newCmds.length) {
+			description.setBuildSpec(newCmds);
+			project.setDescription(description, null);
 		}
 	}
 
@@ -78,12 +82,27 @@ public class TwigcsNature implements IProjectNature, IConstants {
 		this.project = project;
 	}
 
+	/**
+	 * Creates a command with the Twigcs builder-
+	 *
+	 * @param desc
+	 *            the project description used to build command.
+	 * @return the newly created command.
+	 */
 	private ICommand createCommand(final IProjectDescription desc) {
 		final ICommand command = desc.newCommand();
 		command.setBuilderName(BUILDER_ID);
 		return command;
 	}
 
+	/**
+	 * Checks if the given command builder name is equal to the Twigcs builder
+	 * identifier.
+	 *
+	 * @param command
+	 *            the command to validate.
+	 * @return <code>true</code> if equal.
+	 */
 	private boolean match(final ICommand command) {
 		return command.getBuilderName().equals(BUILDER_ID);
 	}

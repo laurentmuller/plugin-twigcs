@@ -1,3 +1,11 @@
+/**
+ * This file is part of the twigcs-plugin package.
+ *
+ * (c) Laurent Muller <bibi@bibi.nu>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 package twigcs.core;
 
 import java.io.IOException;
@@ -9,15 +17,13 @@ import java.util.Arrays;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 
-import twigcs.TwigcsPlugin;
-
 /**
  * Wrapper class for the {@link IFile} content.
  * <p>
  * This class is used to read the content and to track line offsets.
  * </p>
  */
-public class ResourceText {
+public class ResourceText implements IConstants {
 
 	/*
 	 * the line feed character
@@ -60,7 +66,7 @@ public class ResourceText {
 		} catch (final IOException e) {
 			final String msg = String.format("Unable to read content of '%s'.",
 					file.getName());
-			throw TwigcsPlugin.createCoreException(msg, e);
+			throw createCoreException(msg, e);
 		}
 	}
 

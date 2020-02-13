@@ -1,12 +1,20 @@
+/**
+ * This file is part of the twigcs-plugin package.
+ *
+ * (c) Laurent Muller <bibi@bibi.nu>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 package twigcs.core;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IResourceDeltaVisitor;
@@ -18,7 +26,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 
-import twigcs.TwigcsPlugin;
 import twigcs.gson.SeverityDeserializer;
 import twigcs.io.IOExecutor;
 import twigcs.model.TwigFile;
@@ -96,17 +103,16 @@ public class ResourceVisitor
 	@Override
 	public boolean visit(final IResourceDelta delta) throws CoreException {
 		final IResource resource = delta.getResource();
-		switch (delta.getKind()) {
-		case IResourceDelta.ADDED:
-		case IResourceDelta.CHANGED:
-			if (!isFiltered(resource)) {
+		if (!isFiltered(resource)) {
+			switch (delta.getKind()) {
+			case IResourceDelta.ADDED:
+			case IResourceDelta.CHANGED:
 				check(resource);
-				return true;
+				break;
 			}
-			return false;
-		default:
-			return !isFiltered(resource);
+			return true;
 		}
+		return false;
 	}
 
 	/**
@@ -114,14 +120,16 @@ public class ResourceVisitor
 	 *
 	 * @param file
 	 *            the file to update.
+	 * @param text
+	 *            the parsed file content.
 	 * @param violation
 	 *            the violation to get values from.
 	 * @return the new marker.
 	 * @throws CoreException
 	 *             if an exception occurs while creating the marker.
 	 */
-	private IMarker addMarker(final IFile file, ResourceText text,
-			TwigViolation violation) throws CoreException {
+	private IMarker addMarker(final IFile file, final ResourceText text,
+			final TwigViolation violation) throws CoreException {
 		// get values
 		final int severity = violation.getSeverity().getMarkerSeverity();
 		final String message = violation.getMessage();
@@ -144,11 +152,11 @@ public class ResourceVisitor
 	 *
 	 * @param file
 	 *            the file process.
-	 * @return a string array containing the Twigcs program and its arguments.
+	 * @return a string list containing the Twigcs program and its arguments.
 	 * @throws CoreException
 	 *             if some parameters are missing or invalid.
 	 */
-	private String[] buildCommand(IFile file) throws CoreException {
+	private List<String> buildCommand(final IFile file) throws CoreException {
 		if (processor == null) {
 			processor = TwigcsProcessor.instance();
 		}
@@ -170,17 +178,14 @@ public class ResourceVisitor
 	 */
 	private void check(final IResource resource) throws CoreException {
 		if (isTwigFile(resource)) {
+			// convert
 			final IFile file = (IFile) resource;
-			file.getProjectRelativePath();
+
 			// remove markers
 			deleteMarkers(file);
 
 			// process
-			process(file);
-
-			// for test
-			// System.out.println(path.toString());
-			// final String realPath = path.toPortableString();
+			processFile(file);
 		}
 	}
 
@@ -197,7 +202,7 @@ public class ResourceVisitor
 	}
 
 	/**
-	 * gets the GSON parser.
+	 * Gets the GSON parser.
 	 *
 	 * @return the GSON parser.
 	 */
@@ -219,33 +224,29 @@ public class ResourceVisitor
 	 */
 	private boolean isFiltered(final IResource resource) {
 		// filter?
-		if (noFilter) {
+		if (noFilter || resource instanceof IProject) {
 			return false;
 		}
 
 		// relative path
 		final IPath path = resource.getProjectRelativePath();
 
-		// predicate
-		final Predicate<IPath> isPrefixOf = current -> current.isPrefixOf(path);
-
-		// include
+		// include validation
 		if (includePaths.contains(path)) {
 			return false;
-		} else if (includePaths.stream().anyMatch(isPrefixOf)) {
+		} else if (includePaths.stream().anyMatch(p -> p.isPrefixOf(path))) {
 			return false;
 		}
 
-		// exclude
+		// exclude validation
 		if (excludePaths.contains(path)) {
 			return true;
-		} else if (excludePaths.stream().anyMatch(isPrefixOf)) {
+		} else if (excludePaths.stream().anyMatch(p -> p.isPrefixOf(path))) {
 			return true;
 		}
 
-		// ??
-		// !includePaths.isEmpty();
-		return false;
+		// return false;
+		return !includePaths.isEmpty();
 	}
 
 	/**
@@ -266,8 +267,11 @@ public class ResourceVisitor
 	 * @param data
 	 *            the output data of the execution.
 	 * @return the file result, if any; <code>null</code> otherwise.
+	 * @throws JsonSyntaxException
+	 *             if the data output is not a valid representation of
+	 *             {@link TwigResult} type.
 	 */
-	private TwigFile parseResult(String data) {
+	private TwigFile parseResult(final String data) throws JsonSyntaxException {
 		final Gson gson = getGson();
 		final TwigResult result = gson.fromJson(data, TwigResult.class);
 		return result.first();
@@ -281,10 +285,10 @@ public class ResourceVisitor
 	 * @throws CoreException
 	 *             if an error occurs while processing the file.
 	 */
-	private void process(IFile file) throws CoreException {
+	private void processFile(final IFile file) throws CoreException {
 		try {
 			// run
-			final String[] command = buildCommand(file);
+			final List<String> command = buildCommand(file);
 			final IOExecutor executor = new IOExecutor();
 			final int exitCode = executor.run(command);
 
@@ -292,31 +296,31 @@ public class ResourceVisitor
 			final String output = executor.getOutput();
 			if (output != null && !output.isEmpty()) {
 				// convert
-				final TwigFile twigFile = parseResult(output);
-				if (twigFile != null) {
+				final TwigFile result = parseResult(output);
+				if (result != null) {
 					// add violations
 					final ResourceText text = new ResourceText(file);
-					for (final TwigViolation violation : twigFile) {
+					for (final TwigViolation violation : result) {
 						addMarker(file, text, violation);
 					}
 				}
 
-			} else if (exitCode != 0) { // error?
+			} else if (exitCode != 0) { // error or invalid files?
 				IOException e = null;
 				final String error = executor.getError();
 				if (error != null && !error.isEmpty()) {
 					e = new IOException(error);
 				}
 				final String msg = String.format(
-						"Unable to process the resource '%s' (code: %d).",
+						"Unable to validate the resource '%s' (code: %d).",
 						file.getName(), exitCode);
-				throw TwigcsPlugin.createCoreException(msg, e);
+				throw createCoreException(msg, e);
 			}
 
-		} catch (IOException | InterruptedException | JsonSyntaxException e) {
+		} catch (IOException | JsonSyntaxException e) {
 			final String msg = String.format(
-					"Unable to process the resource '%s'.", file.getName());
-			throw TwigcsPlugin.createCoreException(msg, e);
+					"Unable to validate the resource '%s'.", file.getName());
+			throw createCoreException(msg, e);
 		}
 	}
 }
