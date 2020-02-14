@@ -171,6 +171,32 @@ public class TwigcsBuilder extends IncrementalProjectBuilder
 	}
 
 	/**
+	 * Gets the number of visited files.
+	 *
+	 * @param project
+	 *            the project to visit.
+	 * @return the number of files.
+	 */
+	private int countFiles(final IProject project) throws CoreException {
+		final CounterVisitor counter = new CounterVisitor();
+		project.accept(counter);
+		return counter.getFiles();
+	}
+
+	/**
+	 * Gets the number of visited files.
+	 *
+	 * @param delta
+	 *            the resource delta to visit.
+	 * @return the number of files.
+	 */
+	private int countFiles(final IResourceDelta delta) throws CoreException {
+		final CounterVisitor counter = new CounterVisitor();
+		delta.accept(counter);
+		return counter.getFiles();
+	}
+
+	/**
 	 * Create a full build.
 	 *
 	 * @param monitor
@@ -181,10 +207,16 @@ public class TwigcsBuilder extends IncrementalProjectBuilder
 	private void fullBuild(final IProgressMonitor monitor)
 			throws CoreException {
 		final IProject project = getProject();
-		System.out.println("Start full build: " + project.getFullPath());
-		project.accept(new ResourceVisitor(project, monitor));
-		System.out.println("End full build");
-		System.out.println();
+		final int totalWork = countFiles(project);
+		try {
+			monitor.beginTask("Validate Twig files", totalWork);
+			// System.out.println("Start full build: " + project.getFullPath());
+			project.accept(new ValidationVisitor(project, monitor));
+			// System.out.println("End full build");
+			// System.out.println();
+		} finally {
+			monitor.done();
+		}
 	}
 
 	/**
@@ -198,10 +230,16 @@ public class TwigcsBuilder extends IncrementalProjectBuilder
 	private void incrementalBuild(final IResourceDelta delta,
 			final IProgressMonitor monitor) throws CoreException {
 		final IProject project = getProject();
-		System.out.println(
-				"Start incremental build:" + delta.getResource().getFullPath());
-		delta.accept(new ResourceVisitor(project, monitor));
-		System.out.println("End incremental build");
-		System.out.println();
+		final int totalWork = countFiles(delta);
+		try {
+			monitor.beginTask("Validate Twig files", totalWork);
+			// System.out.println("Start incremental build:" +
+			// delta.getResource().getFullPath());
+			delta.accept(new ValidationVisitor(project, monitor));
+			// System.out.println("End incremental build");
+			// System.out.println();
+		} finally {
+			monitor.done();
+		}
 	}
 }

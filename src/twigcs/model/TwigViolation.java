@@ -10,6 +10,10 @@ package twigcs.model;
 
 import java.util.Objects;
 
+import org.eclipse.core.resources.IMarker;
+
+import twigcs.core.ResourceText;
+
 /**
  * Represents a single file violation.
  *
@@ -92,12 +96,37 @@ public class TwigViolation implements Comparable<TwigViolation> {
 	}
 
 	/**
+	 * Gets the marker severity.
+	 *
+	 * @return the marker severity, if any; {@link IMarker#SEVERITY_INFO}
+	 *         otherwise.
+	 */
+	public int getMarkerSeverity() {
+		if (severity != null) {
+			return severity.getMarkerSeverity();
+		} else {
+			return IMarker.SEVERITY_INFO;
+		}
+	}
+
+	/**
 	 * Gets the message.
 	 *
 	 * @return the message.
 	 */
 	public String getMessage() {
 		return message;
+	}
+
+	/**
+	 * Gets the start violation offset.
+	 * 
+	 * @param text
+	 *            the text to get the line offset.
+	 * @return the start violation offset.
+	 */
+	public int getOffset(final ResourceText text) {
+		return text.getOffset(line - 1) + column;
 	}
 
 	/**

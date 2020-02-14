@@ -31,6 +31,17 @@ import org.eclipse.swt.dnd.TransferData;
  */
 public class DragDropViewer<E> {
 
+	/*
+	 * the DND operation
+	 */
+	private static final int DND_OPERATION = DND.DROP_MOVE;
+
+	/*
+	 * the DND transfer
+	 */
+	static final LocalSelectionTransfer DND_TRANSFER = LocalSelectionTransfer
+			.getTransfer();
+
 	// the viewers
 	private final TableViewer sourceViewer;
 	private final TableViewer targetViewer;
@@ -54,8 +65,9 @@ public class DragDropViewer<E> {
 	 * @param targetList
 	 *            the target model list.
 	 */
-	public DragDropViewer(TableViewer sourceViewer, List<E> sourceList,
-			TableViewer targetViewer, List<E> targetList) {
+	public DragDropViewer(final TableViewer sourceViewer,
+			final List<E> sourceList, final TableViewer targetViewer,
+			final List<E> targetList) {
 		this.sourceViewer = sourceViewer;
 		this.sourceList = sourceList;
 
@@ -85,10 +97,6 @@ public class DragDropViewer<E> {
 	 *            the viewer to handle.
 	 */
 	private void addDragSupport(final TableViewer viewer) {
-		final int operations = DND.DROP_MOVE;
-		final LocalSelectionTransfer transfer = getTransfer();
-		final Transfer[] types = new Transfer[] { transfer };
-
 		final DragSourceAdapter adapter = new DragSourceAdapter() {
 			@Override
 			public void dragFinished(final DragSourceEvent event) {
@@ -97,8 +105,8 @@ public class DragDropViewer<E> {
 
 			@Override
 			public void dragSetData(final DragSourceEvent event) {
-				if (transfer.isSupportedType(event.dataType)) {
-					event.data = transfer.getSelection();
+				if (DND_TRANSFER.isSupportedType(event.dataType)) {
+					event.data = DND_TRANSFER.getSelection();
 				}
 			}
 
@@ -111,18 +119,19 @@ public class DragDropViewer<E> {
 					event.doit = false;
 				} else {
 					dragViewer = viewer;
-					transfer.setSelection(selection);
-					transfer.setSelectionSetTime(event.time & 0xFFFF);
+					DND_TRANSFER.setSelection(selection);
+					DND_TRANSFER.setSelectionSetTime(event.time & 0xFFFF);
 				}
 			}
 
 			private void clearSelection() {
 				dragViewer = null;
-				transfer.setSelection(null);
-				transfer.setSelectionSetTime(0);
+				DND_TRANSFER.setSelection(null);
+				DND_TRANSFER.setSelectionSetTime(0);
 			}
 		};
-		viewer.addDragSupport(operations, types, adapter);
+		viewer.addDragSupport(DND_OPERATION, new Transfer[] { DND_TRANSFER },
+				adapter);
 	}
 
 	/**
@@ -132,10 +141,6 @@ public class DragDropViewer<E> {
 	 *            the viewer to handle.
 	 */
 	private void addDropSupport(final TableViewer viewer) {
-		final int operations = DND.DROP_MOVE;
-		final LocalSelectionTransfer transfer = getTransfer();
-		final Transfer[] types = new Transfer[] { transfer };
-
 		final ViewerDropAdapter adapter = new ViewerDropAdapter(viewer) {
 			@Override
 			public boolean performDrop(final Object data) {
@@ -163,7 +168,7 @@ public class DragDropViewer<E> {
 			@Override
 			public boolean validateDrop(final Object target,
 					final int operation, final TransferData transferType) {
-				if (!transfer.isSupportedType(transferType)) {
+				if (!DND_TRANSFER.isSupportedType(transferType)) {
 					return false;
 				} else {
 					// prevent self-drop
@@ -171,16 +176,8 @@ public class DragDropViewer<E> {
 				}
 			}
 		};
-		viewer.addDropSupport(operations, types, adapter);
-	}
-
-	/**
-	 * Gets the singleton local selection transfer instance.
-	 *
-	 * @return the transfer instance.
-	 */
-	private LocalSelectionTransfer getTransfer() {
-		return LocalSelectionTransfer.getTransfer();
+		viewer.addDropSupport(DND_OPERATION, new Transfer[] { DND_TRANSFER },
+				adapter);
 	}
 
 	/**
@@ -199,8 +196,9 @@ public class DragDropViewer<E> {
 	 *            the destination model list.
 	 * @return <code>true</code> if one or more elements has been moved.
 	 */
-	private boolean move(IStructuredSelection selection, TableViewer fromViewer,
-			List<E> fromList, TableViewer toViewer, List<E> toList) {
+	private boolean move(final IStructuredSelection selection,
+			final TableViewer fromViewer, final List<E> fromList,
+			final TableViewer toViewer, final List<E> toList) {
 		// selection?
 		if (selection.isEmpty()) {
 			return false;
@@ -229,25 +227,27 @@ public class DragDropViewer<E> {
 	}
 
 	/**
-	 * Moves the given selection from the target viewer to the source viewer.
+	 * Moves the target viewer selection to the source viewer and update model
+	 * lists accordingly.
 	 *
 	 * @param selection
-	 *            the selection to move.
+	 *            the target viewer selection to move.
 	 * @return <code>true</code> if one or more elements has been moved.
 	 */
-	private boolean moveToSourceViewer(IStructuredSelection selection) {
+	private boolean moveToSourceViewer(final IStructuredSelection selection) {
 		return move(selection, targetViewer, targetList, //
 				sourceViewer, sourceList);
 	}
 
 	/**
-	 * Moves the given selection from the source viewer to the target viewer.
+	 * Moves the source viewer selection to the target viewer and update model
+	 * lists accordingly.
 	 *
 	 * @param selection
-	 *            the selection to move.
+	 *            the source viewer selection to move.
 	 * @return <code>true</code> if one or more elements has been moved.
 	 */
-	private boolean moveToTargetViewer(IStructuredSelection selection) {
+	private boolean moveToTargetViewer(final IStructuredSelection selection) {
 		return move(selection, sourceViewer, sourceList, //
 				targetViewer, targetList);
 	}

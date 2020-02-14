@@ -13,6 +13,7 @@ import java.util.ArrayList;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.viewers.ArrayContentProvider;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
@@ -52,5 +53,19 @@ public class ResourceTableViewer extends TableViewer {
 	 */
 	public void setLayoutData(final Object layoutData) {
 		getTable().setLayoutData(layoutData);
+	}
+
+	/**
+	 * Sets a new selection for this viewer and makes it visible.
+	 *
+	 * @param resource
+	 *            the new selection or <code>null</code> if none.
+	 */
+	public void setSelection(final IResource resource) {
+		if (resource == null) {
+			setSelection(StructuredSelection.EMPTY);
+		} else {
+			setSelection(new StructuredSelection(resource), true);
+		}
 	}
 }

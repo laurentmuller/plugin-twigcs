@@ -11,15 +11,11 @@ package twigcs.core;
 import java.io.IOException;
 import java.util.List;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IResourceDelta;
-import org.eclipse.core.resources.IResourceDeltaVisitor;
-import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -36,13 +32,13 @@ import twigcs.model.TwigSeverity;
 import twigcs.model.TwigViolation;
 
 /**
- * Resource visitor.
+ * Resource visitor to validate Twig files.
  *
  * @author Laurent Muller
  * @version 1.0
  */
-public class ResourceVisitor
-		implements IResourceVisitor, IResourceDeltaVisitor, IConstants {
+public class ValidationVisitor extends AbstractResouceVisitor
+		implements IConstants {
 
 	/*
 	 * the include paths
@@ -82,7 +78,7 @@ public class ResourceVisitor
 	 * @param monitor
 	 *            the progress monitor.
 	 */
-	public ResourceVisitor(final IProject project,
+	public ValidationVisitor(final IProject project,
 			final IProgressMonitor monitor) throws CoreException {
 		this.monitor = monitor;
 
@@ -90,14 +86,10 @@ public class ResourceVisitor
 		final ProjectPreferences preferences = new ProjectPreferences(project);
 
 		// get include paths
-		includePaths = preferences.getIncludeResources().stream()
-				.map(IResource::getProjectRelativePath)
-				.collect(Collectors.toList());
+		includePaths = preferences.getIncludePaths();
 
 		// get exclude paths
-		excludePaths = preferences.getExcludeResources().stream()
-				.map(IResource::getProjectRelativePath)
-				.collect(Collectors.toList());
+		excludePaths = preferences.getExcludePaths();
 
 		// no filter state
 		noFilter = includePaths.isEmpty() && excludePaths.isEmpty();
@@ -109,51 +101,23 @@ public class ResourceVisitor
 	@Override
 	public boolean visit(final IResource resource) throws CoreException {
 		if (resource.exists()) {
-			final IPath path = resource.getFullPath();
-			System.out.println("Visit   : " + path);
+			// final IPath path = resource.getFullPath();
+			// System.out.println("Visit : " + path);
 			if (resource instanceof IFile) {
 				final IFile file = (IFile) resource;
 				if (isTwigFile(file)) {
 					deleteMarkers(file);
 					if (!isFiltered(file)) {
-						System.out.println("Validate: " + path);
+						// System.out.println("Validate: " + path);
 						validate(file);
 					}
 				}
+				monitor.worked(1);
 			}
 		}
 
 		return !monitor.isCanceled();
 	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public boolean visit(final IResourceDelta delta) throws CoreException {
-		return visit(delta.getResource());
-	}
-
-	// /**
-	// * Validate the given resource.
-	// *
-	// * @param resource
-	// * the resource to verify.
-	// * @throws CoreException
-	// * if an exception occurs while validating the resource.
-	// */
-	// private void check(final IResource resource) throws CoreException {
-	// if (isTwigFile(resource)) {
-	// // convert
-	// final IFile file = (IFile) resource;
-	//
-	// // remove markers
-	// // deleteMarkers(file);
-	//
-	// // process
-	// validate(file);
-	// }
-	// }
 
 	/**
 	 * Creates and returns the marker for the given violation.
@@ -171,10 +135,10 @@ public class ResourceVisitor
 	private IMarker addMarker(final IFile file, final ResourceText text,
 			final TwigViolation violation) throws CoreException {
 		// get values
-		final int severity = violation.getSeverity().getMarkerSeverity();
 		final String message = violation.getMessage();
+		final int severity = violation.getMarkerSeverity();
 		final int line = violation.getLine();
-		final int offset = text.getOffset(line - 1) + violation.getColumn();
+		final int offset = violation.getOffset(text);
 
 		// create
 		final IMarker marker = file.createMarker(MARKER_TYPE);

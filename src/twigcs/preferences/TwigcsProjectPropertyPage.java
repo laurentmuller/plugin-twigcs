@@ -15,12 +15,12 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
@@ -162,6 +162,13 @@ public class TwigcsProjectPropertyPage extends PropertyPage
 			includeViewer.refresh();
 		}
 
+		// find vendor folder
+		final IResource vendor = getElement().findMember("vendor");
+		if (vendor != null) {
+			excludeList.add(vendor);
+			excludeViewer.refresh();
+		}
+
 		// update
 		includeViewer.refresh();
 		excludeViewer.refresh();
@@ -185,7 +192,7 @@ public class TwigcsProjectPropertyPage extends PropertyPage
 				list.add(resource);
 				viewer.refresh();
 			}
-			viewer.setSelection(new StructuredSelection(resource));
+			viewer.setSelection(resource);
 		}
 	}
 
@@ -202,10 +209,8 @@ public class TwigcsProjectPropertyPage extends PropertyPage
 			final int columns) {
 		final Composite composite = new Composite(parent, SWT.NONE);
 		composite.setLayoutData(new GridData(GridData.FILL_BOTH));
-
-		final GridLayout layout = new GridLayout(columns, false);
-		layout.marginWidth = 0;
-		composite.setLayout(layout);
+		GridLayoutFactory.swtDefaults().numColumns(columns).margins(0, 5)
+				.applyTo(composite);
 
 		return composite;
 	}
@@ -225,17 +230,16 @@ public class TwigcsProjectPropertyPage extends PropertyPage
 		if (text != null) {
 			label.setText(text);
 		}
+
 		final GridData gd = new GridData(GridData.FILL_HORIZONTAL);
-		if (columns > 1) {
-			gd.horizontalSpan = columns;
-		}
+		gd.horizontalSpan = Math.max(columns, 1);
 		label.setLayoutData(gd);
 
 		return label;
 	}
 
 	/**
-	 * Creates a resource viewer.
+	 * Creates a resource viewer and edtion buttons.
 	 *
 	 * @param parent
 	 *            the parent composite.
@@ -247,7 +251,7 @@ public class TwigcsProjectPropertyPage extends PropertyPage
 	 */
 	private ResourceTableViewer createViewer(final Composite parent,
 			final List<IResource> list, final String text) {
-
+		// viewer and buttons container
 		final Composite container = createComposite(parent, 2);
 
 		// label
@@ -255,32 +259,40 @@ public class TwigcsProjectPropertyPage extends PropertyPage
 
 		// table viewer
 		final ResourceTableViewer viewer = new ResourceTableViewer(container);
-		final GridData gd = new GridData(GridData.FILL_BOTH);
-		gd.widthHint = convertHorizontalDLUsToPixels(120);
-		gd.heightHint = viewer.getTable().getItemHeight() * 5;
-		viewer.setLayoutData(gd);
+		GridDataFactory.fillDefaults().grab(true, true)
+				.hint(convertHorizontalDLUsToPixels(120),
+						viewer.getTable().getItemHeight() * 5)
+				.applyTo(viewer.getControl());
 
-		// button bar
-		final Composite buttonBar = new Composite(container, SWT.NONE);
-		buttonBar.setLayoutData(new GridData(GridData.FILL_VERTICAL));
-		final GridLayout layout = new GridLayout();
-		layout.marginWidth = layout.marginHeight = 0;
-		buttonBar.setLayout(layout);
+		// buttons bar
+		final Composite buttonsBar = new Composite(container, SWT.NONE);
+		buttonsBar.setLayoutData(new GridData(GridData.FILL_VERTICAL));
+		GridLayoutFactory.fillDefaults().applyTo(buttonsBar);
+
+		// button listeners
+		final Listener addListener = e -> {
+			addResources(viewer, list);
+		};
+		final Listener deleteListener = e -> {
+			deleteResource(viewer, list);
+		};
+		final Listener editListener = e -> {
+			editResources(viewer, list);
+		};
 
 		// buttons
-		createViewerButton(buttonBar, "Add...", //
-				e -> {
-					addResources(viewer, list);
-				});
-		final Button deleteButton = createViewerButton(buttonBar, "Remove",
-				e -> {
-					deleteResource(viewer, list);
-				});
-		final Button editButton = createViewerButton(buttonBar, "Edit...",
-				e -> {
-					editResources(viewer, list);
-				});
+		createViewerButton(buttonsBar, "Add...", addListener);
+		final Button deleteButton = createViewerButton(buttonsBar, "Remove",
+				deleteListener);
+		final Button editButton = createViewerButton(buttonsBar, "Edit...",
+				editListener);
 
+		// add viewer listeners
+		viewer.getTable().addListener(SWT.KeyDown, e -> {
+			if (e.keyCode == SWT.DEL && deleteButton.isEnabled()) {
+				deleteButton.notifyListeners(SWT.Selection, null);
+			}
+		});
 		viewer.addSelectionChangedListener(e -> {
 			final boolean enabled = !e.getSelection().isEmpty();
 			deleteButton.setEnabled(enabled);
@@ -294,7 +306,7 @@ public class TwigcsProjectPropertyPage extends PropertyPage
 
 		// update
 		viewer.setInput(list);
-		viewer.setSelection(StructuredSelection.EMPTY);
+		// viewer.setSelection(list.isEmpty() ? null : list.get(0));
 
 		return viewer;
 	}
@@ -370,7 +382,7 @@ public class TwigcsProjectPropertyPage extends PropertyPage
 		if (!list.contains(resource)) {
 			list.add(resource);
 			viewer.refresh();
-			viewer.setSelection(new StructuredSelection(resource));
+			viewer.setSelection(resource);
 		}
 	}
 
