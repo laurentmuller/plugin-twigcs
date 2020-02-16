@@ -8,7 +8,7 @@
         <builder
             hasNature="true">
             <run
-                class="twigcs.core.TwigcsBuilder" />
+                class="nu.bibi.twigcs.core.TwigcsBuilder" />
         </builder>
     </extension>
     <extension
@@ -17,10 +17,10 @@
         point="org.eclipse.core.resources.natures">
         <runtime>
             <run
-                class="twigcs.core.TwigcsNature" />
+                class="nu.bibi.twigcs.core.TwigcsNature" />
         </runtime>
         <builder
-            id="plugin-twigcs.twigcs" />
+            id="nu.bibi.twigcs.twigcs" />
     </extension>
     <extension
         point="org.eclipse.ui.commands">
@@ -29,7 +29,7 @@
             name="Twigcs" />
         <command
             categoryId="twigcs.category"
-            defaultHandler="twigcs.core.TwigcsNatureHandler"
+            defaultHandler="nu.bibi.twigcs.core.TwigcsNatureHandler"
             id="twigcs.addRemovesNature"
             name="Add/Remove Twigcs Project Nature" />
     </extension>
@@ -52,7 +52,7 @@
                                 type="org.eclipse.core.resources.IProject">
                                 <test
                                     property="org.eclipse.core.resources.projectNature"
-                                    value="plugin-twigcs.twigcs" />
+                                    value="nu.bibi.twigcs.twigcs" />
                             </adapt>
                         </iterate>
                     </with>
@@ -74,7 +74,7 @@
                                 <not>
                                     <test
                                         property="org.eclipse.core.resources.projectNature"
-                                        value="plugin-twigcs.twigcs" />
+                                        value="nu.bibi.twigcs.twigcs" />
                                 </not>
                             </adapt>
                         </iterate>
@@ -95,20 +95,20 @@
     <extension
         point="org.eclipse.core.runtime.preferences">
         <initializer
-            class="twigcs.preferences.TwigcsPreferencesInitializer" />
+            class="nu.bibi.twigcs.preferences.PreferencesInitializer" />
     </extension>
     <extension
         point="org.eclipse.ui.preferencePages">
         <page
-            class="twigcs.preferences.TwigcsPreferencesPage"
-            id="twigcs.preferences.TwigcsPreferencePage"
+            class="nu.bibi.twigcs.preferences.PreferencesPage"
+            id="nu.bibi.twigcs.preferences.PreferencesPage"
             name="Twigcs" />
     </extension>
     <extension
         point="org.eclipse.ui.propertyPages">
         <page
-            class="twigcs.preferences.TwigcsProjectPropertyPage"
-            id="twigcs.properties.TwigcsProjectPropertyPage"
+            class="nu.bibi.twigcs.preferences.ProjectPropertyPage"
+            id="nu.bibi.twigcs.preferences.ProjectPropertyPage"
             name="Twigcs">
             <filter
                 name="open"
@@ -119,7 +119,7 @@
                         type="org.eclipse.core.resources.IProject" />
                     <test
                           property="org.eclipse.core.resources.projectNature"
-                          value="plugin-twigcs.twigcs">
+                          value="nu.bibi.twigcs.twigcs">
                     </test>
                 </and>
             </enabledWhen>
