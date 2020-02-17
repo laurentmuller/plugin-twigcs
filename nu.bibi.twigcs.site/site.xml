@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <feature url="features/nu.bibi.twigcs.feature_1.0.0.jar" id="nu.bibi.twigcs.feature" version="1.0.0">
+      <category name="twigcs"/>
+   </feature>
+   <category-def name="twigcs" label="Twigcs"/>
+</site>

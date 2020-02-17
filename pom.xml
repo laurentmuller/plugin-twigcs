@@ -1,31 +1,36 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>nu.bibi</groupId>
-	<artifactId>nu.bibi.twigcs</artifactId>
-	<name>Twigcs</name>
-	<description>An Eclipse plugin to validate Twig (*.twig) files with the Twigcs component.</description>
+	<name>Twigcs Parent</name>
+	<groupId>nu.bibi.twigcs</groupId>
+	<artifactId>nu.bibi.twigcs.parent</artifactId>
 	<version>1.0.0</version>
-	<packaging>eclipse-plugin</packaging>
+	<packaging>pom</packaging>
 
 	<properties>
 		<tycho-version>1.6.0</tycho-version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<eclipse-repo.url>http://download.eclipse.org/releases/latest</eclipse-repo.url>
+		<eclipse.repo>http://download.eclipse.org/releases/latest</eclipse.repo>
 	</properties>
+
+	<modules>
+		<module>nu.bibi.twigcs.plugin</module>
+		<module>nu.bibi.twigcs.feature</module>
+		<module>nu.bibi.twigcs.site</module>
+	</modules>
 
 	<repositories>
 		<repository>
 			<id>latest</id>
 			<layout>p2</layout>
-			<url>${eclipse-repo.url}</url>
+			<url>${eclipse.repo}</url>
 		</repository>
 	</repositories>
-
+	
 	<build>
-		<sourceDirectory>src</sourceDirectory>
 		<plugins>
 			<plugin>
 				<groupId>org.eclipse.tycho</groupId>
@@ -36,6 +41,29 @@
 					<target>1.8</target>
 				</configuration>
 			</plugin>
+			
+			<plugin>
+		        <groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-packaging-plugin</artifactId>
+		        <version>${tycho-version}</version>
+		        <executions>
+		            <execution>
+						<phase>package</phase>
+		                <id>package-feature</id>
+	                	<configuration>
+	                        <finalName>${project.artifactId}_${unqualifiedVersion}.${buildQualifier}</finalName>
+	                    </configuration>
+					</execution>
+		        </executions>
+		    </plugin>
+		    
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-maven-plugin</artifactId>
+				<version>${tycho-version}</version>
+				<extensions>true</extensions>
+			</plugin>
+						
 			<plugin>
 				<groupId>org.eclipse.tycho</groupId>
 				<artifactId>tycho-source-plugin</artifactId>
@@ -49,11 +77,30 @@
 					</execution>
 				</executions>
 			</plugin>
+			
 			<plugin>
 				<groupId>org.eclipse.tycho</groupId>
-				<artifactId>tycho-maven-plugin</artifactId>
+				<artifactId>target-platform-configuration</artifactId>
 				<version>${tycho-version}</version>
-				<extensions>true</extensions>
+				<configuration>
+					<environments>
+						<environment>
+							<os>win32</os>
+							<ws>win32</ws>
+							<arch>x86_64</arch>
+						</environment>
+						<environment>
+							<os>linux</os>
+							<ws>gtk</ws>
+							<arch>x86_64</arch>
+						</environment>
+						<environment>
+							<os>macosx</os>
+							<ws>cocoa</ws>
+							<arch>x86_64</arch>
+						</environment>
+					</environments>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>
