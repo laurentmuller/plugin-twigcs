@@ -1,26 +1,24 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" 
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
-	
+		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
 	<modelVersion>4.0.0</modelVersion>
 
-	<name>Twigcs Parent</name>
-	<groupId>nu.bibi.twigcs</groupId>
-	<artifactId>nu.bibi.twigcs.parent</artifactId>
+	<groupId>nu.bibi</groupId>
+	<artifactId>nu.bibi.twigcs</artifactId>
 	<version>1.0.0</version>
-	<packaging>pom</packaging>
+	<name>Twigcs Plugin</name>
+	<description>An Eclipse plugin to validate Twig (*.twig) files with the Twigcs component.</description>
+	<packaging>eclipse-plugin</packaging>
 
 	<properties>
 		<tycho-version>1.6.0</tycho-version>
+		<p2-maven-version>1.3.0</p2-maven-version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<eclipse.repo>http://download.eclipse.org/releases/latest</eclipse.repo>
+		<final-name>${project.artifactId}.v${project.version}</final-name>
+		<site-name>update_site_v${project.version}</site-name>
 	</properties>
-
-	<modules>
-		<module>nu.bibi.twigcs.plugin</module>
-		<module>nu.bibi.twigcs.feature</module>
-		<module>nu.bibi.twigcs.site</module>
-	</modules>
 
 	<repositories>
 		<repository>
@@ -29,7 +27,7 @@
 			<url>${eclipse.repo}</url>
 		</repository>
 	</repositories>
-	
+
 	<build>
 		<plugins>
 			<plugin>
@@ -41,29 +39,30 @@
 					<target>1.8</target>
 				</configuration>
 			</plugin>
-			
+
 			<plugin>
-		        <groupId>org.eclipse.tycho</groupId>
+				<groupId>org.eclipse.tycho</groupId>
 				<artifactId>tycho-packaging-plugin</artifactId>
-		        <version>${tycho-version}</version>
-		        <executions>
-		            <execution>
+				<version>${tycho-version}</version>
+				<configuration>
+					<archiveSite>true</archiveSite>
+					<finalName>${final-name}</finalName>
+				</configuration>
+				<executions>
+					<execution>
 						<phase>package</phase>
-		                <id>package-feature</id>
-	                	<configuration>
-	                        <finalName>${project.artifactId}_${unqualifiedVersion}.${buildQualifier}</finalName>
-	                    </configuration>
+						<id>package-feature</id>
 					</execution>
-		        </executions>
-		    </plugin>
-		    
+				</executions>
+			</plugin>
+
 			<plugin>
 				<groupId>org.eclipse.tycho</groupId>
 				<artifactId>tycho-maven-plugin</artifactId>
 				<version>${tycho-version}</version>
 				<extensions>true</extensions>
 			</plugin>
-						
+
 			<plugin>
 				<groupId>org.eclipse.tycho</groupId>
 				<artifactId>tycho-source-plugin</artifactId>
@@ -76,8 +75,11 @@
 						</goals>
 					</execution>
 				</executions>
+				<configuration>
+					<finalName>${final-name}</finalName>
+				</configuration>
 			</plugin>
-			
+
 			<plugin>
 				<groupId>org.eclipse.tycho</groupId>
 				<artifactId>target-platform-configuration</artifactId>
@@ -102,6 +104,76 @@
 					</environments>
 				</configuration>
 			</plugin>
+
+			<plugin>
+				<groupId>org.reficio</groupId>
+				<artifactId>p2-maven-plugin</artifactId>
+				<version>${p2-maven-version}</version>
+				<executions>
+					<execution>
+						<id>default-cli</id>
+						<phase>package</phase>
+						<goals>
+							<goal>site</goal>
+						</goals>
+						<configuration>
+							<categoryFileURL>p2/category.xml</categoryFileURL>
+							<compressSite>false</compressSite>
+							<artifacts>
+								<artifact>
+									<id>nu.bibi:nu.bibi.twigcs:1.0.0</id>
+									<transitive>false</transitive>
+								</artifact>
+								<artifact>
+									<id>com.google.code.gson:gson:2.8.2</id>
+									<transitive>false</transitive>
+									<!-- <override>true</override> <singleton>true</singleton> <instructions> <Bundle-Name>Gson</Bundle-Name> <Bundle-Vendor>Google Gson Project</Bundle-Vendor> <Bundle-ContactAddress>https://github.com/google/gson</Bundle-ContactAddress> <Bundle-Description>Gson JSON library</Bundle-Description> <_noee>true</_noee> </instructions> -->
+								</artifact>
+							</artifacts>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-p2-repository-plugin</artifactId>
+				<version>${tycho-version}</version>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>archive-repository</goal>
+						</goals>
+						<configuration>
+							<finalName>${site-name}</finalName>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<version>3.0.0</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>attach-artifact</goal>
+						</goals>
+						<configuration>
+							<artifacts>
+								<artifact>
+									<file>target/${site-name}.zip</file>
+									<type>zip</type>
+								</artifact>
+							</artifacts>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
 		</plugins>
 	</build>
+
 </project>

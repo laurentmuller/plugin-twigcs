@@ -17,19 +17,21 @@ And displayed in the **Problems view**.
   composer global require friendsoftwig/twigcs
   ```
 
-- Download the update site from the release and extract content to locale.
+- Download the update site zip file from the releases tab.
 
 - Start Eclipse PDT and select the menu **Help** -> **Install New Software...**
 
-- Select the extracted directory.
+- Add the downloaded zip file as source.
 
-- Copy the jar file to the dropins folder of your Eclipse PDT installation.
+  ![Add Repository](docs/add_repository.png)
 
-- Start Eclipse PDT.
+- Select the newly added repository.  Check the the Twigcs category check box and follow the wizard instructions.
 
-- Update the [Workspace preferences](##Workspace preferences) to define the path to the Twigcs batch file.
+- An other solution is to download the the jar file from the releases tab and copy to the dropins folder of your Eclipse PDT installation.
 
-- Update your [Project properties](##Project properties) to define witch folders are validate.
+- Update the [Workspace preferences](#workspace-preferences) to define the path to the Twigcs batch file.
+
+- Update your [Project properties](#project-properties) to define witch folders are validate.
 
 ## Workspace preferences
 
