@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <feature id="nu.bibi.twigcs.feature" version="1.0.0">
+      <category name="nu.bibi.twigcs"/>
+   </feature>
+   <category-def name="nu.bibi.twigcs" label="Twigcs">
+      <description>
+         Twigcs Integration for Eclipse.
+      </description>
+   </category-def>
+</site>

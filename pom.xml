@@ -1,30 +1,36 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" 
-		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
-
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>nu.bibi</groupId>
-	<artifactId>nu.bibi.twigcs</artifactId>
+	<groupId>nu.bibi.twigcs</groupId>
+	<artifactId>nu.bibi.twigcs.parent</artifactId>
 	<version>1.0.0</version>
-	<name>Twigcs Plugin</name>
-	<description>An Eclipse plugin to validate Twig (*.twig) files with the Twigcs component.</description>
-	<packaging>eclipse-plugin</packaging>
+	<packaging>pom</packaging>
 
 	<properties>
 		<tycho-version>1.6.0</tycho-version>
-		<p2-maven-version>1.3.0</p2-maven-version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<eclipse.repo>http://download.eclipse.org/releases/latest</eclipse.repo>
+		<orbit.repo>https://download.eclipse.org/tools/orbit/downloads/drops/I20200106175313/repository/</orbit.repo>
 		<final-name>${project.artifactId}.v${project.version}</final-name>
-		<site-name>update_site_v${project.version}</site-name>
 	</properties>
 
+	<prerequisites>
+		<maven>3.0</maven>
+	</prerequisites>
+
+	<!-- repositories to get pre-built pieces from -->
 	<repositories>
 		<repository>
-			<id>latest</id>
+			<id>target-repo</id>
 			<layout>p2</layout>
 			<url>${eclipse.repo}</url>
+		</repository>
+		<repository>
+			<id>orbit-repo</id>
+			<layout>p2</layout>
+			<url>${orbit.repo}</url>
 		</repository>
 	</repositories>
 
@@ -32,35 +38,20 @@
 		<plugins>
 			<plugin>
 				<groupId>org.eclipse.tycho</groupId>
-				<artifactId>tycho-compiler-plugin</artifactId>
+				<artifactId>tycho-maven-plugin</artifactId>
 				<version>${tycho-version}</version>
-				<configuration>
-					<source>1.8</source>
-					<target>1.8</target>
-				</configuration>
+				<extensions>true</extensions>
 			</plugin>
 
 			<plugin>
 				<groupId>org.eclipse.tycho</groupId>
 				<artifactId>tycho-packaging-plugin</artifactId>
 				<version>${tycho-version}</version>
+				<!-- 
 				<configuration>
-					<archiveSite>true</archiveSite>
 					<finalName>${final-name}</finalName>
 				</configuration>
-				<executions>
-					<execution>
-						<phase>package</phase>
-						<id>package-feature</id>
-					</execution>
-				</executions>
-			</plugin>
-
-			<plugin>
-				<groupId>org.eclipse.tycho</groupId>
-				<artifactId>tycho-maven-plugin</artifactId>
-				<version>${tycho-version}</version>
-				<extensions>true</extensions>
+				-->
 			</plugin>
 
 			<plugin>
@@ -75,11 +66,8 @@
 						</goals>
 					</execution>
 				</executions>
-				<configuration>
-					<finalName>${final-name}</finalName>
-				</configuration>
 			</plugin>
-
+			 
 			<plugin>
 				<groupId>org.eclipse.tycho</groupId>
 				<artifactId>target-platform-configuration</artifactId>
@@ -91,89 +79,15 @@
 							<ws>win32</ws>
 							<arch>x86_64</arch>
 						</environment>
-						<environment>
-							<os>linux</os>
-							<ws>gtk</ws>
-							<arch>x86_64</arch>
-						</environment>
-						<environment>
-							<os>macosx</os>
-							<ws>cocoa</ws>
-							<arch>x86_64</arch>
-						</environment>
 					</environments>
 				</configuration>
 			</plugin>
-
-			<plugin>
-				<groupId>org.reficio</groupId>
-				<artifactId>p2-maven-plugin</artifactId>
-				<version>${p2-maven-version}</version>
-				<executions>
-					<execution>
-						<id>default-cli</id>
-						<phase>package</phase>
-						<goals>
-							<goal>site</goal>
-						</goals>
-						<configuration>
-							<categoryFileURL>p2/category.xml</categoryFileURL>
-							<compressSite>false</compressSite>
-							<artifacts>
-								<artifact>
-									<id>nu.bibi:nu.bibi.twigcs:1.0.0</id>
-									<transitive>false</transitive>
-								</artifact>
-								<artifact>
-									<id>com.google.code.gson:gson:2.8.2</id>
-									<transitive>false</transitive>
-									<!-- <override>true</override> <singleton>true</singleton> <instructions> <Bundle-Name>Gson</Bundle-Name> <Bundle-Vendor>Google Gson Project</Bundle-Vendor> <Bundle-ContactAddress>https://github.com/google/gson</Bundle-ContactAddress> <Bundle-Description>Gson JSON library</Bundle-Description> <_noee>true</_noee> </instructions> -->
-								</artifact>
-							</artifacts>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-
-			<plugin>
-				<groupId>org.eclipse.tycho</groupId>
-				<artifactId>tycho-p2-repository-plugin</artifactId>
-				<version>${tycho-version}</version>
-				<executions>
-					<execution>
-						<phase>package</phase>
-						<goals>
-							<goal>archive-repository</goal>
-						</goals>
-						<configuration>
-							<finalName>${site-name}</finalName>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>build-helper-maven-plugin</artifactId>
-				<version>3.0.0</version>
-				<executions>
-					<execution>
-						<goals>
-							<goal>attach-artifact</goal>
-						</goals>
-						<configuration>
-							<artifacts>
-								<artifact>
-									<file>target/${site-name}.zip</file>
-									<type>zip</type>
-								</artifact>
-							</artifacts>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-
+			
 		</plugins>
 	</build>
-
+	<modules>
+		<module>bundles/nu.bibi.twigcs</module>
+		<module>releng/nu.bibi.twigcs.repository</module>
+		<module>releng/nu.bibi.twigcs.feature</module>
+	</modules>
 </project>

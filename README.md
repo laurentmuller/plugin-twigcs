@@ -1,4 +1,6 @@
 # Plugin-twigcs
+[![Build Status](https://travis-ci.org/laurentmuller/plugin-twigcs.svg?branch=master)](https://travis-ci.org/laurentmuller/plugin-twigcs)
+
 An Eclipse plugin to validate Twig (*.twig) files with the [Twigcs](https://github.com/friendsoftwig/twigcs) component.
 
 Errors are visible in the **Editor**.
