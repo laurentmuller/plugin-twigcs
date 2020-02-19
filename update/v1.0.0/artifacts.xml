@@ -1,0 +1,51 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<?artifactRepository version='1.1.0'?>
+<repository name='Twigcs Eclipse Integration.' type='org.eclipse.equinox.p2.artifact.repository.simpleRepository' version='1'>
+  <properties size='2'>
+    <property name='p2.timestamp' value='1582097132153'/>
+    <property name='publishPackFilesAsSiblings' value='true'/>
+  </properties>
+  <mappings size='5'>
+    <rule filter='(&amp; (classifier=osgi.bundle) (format=packed))' output='${repoUrl}/plugins/${id}_${version}.jar.pack.gz'/>
+    <rule filter='(&amp; (classifier=osgi.bundle))' output='${repoUrl}/plugins/${id}_${version}.jar'/>
+    <rule filter='(&amp; (classifier=binary))' output='${repoUrl}/binary/${id}_${version}'/>
+    <rule filter='(&amp; (classifier=org.eclipse.update.feature) (format=packed))' output='${repoUrl}/features/${id}_${version}.jar.pack.gz'/>
+    <rule filter='(&amp; (classifier=org.eclipse.update.feature))' output='${repoUrl}/features/${id}_${version}.jar'/>
+  </mappings>
+  <artifacts size='3'>
+    <artifact classifier='osgi.bundle' id='nu.bibi.twigcs' version='1.0.0'>
+      <properties size='8'>
+        <property name='artifact.size' value='63050'/>
+        <property name='download.size' value='63050'/>
+        <property name='maven-groupId' value='nu.bibi.twigcs'/>
+        <property name='maven-artifactId' value='nu.bibi.twigcs'/>
+        <property name='maven-version' value='1.0.0'/>
+        <property name='download.md5' value='bbd42a98f530743a55a89ff9720863a1'/>
+        <property name='download.checksum.md5' value='bbd42a98f530743a55a89ff9720863a1'/>
+        <property name='download.checksum.sha-256' value='f17dbfe2eff6a36624783bfe457321a67143839d40fcf9afa587ec67d72f3bf1'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='com.google.gson' version='2.8.2.v20180104-1110'>
+      <properties size='5'>
+        <property name='download.size' value='259868'/>
+        <property name='artifact.size' value='259868'/>
+        <property name='download.md5' value='a4bcfd161d43f14cc26e751cd5c75270'/>
+        <property name='download.checksum.md5' value='a4bcfd161d43f14cc26e751cd5c75270'/>
+        <property name='download.checksum.sha-256' value='da52286d82d1415ff469fbe2f9360ea8b162bbd8dab2a207a445b41803d7a47f'/>
+      </properties>
+    </artifact>
+    <artifact classifier='org.eclipse.update.feature' id='nu.bibi.twigcs.feature' version='1.0.0'>
+      <properties size='9'>
+        <property name='artifact.size' value='1308'/>
+        <property name='download.size' value='1308'/>
+        <property name='maven-groupId' value='nu.bibi.twigcs'/>
+        <property name='maven-artifactId' value='nu.bibi.twigcs.feature'/>
+        <property name='maven-version' value='1.0.0'/>
+        <property name='download.contentType' value='application/zip'/>
+        <property name='download.md5' value='00c4155f0cb842385eb4919ea9b9170b'/>
+        <property name='download.checksum.md5' value='00c4155f0cb842385eb4919ea9b9170b'/>
+        <property name='download.checksum.sha-256' value='3fe0280a0a8a9b5032e3b6b37ae000a3f478c0fe973a9d2afc3eb35db9bcd531'/>
+      </properties>
+    </artifact>
+  </artifacts>
+</repository>
