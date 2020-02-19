@@ -41,8 +41,8 @@ import nu.bibi.twigcs.preferences.ProjectPreferences;
  * @author Laurent Muller
  * @version 1.0
  */
-public class ResourceListener
-		implements IResourceChangeListener, IResourceDeltaVisitor, IConstants {
+public class ResourceListener implements IResourceChangeListener,
+		IResourceDeltaVisitor, ICoreException {
 
 	/**
 	 * Creates a new instance of this class.
@@ -58,7 +58,7 @@ public class ResourceListener
 		try {
 			event.getDelta().accept(this);
 		} catch (final CoreException e) {
-			handleError(e.getStatus());
+			handleStatus(e.getStatus());
 		}
 	}
 

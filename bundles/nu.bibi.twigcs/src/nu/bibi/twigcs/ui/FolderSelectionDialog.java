@@ -26,7 +26,7 @@ import org.eclipse.ui.dialogs.ElementTreeSelectionDialog;
 import org.eclipse.ui.dialogs.ISelectionStatusValidator;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
 
-import nu.bibi.twigcs.core.IConstants;
+import nu.bibi.twigcs.core.ICoreException;
 import nu.bibi.twigcs.internal.Messages;
 
 /**
@@ -36,7 +36,7 @@ import nu.bibi.twigcs.internal.Messages;
  * @version 1.0
  */
 public class FolderSelectionDialog extends ElementTreeSelectionDialog
-		implements ISelectionStatusValidator, IConstants {
+		implements ISelectionStatusValidator, ICoreException {
 
 	/*
 	 * the excluded resources

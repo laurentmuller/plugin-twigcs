@@ -22,7 +22,7 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.preferences.ScopedPreferenceStore;
 
 import nu.bibi.twigcs.TwigcsPlugin;
-import nu.bibi.twigcs.core.IConstants;
+import nu.bibi.twigcs.core.ICoreException;
 import nu.bibi.twigcs.core.TwigcsBuilder;
 import nu.bibi.twigcs.internal.Messages;
 import nu.bibi.twigcs.model.TwigReporter;
@@ -35,8 +35,8 @@ import nu.bibi.twigcs.model.TwigVersion;
  * @author Laurent Muller
  * @version 1.0
  */
-public class PreferencesPage extends FieldEditorPreferencePage
-		implements IWorkbenchPreferencePage, PreferencesConstants, IConstants {
+public class PreferencesPage extends FieldEditorPreferencePage implements
+		IWorkbenchPreferencePage, PreferencesConstants, ICoreException {
 
 	/**
 	 * Creates a new instance of this class.
@@ -93,11 +93,11 @@ public class PreferencesPage extends FieldEditorPreferencePage
 				TwigcsBuilder.triggerCleanBuild();
 
 			} catch (final IOException e) {
-				handleError(createErrorStatus(
+				handleStatus(createErrorStatus(
 						Messages.PreferencesPage_Error_Save, e));
 				return false;
 			} catch (final CoreException e) {
-				handleError(e.getStatus());
+				handleStatus(e.getStatus());
 				return false;
 			}
 		}

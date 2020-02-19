@@ -1,4 +1,4 @@
-# Plugin-twigcs
+# Plugin-Twigcs
 [![Build Status](https://travis-ci.org/laurentmuller/plugin-twigcs.svg?branch=master)](https://travis-ci.org/laurentmuller/plugin-twigcs)
 
 An Eclipse plugin to validate Twig (*.twig) files with the [Twigcs](https://github.com/friendsoftwig/twigcs) component.
@@ -13,31 +13,59 @@ And displayed in the **Problems view**.
 
 ## Installation
 
-- Install Twigcs component globally as explain in the [Twigcs Github site](https://github.com/friendsoftwig/twigcs). 
+  ### Installation of Twigcs
 
-  ```bash
-  composer global require friendsoftwig/twigcs
-  ```
+  - Install Twigcs component globally as explain in the [Twigcs Github site](https://github.com/friendsoftwig/twigcs). 
 
-- Download the update site zip file from the releases tab.
+    ```bash
+    composer global require friendsoftwig/twigcs
+    ```
 
-- Start Eclipse PDT and select the menu **Help** -> **Install New Software...**
+  ### Eclipse Installation from the Update Site
 
-- Click to the **Add....** button.
+  - Start Eclipse PDT and select the menu **Help** -> **Install New Software...**
 
-- Click to the **Archive...** button and select the downloaded zip file.
+  - Click the **Add....** button.
 
-  ![Add Repository](docs/add_repository.png)
+  - Enter the location as the image below.
+  
+    ![Add Update Site](docs/add_repository_site.png)
+    
+  - Select the newly added repository. 
 
-- Select the newly added repository.  Check the the Twigcs category check box and follow the wizard instructions.
+  - Check the the Twigcs category check box.
 
-  ![Install](docs/update.png)
+    ![Install](docs/update.png)
 
-- Alternatively, you can download the jar file from the releases tab and copy it to the dropins folder of your Eclipse PDT installation.
+  - Follow the wizard instructions.
 
-- Update the [Workspace preferences](#workspace-preferences) to define the path to the Twigcs batch file.
+  - Update the [Workspace preferences](#workspace-preferences) to define the path to the Twigcs batch file.
 
-- Update your [Project properties](#project-properties) to define witch folders are validate.
+  - Update your [Project properties](#project-properties) to define witch folders are validate.
+    
+  ### Eclipse Installation from the Zip file
+
+  - Download the update site zip file from the releases tab.
+
+  - Start Eclipse PDT and select the menu **Help** -> **Install New Software...**
+
+  - Click the **Add....** button.
+
+  - Click the **Archive...** button and select the downloaded zip file.
+
+    ![Add Repository](docs/add_repository_zip.png)
+
+  - Select the newly added repository.
+
+  - Check the the Twigcs category check box.
+
+  - Follow the wizard instructions.
+
+  ### Installation in the dropins folder
+
+  - Download the jar file (nu.bibi.twigcs-x.y.z.jar) from the releases tab to your local drive.
+  - Copy that file to the dropins folder of your Eclipse PDT installation.
+  - Restart Eclipse.
 
 ## Workspace preferences
 
@@ -47,6 +75,15 @@ The workspace preferences allow user to define how the Twigcs component run. The
 
 
 ## Project properties
+
+To enable validation, You must add the Twigcs nature to the project.
+
+- Select the project You want to update in the Explorer View.
+- Display the context menu.
+- Select **Configure** -> **Enable Twigcs validation**.
+
+![Install](docs/enable_twigcs.png)
+
 
 For each project, user can select witch folders are included for the validation or are excluded. The user must select at least one included folder .
 

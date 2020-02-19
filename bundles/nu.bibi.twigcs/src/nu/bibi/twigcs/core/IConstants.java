@@ -8,11 +8,6 @@
  */
 package nu.bibi.twigcs.core;
 
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.ui.statushandlers.StatusManager;
-
 /**
  * Global constants.
  *
@@ -46,44 +41,4 @@ public interface IConstants {
 	 */
 	String TWIG_EXTENSION = "twig"; //$NON-NLS-1$
 
-	/**
-	 * Creates a core exception.
-	 *
-	 * @param message
-	 *            the status message.
-	 * @param exception
-	 *            a low-level exception, or <code>null</code> if not applicable.
-	 * @return the core exception.
-	 */
-	default CoreException createCoreException(final String message,
-			final Throwable exception) {
-		final IStatus status = createErrorStatus(message, exception);
-		return new CoreException(status);
-	}
-
-	/**
-	 * Creates an error status.
-	 *
-	 * @param message
-	 *            the status message.
-	 * @param exception
-	 *            a low-level exception, or <code>null</code> if not applicable.
-	 * @return the error status.
-	 */
-	default IStatus createErrorStatus(final String message,
-			final Throwable exception) {
-		return new Status(IStatus.ERROR, PLUGIN_ID, message, exception);
-	}
-
-	/**
-	 * Handles the given error status.
-	 *
-	 * @param status
-	 *            the status to handle.
-	 */
-	default void handleError(final IStatus status) {
-		if (status != null) {
-			StatusManager.getManager().handle(status);
-		}
-	}
 }

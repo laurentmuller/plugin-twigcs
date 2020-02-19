@@ -20,12 +20,10 @@ import org.eclipse.core.runtime.CoreException;
 import nu.bibi.twigcs.internal.Messages;
 
 /**
- * Wrapper class for the {@link IFile} content.
- * <p>
- * This class is used to read the content and to track line offsets.
- * </p>
+ * Wrapper class for the {@link IFile} content. This class is used to read the
+ * content and to track line offsets.
  */
-public class ResourceText implements IConstants {
+public class ResourceText implements ICoreException {
 
 	/*
 	 * the line feed character

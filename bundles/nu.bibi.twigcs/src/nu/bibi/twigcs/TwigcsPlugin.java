@@ -27,12 +27,7 @@ import nu.bibi.twigcs.core.ResourceListener;
  * @author Laurent Muller
  * @version 1.0
  */
-public class TwigcsPlugin extends AbstractUIPlugin {
-
-	/**
-	 * The plugin identifier.
-	 */
-	public static final String PLUGIN_ID = IConstants.PLUGIN_ID;
+public class TwigcsPlugin extends AbstractUIPlugin implements IConstants {
 
 	/*
 	 * The shared instance

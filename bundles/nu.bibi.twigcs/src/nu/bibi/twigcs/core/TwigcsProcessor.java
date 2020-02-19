@@ -32,7 +32,7 @@ import nu.bibi.twigcs.preferences.PreferencesInitializer;
  * @author Laurent Muller
  * @version 1.0
  */
-public class TwigcsProcessor implements IConstants {
+public class TwigcsProcessor implements ICoreException {
 
 	/**
 	 * Creates an instance of processor from the preference store.

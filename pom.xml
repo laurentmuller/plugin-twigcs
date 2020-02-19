@@ -2,7 +2,7 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-
+	
 	<groupId>nu.bibi.twigcs</groupId>
 	<artifactId>nu.bibi.twigcs.parent</artifactId>
 	<version>1.0.0</version>
@@ -14,6 +14,7 @@
 		<eclipse.repo>http://download.eclipse.org/releases/latest</eclipse.repo>
 		<orbit.repo>https://download.eclipse.org/tools/orbit/downloads/drops/I20200106175313/repository/</orbit.repo>
 		<final-name>${project.artifactId}.v${project.version}</final-name>
+		<update.dir>${project.basedir}/update/v${project.version}</update.dir>
 	</properties>
 
 	<modules>
@@ -33,11 +34,13 @@
 			<layout>p2</layout>
 			<url>${eclipse.repo}</url>
 		</repository>
+		<!-- 
 		<repository>
 			<id>orbit-repo</id>
 			<layout>p2</layout>
 			<url>${orbit.repo}</url>
 		</repository>
+		 -->
 	</repositories>
 
 	<build>
@@ -53,11 +56,7 @@
 				<groupId>org.eclipse.tycho</groupId>
 				<artifactId>tycho-packaging-plugin</artifactId>
 				<version>${tycho-version}</version>
-				<!-- 
-				<configuration>
-					<finalName>${final-name}</finalName>
-				</configuration>
-				-->
+				<!-- <configuration> <finalName>${final-name}</finalName> </configuration> -->
 			</plugin>
 
 			<plugin>
@@ -73,7 +72,7 @@
 					</execution>
 				</executions>
 			</plugin>
-			 
+
 			<plugin>
 				<groupId>org.eclipse.tycho</groupId>
 				<artifactId>target-platform-configuration</artifactId>
@@ -88,7 +87,46 @@
 					</environments>
 				</configuration>
 			</plugin>
-			
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-clean-plugin</artifactId>
+				<version>3.1.0</version>
+				<configuration>
+					<filesets>
+						<fileset>
+							<directory>${update.dir}</directory>
+						</fileset>
+					</filesets>
+				</configuration>
+			</plugin>
+
+			<!-- copy update site -->
+			<!-- https://raw.githubusercontent.com/laurentmuller/plugin-twigcs/master/update/v1.0.0 -->
+			<!-- https://github.com/laurentmuller/plugin-twigcs/raw/master/update/v1.0.0/p2.index -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>3.1.0</version>
+				<executions>
+					<execution>
+						<id>copy-resources</id>
+						<phase>install</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<overwrite>true</overwrite>
+							<outputDirectory>${update.dir}</outputDirectory>
+							<resources>
+								<resource>
+									<directory>${project.basedir}/releng/nu.bibi.twigcs.repository/target/repository</directory>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
 </project>

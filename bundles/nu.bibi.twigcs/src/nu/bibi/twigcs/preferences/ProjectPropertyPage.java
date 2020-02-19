@@ -29,7 +29,7 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.ui.dialogs.PropertyPage;
 import org.osgi.service.prefs.BackingStoreException;
 
-import nu.bibi.twigcs.core.IConstants;
+import nu.bibi.twigcs.core.ICoreException;
 import nu.bibi.twigcs.core.TwigcsBuilder;
 import nu.bibi.twigcs.internal.Messages;
 import nu.bibi.twigcs.ui.DragDropViewer;
@@ -42,7 +42,8 @@ import nu.bibi.twigcs.ui.FolderTableViewer;
  * @author Laurent Muller
  * @version 1.0
  */
-public class ProjectPropertyPage extends PropertyPage implements IConstants {
+public class ProjectPropertyPage extends PropertyPage
+		implements ICoreException {
 
 	// viewers
 	private FolderTableViewer includeViewer;
@@ -96,11 +97,11 @@ public class ProjectPropertyPage extends PropertyPage implements IConstants {
 				TwigcsBuilder.triggerCleanBuild(getElement());
 			}
 		} catch (final BackingStoreException e) {
-			handleError(createErrorStatus(
+			handleStatus(createErrorStatus(
 					Messages.ProjectPropertyPage_Error_Save, e));
 			return false;
 		} catch (final CoreException e) {
-			handleError(e.getStatus());
+			handleStatus(e.getStatus());
 			return false;
 		}
 

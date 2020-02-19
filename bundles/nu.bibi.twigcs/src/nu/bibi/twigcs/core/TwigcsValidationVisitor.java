@@ -41,7 +41,7 @@ import nu.bibi.twigcs.preferences.ProjectPreferences;
  * @version 1.0
  */
 public class TwigcsValidationVisitor extends AbstractResouceVisitor
-		implements IConstants {
+		implements IConstants, ICoreException {
 
 	/**
 	 * Returns if the given resource is a Twig file.
