@@ -23,13 +23,17 @@ And displayed in the **Problems view**.
 
 - Start Eclipse PDT and select the menu **Help** -> **Install New Software...**
 
-- Add the downloaded zip file as source.
+- Click to the **Add....** button.
+
+- Click to the **Archive...** button and select the downloaded zip file.
 
   ![Add Repository](docs/add_repository.png)
 
 - Select the newly added repository.  Check the the Twigcs category check box and follow the wizard instructions.
 
-- An other solution is to download the the jar file from the releases tab and copy to the dropins folder of your Eclipse PDT installation.
+  ![Install](docs/update.png)
+
+- Alternatively, you can download the jar file from the releases tab and copy it to the dropins folder of your Eclipse PDT installation.
 
 - Update the [Workspace preferences](#workspace-preferences) to define the path to the Twigcs batch file.
 

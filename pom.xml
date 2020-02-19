@@ -16,6 +16,12 @@
 		<final-name>${project.artifactId}.v${project.version}</final-name>
 	</properties>
 
+	<modules>
+		<module>bundles/nu.bibi.twigcs</module>
+		<module>releng/nu.bibi.twigcs.repository</module>
+		<module>releng/nu.bibi.twigcs.feature</module>
+	</modules>
+
 	<prerequisites>
 		<maven>3.0</maven>
 	</prerequisites>
@@ -85,9 +91,4 @@
 			
 		</plugins>
 	</build>
-	<modules>
-		<module>bundles/nu.bibi.twigcs</module>
-		<module>releng/nu.bibi.twigcs.repository</module>
-		<module>releng/nu.bibi.twigcs.feature</module>
-	</modules>
 </project>
