@@ -103,7 +103,7 @@
 
 			<!-- copy update site -->
 			<!-- https://raw.githubusercontent.com/laurentmuller/plugin-twigcs/master/update/v1.0.0 -->
-			<!-- https://github.com/laurentmuller/plugin-twigcs/raw/master/update/v1.0.0/p2.index -->
+			<!-- https://github.com/laurentmuller/plugin-twigcs/raw/master/update/v1.0.0
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-resources-plugin</artifactId>
@@ -127,6 +127,7 @@
 					</execution>
 				</executions>
 			</plugin>
+			 -->
 		</plugins>
 	</build>
 </project>
