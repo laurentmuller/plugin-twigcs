@@ -17,7 +17,7 @@
 		<ftp.serverId>infomaniak</ftp.serverId>		
 		<ftp.url>ftp://tj8om.ftp.infomaniak.com/web</ftp.url>
 		<ftp.fromDir>${project.basedir}/releng/nu.bibi.twigcs.repository/target/repository</ftp.fromDir>
-		<ftp.toDir>update/v${project.version}</ftp.toDir>
+		<ftp.toDir>twigcs/v${project.version}</ftp.toDir>
 	</properties>
 
 	<modules>
@@ -32,7 +32,7 @@
 
 	<repositories>
 		<repository>
-			<id>target-repo</id>
+			<id>eclipse-repo</id>
 			<layout>p2</layout>
 			<url>${eclipse.repo}</url>
 		</repository>
