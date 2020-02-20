@@ -15,21 +15,16 @@ import org.eclipse.osgi.util.NLS;
 
 /**
  * Properties wrapper.
- */ 
+ */
 public final class Messages extends NLS {
-	
+
 	/*
 	 * the bundle name
 	 */
 	private static final String BUNDLE_NAME = "nu.bibi.twigcs.internal.messages"; //$NON-NLS-1$
-	
-	/*
-	 * prevent instance creation
-	 */
-	private Messages() {
-	}
-	
+
 	public static String FolderSelectionDialog_Error_Already_Selected;
+
 	public static String FolderSelectionDialog_Error_No_Selection;
 	public static String FolderSelectionDialog_Error_Not_A_Folder;
 	public static String FolderSelectionDialog_Title;
@@ -48,6 +43,7 @@ public final class Messages extends NLS {
 	public static String ProjectPropertyPage_Exclude;
 	public static String ProjectPropertyPage_Include;
 	public static String ProjectPropertyPage_Remove;
+	public static String ProjectPropertyPage_Override;
 	public static String ResourceListener_Update;
 	public static String ResourceText_Error_Index;
 	public static String ResourceText_Error_Read;
@@ -59,11 +55,16 @@ public final class Messages extends NLS {
 	public static String TwigcsProcessor_Error_Real_Path;
 	public static String ValidationVisitor_Error_Validate_Code;
 	public static String ValidationVisitor_Error_Validate_Name;
-
 	/*
 	 * initialise messages
 	 */
 	static {
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
+	}
+
+	/*
+	 * prevent instance creation
+	 */
+	private Messages() {
 	}
 }

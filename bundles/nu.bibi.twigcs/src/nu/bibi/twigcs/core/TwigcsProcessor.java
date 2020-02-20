@@ -42,9 +42,9 @@ public class TwigcsProcessor implements ICoreException {
 	public static TwigcsProcessor instance() {
 		final TwigcsProcessor processor = new TwigcsProcessor();
 		processor.setProgramPath(PreferencesInitializer.getExecutable());
-		processor.setSeverity(PreferencesInitializer.getSeverity());
-		processor.setReporter(PreferencesInitializer.getReporter());
 		processor.setTwigVersion(PreferencesInitializer.getTwigVersion());
+		processor.setTwigSeverity(PreferencesInitializer.getTwigSeverity());
+		processor.setTwigReporter(PreferencesInitializer.getTwigReporter());
 
 		return processor;
 	}
@@ -55,17 +55,17 @@ public class TwigcsProcessor implements ICoreException {
 	private String programPath;
 
 	/*
-	 * the twig version
+	 * the Twig version
 	 */
-	private TwigVersion twigVersion = TwigVersion.VERSION_3;
+	private TwigVersion version = TwigVersion.VERSION_3;
 
 	/*
-	 * the minimum severity level
+	 * the minimum Twig severity level
 	 */
 	private TwigSeverity severity = TwigSeverity.warning;
 
 	/*
-	 * the output reporter
+	 * the output Twig reporter
 	 */
 	private TwigReporter reporter = TwigReporter.json;
 
@@ -156,7 +156,7 @@ public class TwigcsProcessor implements ICoreException {
 
 		// twig version
 		command.add("-t"); //$NON-NLS-1$
-		command.add(twigVersion.version());
+		command.add(version.version());
 
 		// severity
 		command.add("-s"); //$NON-NLS-1$
@@ -191,15 +191,6 @@ public class TwigcsProcessor implements ICoreException {
 	}
 
 	/**
-	 * Gets the reporter to use for output results.
-	 *
-	 * @return the reporter.
-	 */
-	public TwigReporter getReporter() {
-		return reporter;
-	}
-
-	/**
 	 * Gets the search paths.
 	 *
 	 * @return the search paths.
@@ -209,21 +200,30 @@ public class TwigcsProcessor implements ICoreException {
 	}
 
 	/**
-	 * Gets the minimum severity level.
+	 * Gets the Twig reporter to use for output results.
 	 *
-	 * @return the minimum severity.
+	 * @return the reporter.
 	 */
-	public TwigSeverity getSeverity() {
+	public TwigReporter getTwigReporter() {
+		return reporter;
+	}
+
+	/**
+	 * Gets the minimum Twig severity level.
+	 *
+	 * @return the minimum Twig severity level.
+	 */
+	public TwigSeverity getTwigSeverity() {
 		return severity;
 	}
 
 	/**
-	 * Gets the twig version to use.
+	 * Gets the Twig version to use.
 	 *
-	 * @return the twig version.
+	 * @return the Twig version.
 	 */
 	public TwigVersion getTwigVersion() {
-		return twigVersion;
+		return version;
 	}
 
 	/**
@@ -234,16 +234,6 @@ public class TwigcsProcessor implements ICoreException {
 	 */
 	public void setProgramPath(final String programPath) {
 		this.programPath = programPath;
-	}
-
-	/**
-	 * Sets the reporter to use for output results.
-	 *
-	 * @param reporter
-	 *            the reporter to use
-	 */
-	public void setReporter(final TwigReporter reporter) {
-		this.reporter = reporter;
 	}
 
 	/**
@@ -258,23 +248,33 @@ public class TwigcsProcessor implements ICoreException {
 	}
 
 	/**
-	 * Sets the minimum severity level.
+	 * Sets the Twig reporter to use for output results.
+	 *
+	 * @param reporter
+	 *            the Twig reporter to use
+	 */
+	public void setTwigReporter(final TwigReporter reporter) {
+		this.reporter = reporter;
+	}
+
+	/**
+	 * Sets the minimum Twig severity level.
 	 *
 	 * @param severity
-	 *            the minimum severity.
+	 *            the minimum Twig severity.
 	 */
-	public void setSeverity(final TwigSeverity severity) {
+	public void setTwigSeverity(final TwigSeverity severity) {
 		this.severity = severity;
 	}
 
 	/**
-	 * Set the twig version to use.
+	 * Set the Twig version to use.
 	 *
-	 * @param twigVersion
-	 *            the twig version.
+	 * @param version
+	 *            the Twig version.
 	 */
-	public void setTwigVersion(final TwigVersion twigVersion) {
-		this.twigVersion = twigVersion;
+	public void setTwigVersion(final TwigVersion version) {
+		this.version = version;
 	}
 
 	/**

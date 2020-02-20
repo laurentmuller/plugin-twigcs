@@ -23,6 +23,8 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.osgi.service.prefs.BackingStoreException;
 
 import nu.bibi.twigcs.core.IConstants;
+import nu.bibi.twigcs.model.TwigSeverity;
+import nu.bibi.twigcs.model.TwigVersion;
 
 /**
  * Project preferences helper.
@@ -30,7 +32,7 @@ import nu.bibi.twigcs.core.IConstants;
  * @author Laurent Muller
  * @version 1.0
  */
-public class ProjectPreferences implements IConstants {
+public class ProjectPreferences implements IConstants, PreferencesConstants {
 
 	/*
 	 * the key to get/set include paths
@@ -47,17 +49,6 @@ public class ProjectPreferences implements IConstants {
 	 */
 	private static final String SEPARATOR = ":"; //$NON-NLS-1$
 
-	// /**
-	// * A predicate that always evaluates to {@code true}.
-	// *
-	// * @param o
-	// * the NOP object.
-	// * @return <code>true</code>.
-	// */
-	// private static boolean alwaysTrue(final Object o) {
-	// return true;
-	// }
-
 	/*
 	 * the project's preferences
 	 */
@@ -68,6 +59,11 @@ public class ProjectPreferences implements IConstants {
 	 */
 	private final IProject project;
 
+	/*
+	 * the dirty state
+	 */
+	private boolean dirty;
+
 	/**
 	 * Creates a new instance of this class.
 	 *
@@ -75,8 +71,11 @@ public class ProjectPreferences implements IConstants {
 	 *            the project to get or set preferences.
 	 */
 	public ProjectPreferences(final IProject project) {
-		preferences = new ProjectScope(project).getNode(PLUGIN_ID);
 		this.project = project;
+		preferences = new ProjectScope(project).getNode(PLUGIN_ID);
+		// preferences.addPreferenceChangeListener(e -> {
+		// System.out.println("Changed: " + e.getKey());
+		// });
 	}
 
 	/**
@@ -89,6 +88,7 @@ public class ProjectPreferences implements IConstants {
 	 */
 	public void flush() throws BackingStoreException {
 		preferences.flush();
+		dirty = false;
 	}
 
 	/**
@@ -101,7 +101,7 @@ public class ProjectPreferences implements IConstants {
 	}
 
 	/**
-	 * Gets the exclude paths without the verification of existence..
+	 * Gets the exclude paths without the verification of existence.
 	 *
 	 * @return the exclude paths.
 	 */
@@ -146,12 +146,39 @@ public class ProjectPreferences implements IConstants {
 	}
 
 	/**
-	 * Get the project preferences.
+	 * Gets the Twig severity.
 	 *
-	 * @return the preferences.
+	 * @return the Twig severity.
 	 */
-	public IEclipsePreferences getPreferences() {
-		return preferences;
+	public TwigSeverity getTwigSeverity() {
+		final String name = preferences.get(P_SEVERITY, "");
+		if (!name.isEmpty()) {
+			return TwigSeverity.valueOf(name);
+		}
+		return PreferencesInitializer.getTwigSeverity();
+	}
+
+	/**
+	 * Gets the Twig version.
+	 *
+	 * @return the Twig version.
+	 */
+	public TwigVersion getTwigVersion() {
+		final String name = preferences.get(P_VERSION, "");
+		if (!name.isEmpty()) {
+			return TwigVersion.valueOf(name);
+		}
+		return PreferencesInitializer.getTwigVersion();
+
+	}
+
+	/**
+	 * Returns if a change occurred from the last flush.
+	 *
+	 * @return <code>true</code> if dirty.
+	 */
+	public boolean isDirty() {
+		return dirty;
 	}
 
 	/**
@@ -195,6 +222,69 @@ public class ProjectPreferences implements IConstants {
 	}
 
 	/**
+	 * Sets the Twig severity.
+	 *
+	 * @param severity
+	 *            the severity to set or <code>null</code> to use global
+	 *            preferences.
+	 */
+	public void setTwigSeverity(final TwigSeverity severity) {
+		if (severity == null
+				|| severity.equals(PreferencesInitializer.getTwigSeverity())) {
+			doRemove(P_SEVERITY);
+		} else {
+			doPut(P_SEVERITY, severity.name());
+		}
+	}
+
+	/**
+	 * Sets the Twig version.
+	 *
+	 * @param version
+	 *            the version to set or <code>null</code> to use global
+	 *            preferences.
+	 */
+	public void setTwigVersion(final TwigVersion version) {
+		if (version == null
+				|| version.equals(PreferencesInitializer.getTwigVersion())) {
+			doRemove(P_VERSION);
+		} else {
+			doPut(P_VERSION, version.name());
+		}
+	}
+
+	/**
+	 * Associates the specified value with the specified key in this node.
+	 *
+	 * @param key
+	 *            the key with which the specified value is to be associated.
+	 * @param value
+	 *            the value to be associated with the specified key.
+	 */
+	private void doPut(final String key, final String value) {
+		final String oldValue = preferences.get(key, "");
+		if (!value.equals(oldValue)) {
+			preferences.put(key, value);
+			dirty = true;
+		}
+	}
+
+	/**
+	 * Removes the value associated with the specified {@code key} in this node,
+	 * if any.
+	 *
+	 * @param key
+	 *            the key whose mapping is to be removed from this node.
+	 */
+	private void doRemove(final String key) {
+		final String oldValue = preferences.get(key, "");
+		if (!oldValue.isEmpty()) {
+			preferences.remove(key);
+			dirty = true;
+		}
+	}
+
+	/**
 	 * Gets the paths.
 	 *
 	 * @param key
@@ -209,7 +299,6 @@ public class ProjectPreferences implements IConstants {
 
 		// split
 		final String[] paths = value.split(SEPARATOR);
-		// .filter(IResource::exists)
 
 		// build
 		return Arrays.stream(paths).map(path -> project.findMember(path))
@@ -272,9 +361,9 @@ public class ProjectPreferences implements IConstants {
 				.collect(Collectors.joining(SEPARATOR));
 
 		if (value.isEmpty()) {
-			preferences.remove(key);
+			doRemove(key);
 		} else {
-			preferences.put(key, value);
+			doPut(key, value);
 		}
 	}
 

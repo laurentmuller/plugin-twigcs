@@ -58,7 +58,7 @@ public class DragDropViewer<E> {
 	public static <E> DragDropViewer<E> instance(final TableViewer sourceViewer,
 			final List<E> sourceList, final TableViewer targetViewer,
 			final List<E> targetList) {
-		return new DragDropViewer<E>(sourceViewer, sourceList, targetViewer,
+		return new DragDropViewer<>(sourceViewer, sourceList, targetViewer,
 				targetList);
 	}
 

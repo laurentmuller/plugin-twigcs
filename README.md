@@ -79,6 +79,6 @@ To enable validation, You must add the Twigcs nature to the project.
 ![Install](docs/enable_twigcs.png)
 
 
-For each project, user can select witch folders are included for the validation or are excluded. The user must select at least one included folder .
+For each project, user can select witch folders are included for the validation or are excluded. The user must select at least one included folder . If needed, the user can also override the default Twigcs preferences.
 
 ![Alt  Project properties](docs/properties.png)

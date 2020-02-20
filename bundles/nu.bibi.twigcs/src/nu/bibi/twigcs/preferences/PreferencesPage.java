@@ -39,6 +39,36 @@ public class PreferencesPage extends FieldEditorPreferencePage implements
 		IWorkbenchPreferencePage, PreferencesConstants, ICoreException {
 
 	/**
+	 * Gets the enumeration names to populate a combo field editor.
+	 *
+	 * @param clazz
+	 *            the enumeration class.
+	 * @return an array with the enumeration names.
+	 */
+	public static String[][] getEnumNames(
+			final Class<? extends Enum<?>> clazz) {
+		final Enum<?>[] values = clazz.getEnumConstants();
+		final String[][] result = new String[values.length][2];
+		for (int i = 0; i < values.length; i++) {
+			result[i][0] = toProperCase(values[i].name());
+			result[i][1] = values[i].name();
+		}
+		return result;
+	}
+
+	/**
+	 * Convert the given string to proper case.
+	 *
+	 * @param text
+	 *            the string to convert.
+	 * @return the converted string.
+	 */
+	public static String toProperCase(final String text) {
+		return Character.toUpperCase(text.charAt(0))
+				+ text.substring(1).replace('_', ' ').toLowerCase();
+	}
+
+	/**
 	 * Creates a new instance of this class.
 	 */
 	public PreferencesPage() {
@@ -53,7 +83,7 @@ public class PreferencesPage extends FieldEditorPreferencePage implements
 	@Override
 	public void createFieldEditors() {
 		addFileEditor();
-		addEnumEditor(P_TWIG_VERSION, Messages.PreferencesPage_Twig_Version,
+		addEnumEditor(P_VERSION, Messages.PreferencesPage_Twig_Version,
 				TwigVersion.class);
 		addEnumEditor(P_SEVERITY, Messages.PreferencesPage_Severity,
 				TwigSeverity.class);
@@ -141,34 +171,5 @@ public class PreferencesPage extends FieldEditorPreferencePage implements
 		editor.setErrorMessage(Messages.PreferencesPage_Error_Path);
 		editor.setEmptyStringAllowed(false);
 		addField(editor);
-	}
-
-	/**
-	 * Gets the enumeration names to populate a combo field editor.
-	 *
-	 * @param clazz
-	 *            the enumeration class.
-	 * @return an array with the enumeration names.
-	 */
-	private String[][] getEnumNames(final Class<? extends Enum<?>> clazz) {
-		final Enum<?>[] values = clazz.getEnumConstants();
-		final String[][] result = new String[values.length][2];
-		for (int i = 0; i < values.length; i++) {
-			result[i][0] = toProperCase(values[i].name());
-			result[i][1] = values[i].name();
-		}
-		return result;
-	}
-
-	/**
-	 * Convert the given string to proper case.
-	 *
-	 * @param text
-	 *            the string to convert.
-	 * @return the converted string.
-	 */
-	private String toProperCase(final String text) {
-		return Character.toUpperCase(text.charAt(0))
-				+ text.substring(1).replace('_', ' ').toLowerCase();
 	}
 }

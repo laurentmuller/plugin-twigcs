@@ -33,7 +33,7 @@ public interface PreferencesConstants {
 	/**
 	 * The default twig version.
 	 */
-	String DEFAULT_TWIG_VERSION = TwigVersion.VERSION_3.name();
+	String DEFAULT_VERSION = TwigVersion.VERSION_3.name();
 
 	/**
 	 * The Twigcs executable path property.
@@ -53,5 +53,5 @@ public interface PreferencesConstants {
 	/**
 	 * The twig version property.
 	 */
-	String P_TWIG_VERSION = "twigcs.twig_version"; //$NON-NLS-1$
+	String P_VERSION = "twigcs.version"; //$NON-NLS-1$
 }

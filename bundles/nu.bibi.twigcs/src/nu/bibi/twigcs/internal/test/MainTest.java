@@ -90,7 +90,7 @@ public class MainTest {
 	static TwigcsProcessor getProcessor() {
 		final TwigcsProcessor processor = new TwigcsProcessor();
 		processor.setProgramPath(EXEC_PATH);
-		processor.setSeverity(TwigSeverity.error);
+		processor.setTwigSeverity(TwigSeverity.error);
 		processor.setTwigVersion(TwigVersion.VERSION_2);
 		return processor;
 	}

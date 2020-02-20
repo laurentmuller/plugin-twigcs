@@ -17,12 +17,17 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.viewers.ArrayContentProvider;
+import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Table;
@@ -32,6 +37,8 @@ import org.osgi.service.prefs.BackingStoreException;
 import nu.bibi.twigcs.core.ICoreException;
 import nu.bibi.twigcs.core.TwigcsBuilder;
 import nu.bibi.twigcs.internal.Messages;
+import nu.bibi.twigcs.model.TwigSeverity;
+import nu.bibi.twigcs.model.TwigVersion;
 import nu.bibi.twigcs.ui.DragDropViewer;
 import nu.bibi.twigcs.ui.FolderSelectionDialog;
 import nu.bibi.twigcs.ui.FolderTableViewer;
@@ -49,13 +56,14 @@ public class ProjectPropertyPage extends PropertyPage
 	private FolderTableViewer includeViewer;
 	private FolderTableViewer excludeViewer;
 
-	// original lists
-	private List<IResource> oldIncludeList;
-	private List<IResource> oldExcludeList;
-
 	// modified lists
 	private List<IResource> includeList;
 	private List<IResource> excludeList;
+
+	// overrides
+	private Button chkOverride;
+	private ComboViewer twigViewer;
+	private ComboViewer severityViewer;
 
 	/**
 	 * Creates a new instance of this class.
@@ -84,18 +92,31 @@ public class ProjectPropertyPage extends PropertyPage
 	@Override
 	public boolean performOk() {
 		try {
-			// change?
-			if (!oldIncludeList.equals(includeList)
-					|| !oldExcludeList.equals(excludeList)) {
-				// save
-				final ProjectPreferences preferences = getPreferences();
-				preferences.setIncludeResources(includeList);
-				preferences.setExcludeResources(excludeList);
-				preferences.flush();
+			// preferences
+			final ProjectPreferences preferences = getPreferences();
 
-				// build
+			// save paths
+			preferences.setIncludeResources(includeList);
+			preferences.setExcludeResources(excludeList);
+
+			// save override
+			TwigVersion version = null;
+			TwigSeverity severity = null;
+			if (chkOverride.getSelection()) {
+				version = (TwigVersion) twigViewer.getStructuredSelection()
+						.getFirstElement();
+				severity = (TwigSeverity) severityViewer
+						.getStructuredSelection().getFirstElement();
+			}
+			preferences.setTwigVersion(version);
+			preferences.setTwigSeverity(severity);
+
+			// save and build if dirty
+			if (preferences.isDirty()) {
+				preferences.flush();
 				TwigcsBuilder.triggerCleanBuild(getElement());
 			}
+
 		} catch (final BackingStoreException e) {
 			handleStatus(createErrorStatus(
 					Messages.ProjectPropertyPage_Error_Save, e));
@@ -115,11 +136,8 @@ public class ProjectPropertyPage extends PropertyPage
 	protected Composite createContents(final Composite parent) {
 		// get lists
 		final ProjectPreferences preferences = getPreferences();
-		oldIncludeList = preferences.getIncludeResources();
-		oldExcludeList = preferences.getExcludeResources();
-
-		includeList = new ArrayList<>(oldIncludeList);
-		excludeList = new ArrayList<>(oldExcludeList);
+		includeList = preferences.getIncludeResources();
+		excludeList = preferences.getExcludeResources();
 
 		// container
 		final Composite container = createComposite(parent, 1);
@@ -135,6 +153,41 @@ public class ProjectPropertyPage extends PropertyPage
 		// add drag and drop support
 		DragDropViewer.instance(includeViewer, includeList, //
 				excludeViewer, excludeList);
+
+		// override checkbox
+		chkOverride = new Button(container, SWT.CHECK);
+		chkOverride.setText(Messages.ProjectPropertyPage_Override);
+
+		// override container
+		final Composite overrideContainer = createComposite(container, 2);
+		final GridData gd = new GridData(GridData.FILL_HORIZONTAL);
+		overrideContainer.setLayoutData(gd);
+
+		// twig version
+		final TwigVersion version = preferences.getTwigVersion();
+		twigViewer = createEnumViewer(overrideContainer, TwigVersion.class,
+				Messages.PreferencesPage_Twig_Version, version);
+
+		// twig severity
+		final TwigSeverity severity = preferences.getTwigSeverity();
+		severityViewer = createEnumViewer(overrideContainer, TwigSeverity.class,
+				Messages.PreferencesPage_Severity, severity);
+
+		// add listener
+		chkOverride.addListener(SWT.Selection, e -> {
+			final boolean enabled = chkOverride.getSelection();
+			final Control[] children = overrideContainer.getChildren();
+			for (final Control control : children) {
+				control.setEnabled(enabled);
+			}
+		});
+
+		// check if override
+		if (!version.equals(PreferencesInitializer.getTwigVersion())
+				|| !severity.equals(PreferencesInitializer.getTwigSeverity())) {
+			chkOverride.setSelection(true);
+		}
+		chkOverride.notifyListeners(SWT.Selection, null);
 
 		return container;
 	}
@@ -167,6 +220,14 @@ public class ProjectPropertyPage extends PropertyPage
 		} else {
 			excludeViewer.refresh();
 		}
+
+		// override
+		chkOverride.setSelection(false);
+		twigViewer.setSelection(new StructuredSelection(
+				PreferencesInitializer.getTwigVersion()));
+		severityViewer.setSelection(new StructuredSelection(
+				PreferencesInitializer.getTwigSeverity()));
+		chkOverride.notifyListeners(SWT.Selection, null);
 
 		super.performDefaults();
 	}
@@ -211,6 +272,49 @@ public class ProjectPropertyPage extends PropertyPage
 	}
 
 	/**
+	 * Creates a read-only combo viewer for the given enumeration.
+	 *
+	 * @param <E>
+	 *            the enumeration type.
+	 * @param parent
+	 *            the parent composite.
+	 * @param clazz
+	 *            the enumeration class.
+	 * @param text
+	 *            the label's message.
+	 * @param selection
+	 *            the default selection.
+	 * @return the combo viewer.
+	 */
+	private <E extends Enum<E>> ComboViewer createEnumViewer(
+			final Composite parent, final Class<E> clazz, final String text,
+			final E selection) {
+		// label
+		createLabel(parent, text, 1);
+
+		// viewer
+		final ComboViewer viewer = new ComboViewer(parent, SWT.READ_ONLY);
+		GridDataFactory.swtDefaults().hint(120, SWT.DEFAULT)
+				.applyTo(viewer.getControl());
+
+		// UI
+		viewer.setContentProvider(ArrayContentProvider.getInstance());
+		viewer.setLabelProvider(new LabelProvider() {
+			@Override
+			public String getText(final Object element) {
+				final String name = ((Enum<?>) element).name();
+				return PreferencesPage.toProperCase(name);
+			}
+		});
+
+		// content
+		viewer.setInput(clazz.getEnumConstants());
+		viewer.setSelection(new StructuredSelection(selection), true);
+
+		return viewer;
+	}
+
+	/**
 	 * Creates a label control.
 	 *
 	 * @param parent
@@ -226,7 +330,7 @@ public class ProjectPropertyPage extends PropertyPage
 			label.setText(text);
 		}
 
-		final GridData gd = new GridData(GridData.FILL_HORIZONTAL);
+		final GridData gd = new GridData();// GridData.FILL_HORIZONTAL);
 		gd.horizontalSpan = Math.max(columns, 1);
 		label.setLayoutData(gd);
 

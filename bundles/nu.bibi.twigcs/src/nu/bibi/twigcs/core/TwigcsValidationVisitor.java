@@ -30,8 +30,8 @@ import nu.bibi.twigcs.io.IOExecutor;
 import nu.bibi.twigcs.model.TwigFile;
 import nu.bibi.twigcs.model.TwigResult;
 import nu.bibi.twigcs.model.TwigSeverity;
+import nu.bibi.twigcs.model.TwigVersion;
 import nu.bibi.twigcs.model.TwigViolation;
-import nu.bibi.twigcs.preferences.PreferencesInitializer;
 import nu.bibi.twigcs.preferences.ProjectPreferences;
 
 /**
@@ -76,6 +76,11 @@ public class TwigcsValidationVisitor extends AbstractResouceVisitor
 	private Gson gson;
 
 	/*
+	 * the twig version
+	 */
+	private final TwigVersion version;
+
+	/*
 	 * the severity level
 	 */
 	private final TwigSeverity severity;
@@ -99,7 +104,8 @@ public class TwigcsValidationVisitor extends AbstractResouceVisitor
 
 		// get preferences
 		final ProjectPreferences preferences = new ProjectPreferences(project);
-		severity = PreferencesInitializer.getSeverity();
+		version = preferences.getTwigVersion();
+		severity = preferences.getTwigSeverity();
 		includePaths = preferences.getIncludePaths();
 		excludePaths = preferences.getExcludePaths();
 	}
@@ -173,6 +179,8 @@ public class TwigcsValidationVisitor extends AbstractResouceVisitor
 	private List<String> buildCommand(final IFile file) throws CoreException {
 		if (processor == null) {
 			processor = TwigcsProcessor.instance();
+			processor.setTwigVersion(version);
+			// processor.setSeverity(severity);
 		}
 
 		// update

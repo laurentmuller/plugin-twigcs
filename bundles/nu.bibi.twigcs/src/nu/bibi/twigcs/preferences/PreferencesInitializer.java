@@ -28,9 +28,9 @@ public class PreferencesInitializer extends AbstractPreferenceInitializer
 		implements PreferencesConstants {
 
 	/**
-	 * Gets the twigcs executable path from the preference store.
+	 * Gets the Twigcs executable path from the preference store.
 	 *
-	 * @return the twigcs executable path.
+	 * @return the Twigcs executable path.
 	 */
 	public static String getExecutable() {
 		final IPreferenceStore store = getPreferenceStore();
@@ -47,20 +47,20 @@ public class PreferencesInitializer extends AbstractPreferenceInitializer
 	}
 
 	/**
-	 * Gets the twig reporter from the preference store.
+	 * Gets the Twig reporter from the preference store.
 	 *
-	 * @return the twig version.
+	 * @return the Twig reporter.
 	 */
-	public static TwigReporter getReporter() {
+	public static TwigReporter getTwigReporter() {
 		return valueOf(P_REPORTER, TwigReporter.class, TwigReporter.json);
 	}
 
 	/**
-	 * Gets the twig severity from the preference store.
+	 * Gets the Twig severity from the preference store.
 	 *
-	 * @return the twig severity.
+	 * @return the Twig severity.
 	 */
-	public static TwigSeverity getSeverity() {
+	public static TwigSeverity getTwigSeverity() {
 		return valueOf(P_SEVERITY, TwigSeverity.class, TwigSeverity.warning);
 	}
 
@@ -70,8 +70,7 @@ public class PreferencesInitializer extends AbstractPreferenceInitializer
 	 * @return the Twig version.
 	 */
 	public static TwigVersion getTwigVersion() {
-		return valueOf(P_TWIG_VERSION, TwigVersion.class,
-				TwigVersion.VERSION_3);
+		return valueOf(P_VERSION, TwigVersion.class, TwigVersion.VERSION_3);
 	}
 
 	/**
@@ -108,7 +107,7 @@ public class PreferencesInitializer extends AbstractPreferenceInitializer
 	@Override
 	public void initializeDefaultPreferences() {
 		final IPreferenceStore store = getPreferenceStore();
-		store.setDefault(P_TWIG_VERSION, DEFAULT_TWIG_VERSION);
+		store.setDefault(P_VERSION, DEFAULT_VERSION);
 		store.setDefault(P_SEVERITY, DEFAULT_SEVERITY);
 		store.setDefault(P_REPORTER, DEFAULT_REPORTER);
 
