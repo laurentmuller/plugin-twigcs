@@ -1,10 +1,10 @@
 language: java
 
-deploy:
-  provider: pages
-  cleanup: true
-  token: $GITHUB_TOKEN  # Set in the settings page of your repository, as a secure variable
-  keep_history: true
-  local_dir: releng/nu.bibi.twigcs.repository/target/repository
-  on:
-    branch: master
+#deploy:
+#  provider: pages
+#  cleanup: true
+#  token: $GITHUB_TOKEN
+#  keep_history: true
+#  local_dir: releng/nu.bibi.twigcs.repository/target/repository
+#  on:
+#    branch: master
