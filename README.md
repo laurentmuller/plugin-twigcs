@@ -21,7 +21,7 @@ And displayed in the **Problems view**.
     composer global require friendsoftwig/twigcs
     ```
 
-  ### Eclipse Installation from the Update Site
+  ### Installation from the Update Site
 
   - Start Eclipse PDT and select the menu **Help** -> **Install New Software...**
 
@@ -43,7 +43,7 @@ And displayed in the **Problems view**.
 
   - Update your [Project properties](#project-properties) to define witch folders are validate.
     
-  ### Eclipse Installation from the Zip file
+  ### Installation from the Zip file
 
   - Download the update site zip file from the releases tab.
 
@@ -60,12 +60,6 @@ And displayed in the **Problems view**.
   - Check the the Twigcs category check box.
 
   - Follow the wizard instructions.
-
-  ### Installation in the dropins folder
-
-  - Download the jar file (nu.bibi.twigcs-x.y.z.jar) from the releases tab to your local drive.
-  - Copy that file to the dropins folder of your Eclipse PDT installation.
-  - Restart Eclipse.
 
 ## Workspace preferences
 

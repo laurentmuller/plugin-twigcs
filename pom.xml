@@ -12,22 +12,24 @@
 		<tycho-version>1.6.0</tycho-version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<eclipse.repo>http://download.eclipse.org/releases/latest</eclipse.repo>
-		<orbit.repo>https://download.eclipse.org/tools/orbit/downloads/drops/I20200106175313/repository/</orbit.repo>
-		<final-name>${project.artifactId}.v${project.version}</final-name>
-		<update.dir>${project.basedir}/update/v${project.version}</update.dir>
+		
+		<!-- FTP -->
+		<ftp.serverId>infomaniak</ftp.serverId>		
+		<ftp.url>ftp://tj8om.ftp.infomaniak.com/web</ftp.url>
+		<ftp.fromDir>${project.basedir}/releng/nu.bibi.twigcs.repository/target/repository</ftp.fromDir>
+		<ftp.toDir>update/v${project.version}</ftp.toDir>
 	</properties>
 
 	<modules>
 		<module>bundles/nu.bibi.twigcs</module>
-		<module>releng/nu.bibi.twigcs.repository</module>
 		<module>releng/nu.bibi.twigcs.feature</module>
+		<module>releng/nu.bibi.twigcs.repository</module>
 	</modules>
 
 	<prerequisites>
 		<maven>3.0</maven>
 	</prerequisites>
 
-	<!-- repositories to get pre-built pieces from -->
 	<repositories>
 		<repository>
 			<id>target-repo</id>
@@ -38,12 +40,33 @@
 		<repository>
 			<id>orbit-repo</id>
 			<layout>p2</layout>
-			<url>${orbit.repo}</url>
+			<url>https://download.eclipse.org/tools/orbit/downloads/drops/I20200106175313/repository/</url>
 		</repository>
 		 -->
 	</repositories>
-
+	 
+	<distributionManagement>
+		<repository>
+			<id>${ftp.serverId}</id>
+		</repository>
+	</distributionManagement>
+ 	
+ 
 	<build>
+		<!-- used to deploy update site -->
+		<extensions>
+			<extension>
+    			<groupId>org.apache.maven.wagon</groupId>
+    			<artifactId>wagon-ssh</artifactId>
+				<version>3.3.4</version>
+			</extension>
+			<extension>
+                <groupId>org.apache.maven.wagon</groupId>
+                <artifactId>wagon-ftp</artifactId>
+                <version>3.3.4</version>
+            </extension>
+		</extensions>
+		 
 		<plugins>
 			<plugin>
 				<groupId>org.eclipse.tycho</groupId>
@@ -56,7 +79,6 @@
 				<groupId>org.eclipse.tycho</groupId>
 				<artifactId>tycho-packaging-plugin</artifactId>
 				<version>${tycho-version}</version>
-				<!-- <configuration> <finalName>${final-name}</finalName> </configuration> -->
 			</plugin>
 
 			<plugin>
@@ -87,47 +109,39 @@
 					</environments>
 				</configuration>
 			</plugin>
-
+						 
+			<!--  skip deploying artifacts-->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-clean-plugin</artifactId>
-				<version>3.1.0</version>
+				<artifactId>maven-deploy-plugin</artifactId>
+				<version>2.8.2</version>
 				<configuration>
-					<filesets>
-						<fileset>
-							<directory>${update.dir}</directory>
-						</fileset>
-					</filesets>
+					<skip>true</skip>
 				</configuration>
 			</plugin>
-
-			<!-- copy update site -->
-			<!-- https://raw.githubusercontent.com/laurentmuller/plugin-twigcs/master/update/v1.0.0 -->
-			<!-- https://github.com/laurentmuller/plugin-twigcs/raw/master/update/v1.0.0
+			
+			<!-- deploy update site -->
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-resources-plugin</artifactId>
-				<version>3.1.0</version>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>wagon-maven-plugin</artifactId>
+				<version>2.0.0</version>
 				<executions>
 					<execution>
-						<id>copy-resources</id>
-						<phase>install</phase>
+						<id>upload-update</id>
+						<phase>deploy</phase>
 						<goals>
-							<goal>copy-resources</goal>
+							<goal>upload</goal>
 						</goals>
 						<configuration>
-							<overwrite>true</overwrite>
-							<outputDirectory>${update.dir}</outputDirectory>
-							<resources>
-								<resource>
-									<directory>${project.basedir}/releng/nu.bibi.twigcs.repository/target/repository</directory>
-								</resource>
-							</resources>
+							<serverId>${ftp.serverId}</serverId>
+							<url>${ftp.url}</url>
+							<fromDir>${ftp.fromDir}</fromDir>
+							<toDir>${ftp.toDir}</toDir>
+							<includes>*</includes>
 						</configuration>
 					</execution>
 				</executions>
 			</plugin>
-			 -->
 		</plugins>
 	</build>
 </project>
