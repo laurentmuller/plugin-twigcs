@@ -6,7 +6,7 @@
       provider-name="bibi.nu">
 
    <description>
-      Twigcs Feature.
+      An Eclipse plugin to validate Twig (*.twig) files with the Twigcs component.
    </description>
 
    <copyright>
@@ -14,11 +14,7 @@
    </copyright>
 
    <license url="">
-      MIT License
-
-Copyright (c) 2020 Laurent Muller
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
+      Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the &quot;Software&quot;), to deal
 in the Software without restriction, including without limitation the rights
 to use, copy, modify, merge, publish, distribute, sublicense, and/or sell

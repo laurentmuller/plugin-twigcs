@@ -32,7 +32,6 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.ui.dialogs.PropertyPage;
-import org.osgi.service.prefs.BackingStoreException;
 
 import nu.bibi.twigcs.core.ICoreException;
 import nu.bibi.twigcs.core.TwigcsBuilder;
@@ -117,12 +116,8 @@ public class ProjectPropertyPage extends PropertyPage
 				TwigcsBuilder.triggerCleanBuild(getElement());
 			}
 
-		} catch (final BackingStoreException e) {
-			handleStatus(createErrorStatus(
-					Messages.ProjectPropertyPage_Error_Save, e));
-			return false;
 		} catch (final CoreException e) {
-			handleStatus(e.getStatus());
+			handleStatusShow(e.getStatus());
 			return false;
 		}
 
@@ -154,40 +149,8 @@ public class ProjectPropertyPage extends PropertyPage
 		DragDropViewer.instance(includeViewer, includeList, //
 				excludeViewer, excludeList);
 
-		// override checkbox
-		chkOverride = new Button(container, SWT.CHECK);
-		chkOverride.setText(Messages.ProjectPropertyPage_Override);
-
-		// override container
-		final Composite overrideContainer = createComposite(container, 2);
-		final GridData gd = new GridData(GridData.FILL_HORIZONTAL);
-		overrideContainer.setLayoutData(gd);
-
-		// twig version
-		final TwigVersion version = preferences.getTwigVersion();
-		twigViewer = createEnumViewer(overrideContainer, TwigVersion.class,
-				Messages.PreferencesPage_Twig_Version, version);
-
-		// twig severity
-		final TwigSeverity severity = preferences.getTwigSeverity();
-		severityViewer = createEnumViewer(overrideContainer, TwigSeverity.class,
-				Messages.PreferencesPage_Severity, severity);
-
-		// add listener
-		chkOverride.addListener(SWT.Selection, e -> {
-			final boolean enabled = chkOverride.getSelection();
-			final Control[] children = overrideContainer.getChildren();
-			for (final Control control : children) {
-				control.setEnabled(enabled);
-			}
-		});
-
-		// check if override
-		if (!version.equals(PreferencesInitializer.getTwigVersion())
-				|| !severity.equals(PreferencesInitializer.getTwigSeverity())) {
-			chkOverride.setSelection(true);
-		}
-		chkOverride.notifyListeners(SWT.Selection, null);
+		// override settings
+		createOverride(parent, preferences);
 
 		return container;
 	}
@@ -335,6 +298,53 @@ public class ProjectPropertyPage extends PropertyPage
 		label.setLayoutData(gd);
 
 		return label;
+	}
+
+	/**
+	 * Creates the override settings.
+	 *
+	 * @param parent
+	 *            the parent composite.
+	 * @param preferences
+	 *            the project preferences.
+	 */
+	private void createOverride(final Composite parent,
+			final ProjectPreferences preferences) {
+		// override checkbox
+		chkOverride = new Button(parent, SWT.CHECK);
+		chkOverride.setText(Messages.ProjectPropertyPage_Override);
+
+		// override container
+		final Composite overrideContainer = createComposite(parent, 2);
+		final GridData gd = new GridData(GridData.FILL_HORIZONTAL);
+		gd.horizontalIndent = 16;
+		overrideContainer.setLayoutData(gd);
+
+		// twig version
+		final TwigVersion version = preferences.getTwigVersion();
+		twigViewer = createEnumViewer(overrideContainer, TwigVersion.class,
+				Messages.PreferencesPage_Twig_Version, version);
+
+		// twig severity
+		final TwigSeverity severity = preferences.getTwigSeverity();
+		severityViewer = createEnumViewer(overrideContainer, TwigSeverity.class,
+				Messages.PreferencesPage_Severity, severity);
+
+		// add listener
+		chkOverride.addListener(SWT.Selection, e -> {
+			final boolean enabled = chkOverride.getSelection();
+			final Control[] children = overrideContainer.getChildren();
+			for (final Control control : children) {
+				control.setEnabled(enabled);
+			}
+		});
+
+		// check if override
+		if (!version.equals(PreferencesInitializer.getTwigVersion())
+				|| !severity.equals(PreferencesInitializer.getTwigSeverity())) {
+			chkOverride.setSelection(true);
+		}
+		chkOverride.notifyListeners(SWT.Selection, null);
 	}
 
 	/**

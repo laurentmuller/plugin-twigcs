@@ -167,8 +167,8 @@ public class ResourceListener implements IResourceChangeListener,
 	 * @throws CoreException
 	 *             if an error occurs while updating the project.
 	 */
-	private void process(final IProject project, IPath pathFrom, IPath pathTo)
-			throws CoreException {
+	private void process(final IProject project, final IPath pathFrom,
+			final IPath pathTo) throws CoreException {
 		// get paths
 		final ProjectPreferences preferences = new ProjectPreferences(project);
 		final List<IPath> includes = preferences.getIncludeRawPaths();
@@ -176,20 +176,24 @@ public class ResourceListener implements IResourceChangeListener,
 
 		// make relative
 		final IPath fullPath = project.getFullPath();
-		pathFrom = pathFrom.makeRelativeTo(fullPath);
-		pathTo = pathTo.makeRelativeTo(fullPath);
+		final IPath relativeFrom = pathFrom.makeRelativeTo(fullPath);
+		final IPath relativeTo = pathTo.makeRelativeTo(fullPath);
 
 		// update
-		if (includes.contains(pathFrom)) {
-			includes.remove(pathFrom);
-			includes.add(pathTo);
+		if (includes.contains(relativeFrom)) {
+			includes.remove(relativeFrom);
+			includes.add(relativeTo);
 			preferences.setIncludePaths(includes);
 		}
-		if (excludes.contains(pathFrom)) {
-			excludes.remove(pathFrom);
-			excludes.add(pathTo);
+		if (excludes.contains(relativeFrom)) {
+			excludes.remove(relativeFrom);
+			excludes.add(relativeTo);
 			preferences.setExcludePaths(excludes);
 		}
+
+		// if (preferences.isDirty()) {
+		// preferences.flush();
+		// }
 
 		final String message = String.format(Messages.ResourceListener_Update, //
 				pathFrom.toPortableString(), //

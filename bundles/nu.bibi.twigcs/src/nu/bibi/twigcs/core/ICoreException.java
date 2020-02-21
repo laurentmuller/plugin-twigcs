@@ -83,4 +83,16 @@ public interface ICoreException /*extends IConstants*/ {
 			StatusManager.getManager().handle(status, style);
 		}
 	}
+
+	/**
+	 * Handles the given status. The {@link StatusManager#LOG LOG} and
+	 * {@link StatusManager#SHOW SHOW} style are used when this method is
+	 * called.
+	 *
+	 * @param status
+	 *            the status to handle
+	 */
+	default void handleStatusShow(final IStatus status) {
+		handleStatus(status, StatusManager.LOG | StatusManager.SHOW);
+	}
 }

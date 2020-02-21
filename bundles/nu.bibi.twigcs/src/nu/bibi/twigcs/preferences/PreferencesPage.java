@@ -9,6 +9,7 @@
 package nu.bibi.twigcs.preferences;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.preference.ComboFieldEditor;
@@ -48,16 +49,18 @@ public class PreferencesPage extends FieldEditorPreferencePage implements
 	public static String[][] getEnumNames(
 			final Class<? extends Enum<?>> clazz) {
 		final Enum<?>[] values = clazz.getEnumConstants();
-		final String[][] result = new String[values.length][2];
-		for (int i = 0; i < values.length; i++) {
-			result[i][0] = toProperCase(values[i].name());
-			result[i][1] = values[i].name();
-		}
-		return result;
+		return Arrays.stream(values).map(e -> {
+			return new String[] { toProperCase(e.name()), e.name() };
+		}).toArray(String[][]::new);
 	}
 
 	/**
-	 * Convert the given string to proper case.
+	 * Replaces all underscore (<code>'_'</code>) characters by a space
+	 * (<code>' '</code>) character and converts to proper case. For example:
+	 *
+	 * <pre>
+	 * "TWIG_VERSION_1" -> "Twig version 1"
+	 * </pre>
 	 *
 	 * @param text
 	 *            the string to convert.
@@ -123,11 +126,11 @@ public class PreferencesPage extends FieldEditorPreferencePage implements
 				TwigcsBuilder.triggerCleanBuild();
 
 			} catch (final IOException e) {
-				handleStatus(createErrorStatus(
-						Messages.PreferencesPage_Error_Save, e));
+				handleStatusShow(
+						createErrorStatus(Messages.Preferences_Error_Save, e));
 				return false;
 			} catch (final CoreException e) {
-				handleStatus(e.getStatus());
+				handleStatusShow(e.getStatus());
 				return false;
 			}
 		}

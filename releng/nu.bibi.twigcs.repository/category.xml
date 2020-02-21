@@ -5,7 +5,7 @@
    </feature>
    <category-def name="nu.bibi.twigcs" label="Twigcs">
       <description>
-         Twigcs Integration for Eclipse.
+         An Eclipse plugin to validate Twig (*.twig) files with the Twigcs component.
       </description>
    </category-def>
 </site>

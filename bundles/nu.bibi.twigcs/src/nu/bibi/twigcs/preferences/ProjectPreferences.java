@@ -17,12 +17,15 @@ import java.util.stream.Collectors;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ProjectScope;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.osgi.service.prefs.BackingStoreException;
 
 import nu.bibi.twigcs.core.IConstants;
+import nu.bibi.twigcs.core.ICoreException;
+import nu.bibi.twigcs.internal.Messages;
 import nu.bibi.twigcs.model.TwigSeverity;
 import nu.bibi.twigcs.model.TwigVersion;
 
@@ -32,7 +35,8 @@ import nu.bibi.twigcs.model.TwigVersion;
  * @author Laurent Muller
  * @version 1.0
  */
-public class ProjectPreferences implements IConstants, PreferencesConstants {
+public class ProjectPreferences
+		implements IConstants, ICoreException, PreferencesConstants {
 
 	/*
 	 * the key to get/set include paths
@@ -73,22 +77,23 @@ public class ProjectPreferences implements IConstants, PreferencesConstants {
 	public ProjectPreferences(final IProject project) {
 		this.project = project;
 		preferences = new ProjectScope(project).getNode(PLUGIN_ID);
-		// preferences.addPreferenceChangeListener(e -> {
-		// System.out.println("Changed: " + e.getKey());
-		// });
 	}
 
 	/**
 	 * Forces any changes in the contents of this preferences to the persistent
 	 * store.
 	 *
-	 * @throws BackingStoreException
+	 * @throws CoreException
 	 *             if this operation cannot be completed due to a failure in the
 	 *             backing store, or inability to communicate with it.
 	 */
-	public void flush() throws BackingStoreException {
-		preferences.flush();
-		dirty = false;
+	public void flush() throws CoreException {
+		try {
+			preferences.flush();
+			dirty = false;
+		} catch (final BackingStoreException e) {
+			throw createCoreException(Messages.Preferences_Error_Save, e);
+		}
 	}
 
 	/**
