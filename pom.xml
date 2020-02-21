@@ -16,14 +16,14 @@
 		<!-- FTP -->
 		<ftp.serverId>infomaniak</ftp.serverId>		
 		<ftp.url>ftp://tj8om.ftp.infomaniak.com/web</ftp.url>
-		<ftp.fromDir>${project.basedir}/releng/nu.bibi.twigcs.repository/target/repository</ftp.fromDir>
+		<ftp.fromDir>${project.basedir}/nu.bibi.twigcs.repository/target/repository</ftp.fromDir>
 		<ftp.toDir>twigcs/v${project.version}</ftp.toDir>
 	</properties>
 
 	<modules>
-		<module>bundles/nu.bibi.twigcs</module>
-		<module>releng/nu.bibi.twigcs.feature</module>
-		<module>releng/nu.bibi.twigcs.repository</module>
+		<module>nu.bibi.twigcs</module>
+		<module>nu.bibi.twigcs.feature</module>
+		<module>nu.bibi.twigcs.repository</module>
 	</modules>
 
 	<prerequisites>
@@ -103,7 +103,7 @@
 				</configuration>
 			</plugin>
 						 
-			<!--  skip deploying artifacts-->
+			<!--  skip deploying artifacts -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-deploy-plugin</artifactId>
@@ -113,7 +113,7 @@
 				</configuration>
 			</plugin>
 			
-			<!-- deploy update site -->
+			<!-- deploy to update site -->
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>wagon-maven-plugin</artifactId>

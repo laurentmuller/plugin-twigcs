@@ -5,11 +5,11 @@ An Eclipse plugin to validate Twig (*.twig) files with the [Twigcs](https://gith
 
 Errors are visible in the **Editor**.
 
-![Alt Editor](docs/editor.png)
+![Alt Editor](docs/images/editor.png)
 
 And displayed in the **Problems view**.
 
-![Alt Problems](docs/problems.png)
+![Alt Problems](docs/images/problems.png)
 
 ## Installation
 
@@ -29,13 +29,13 @@ And displayed in the **Problems view**.
 
   - Enter the location as the image below.
   
-    ![Add Update Site](docs/add_repository_site.png)
+    ![Add Update Site](docs/images/add_repository_site.png)
     
   - Select the newly added repository. 
 
   - Check the Twigcs category check box.
 
-    ![Install](docs/update.png)
+    ![Install](docs/images/update.png)
 
   - Follow the wizard instructions.
 
@@ -53,7 +53,7 @@ And displayed in the **Problems view**.
 
   - Click the **Archive...** button and select the downloaded zip file.
 
-    ![Add Repository](docs/add_repository_zip.png)
+    ![Add Repository](docs/images/add_repository_zip.png)
 
   - Select the newly added repository.
 
@@ -65,7 +65,7 @@ And displayed in the **Problems view**.
 
 The workspace preferences allow user to define how the Twigcs component run. The most important and required property is the path to the batch file.
 
-![Alt Workspace preferences](docs/preferences.png)
+![Alt Workspace preferences](docs/images/preferences.png)
 
 
 ## Project properties
@@ -76,10 +76,10 @@ To enable validation, You must add the Twigcs nature to the project.
 - Display the context menu.
 - Select **Configure** -> **Enable Twigcs validation**.
 
-![Install](docs/enable_twigcs.png)
+![Install](docs/images/enable_twigcs.png)
 
 For each project, user can select witch folders are included for the validation or excluded. The user must select at least one included folder. 
 
 If needed, the user can also override the default Twigcs preferences.
 
-![Alt  Project properties](docs/properties.png)
+![Alt  Project properties](docs/images/properties.png)

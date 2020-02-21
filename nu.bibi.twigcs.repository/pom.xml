@@ -10,7 +10,7 @@
 		<groupId>nu.bibi.twigcs</groupId>
 		<artifactId>nu.bibi.twigcs.parent</artifactId>
 		<version>1.0.0</version>
-		<relativePath>../..</relativePath>
+		<relativePath>..</relativePath>
 	</parent>
 	
 	<build>
@@ -23,7 +23,7 @@
 				<executions>
 					<execution>
 						<id>copy-resources</id>
-						<phase>validate</phase>
+						<phase>deploy</phase>
 						<goals>
 							<goal>copy-resources</goal>
 						</goals>
@@ -39,20 +39,6 @@
 					</execution>
 				</executions>
 			</plugin>
-			
-			<!-- 
-			<plugin>
-				<groupId>org.eclipse.tycho</groupId>
-				<artifactId>tycho-p2-repository-plugin</artifactId>
-				<version>${tycho-version}</version>
-				<configuration>
-					<repositoryName>Twigcs Eclipse Integration.</repositoryName>
-					<includeAllDependencies>false</includeAllDependencies>
-					<compress>true</compress>
-				</configuration>
-			</plugin>
-			 -->
 		</plugins>
 	</build>
-	
 </project>
