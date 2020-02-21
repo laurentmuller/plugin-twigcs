@@ -36,13 +36,6 @@
 			<layout>p2</layout>
 			<url>${eclipse.repo}</url>
 		</repository>
-		<!-- 
-		<repository>
-			<id>orbit-repo</id>
-			<layout>p2</layout>
-			<url>https://download.eclipse.org/tools/orbit/downloads/drops/I20200106175313/repository/</url>
-		</repository>
-		 -->
 	</repositories>
 	 
 	<distributionManagement>
@@ -137,7 +130,6 @@
 							<url>${ftp.url}</url>
 							<fromDir>${ftp.fromDir}</fromDir>
 							<toDir>${ftp.toDir}</toDir>
-							<includes>*</includes>
 						</configuration>
 					</execution>
 				</executions>
