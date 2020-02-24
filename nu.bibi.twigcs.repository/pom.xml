@@ -17,27 +17,17 @@
 		<plugins>
 			<!--  copy the HTML page -->
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-resources-plugin</artifactId>
 				<version>3.1.0</version>
-				<executions>
-					<execution>
-						<id>copy-resources</id>
-						<phase>deploy</phase>
-						<goals>
-							<goal>copy-resources</goal>
-						</goals>
-						<configuration>
-							<outputDirectory>${basedir}/target/repository</outputDirectory>
-							<resources>
-								<resource>
-									<directory>html/parent/version</directory>
-									<filtering>true</filtering>
-								</resource>
-							</resources>
-						</configuration>
-					</execution>
-				</executions>
+				<configuration>
+					<outputDirectory>${basedir}/target/repository</outputDirectory>
+					<resources>
+						<resource>
+							<directory>html/version</directory>
+							<filtering>true</filtering>
+						</resource>
+					</resources>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>

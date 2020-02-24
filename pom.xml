@@ -9,9 +9,13 @@
 	<packaging>pom</packaging>
 
 	<properties>
-		<tycho-version>1.6.0</tycho-version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<maven.descriptor>false</maven.descriptor>
+		<tycho-version>1.6.0</tycho-version>
+		
+		<!-- repositories -->
 		<eclipse.repo>http://download.eclipse.org/releases/latest</eclipse.repo>
+		<orbit.repo>https://download.eclipse.org/tools/orbit/downloads/drops/R20191126223242/repository</orbit.repo>
 		
 		<!-- FTP -->
 		<ftp.serverId>infomaniak</ftp.serverId>		
@@ -21,7 +25,7 @@
 	</properties>
 
 	<modules>
-		<module>nu.bibi.twigcs</module>
+		<module>nu.bibi.twigcs.plugin</module>
 		<module>nu.bibi.twigcs.feature</module>
 		<module>nu.bibi.twigcs.repository</module>
 	</modules>
@@ -35,6 +39,11 @@
 			<id>eclipse-repo</id>
 			<layout>p2</layout>
 			<url>${eclipse.repo}</url>
+		</repository>
+		<repository>
+			<id>orbit</id>
+			<layout>p2</layout>
+			<url>${orbit.repo}</url>
 		</repository>
 	</repositories>
 	 
@@ -72,12 +81,22 @@
 				<groupId>org.eclipse.tycho</groupId>
 				<artifactId>tycho-packaging-plugin</artifactId>
 				<version>${tycho-version}</version>
+				<configuration>
+					<archive>
+						<addMavenDescriptor>${maven.descriptor}</addMavenDescriptor>
+					</archive>
+				</configuration>
 			</plugin>
 
 			<plugin>
 				<groupId>org.eclipse.tycho</groupId>
 				<artifactId>tycho-source-plugin</artifactId>
 				<version>${tycho-version}</version>
+				<configuration>
+					<archive>
+						<addMavenDescriptor>${maven.descriptor}</addMavenDescriptor>
+					</archive>
+				</configuration>
 				<executions>
 					<execution>
 						<id>plugin-source</id>

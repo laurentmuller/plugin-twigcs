@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+    <extension
+        id="builder"
+        name="%Project_Builder"
+        point="org.eclipse.core.resources.builders">
+        <builder
+            hasNature="true">
+            <run
+                class="nu.bibi.twigcs.core.TwigcsBuilder" />
+        </builder>
+    </extension>
+    <extension
+        id="nature"
+        name="%Project_Nature"
+        point="org.eclipse.core.resources.natures">
+        <runtime>
+            <run
+                class="nu.bibi.twigcs.core.TwigcsNature" />
+        </runtime>
+        <builder
+            id="nu.bibi.twigcs.builder" />
+    </extension>
+    <extension
+        point="org.eclipse.ui.commands">
+        <category
+            id="twigcs.category"
+            name="%Common_Name" />
+        <command
+            categoryId="twigcs.category"
+            defaultHandler="nu.bibi.twigcs.core.TwigcsNatureHandler"
+            id="twigcs.addRemovesNature"
+            name="%Command_Nature" />
+    </extension>
+    <extension
+        point="org.eclipse.ui.menus">
+        <menuContribution
+            locationURI="popup:org.eclipse.ui.projectConfigure?after=additions">
+            <command
+                commandId="twigcs.addRemovesNature"
+                label="%Command_Disable"
+                style="push">
+                <visibleWhen
+                    checkEnabled="false">
+                    <with
+                        variable="selection">
+                        <count
+                            value="1" />
+                        <iterate>
+                            <adapt
+                                type="org.eclipse.core.resources.IProject">
+                                <test
+                                    property="org.eclipse.core.resources.projectNature"
+                                    value="nu.bibi.twigcs.nature" />
+                            </adapt>
+                        </iterate>
+                    </with>
+                </visibleWhen>
+            </command>
+            <command
+                commandId="twigcs.addRemovesNature"
+                label="%Command_Enable"
+                style="push">
+                <visibleWhen
+                    checkEnabled="false">
+                    <with
+                        variable="selection">
+                        <count
+                            value="1" />
+                        <iterate>
+                            <adapt
+                                type="org.eclipse.core.resources.IProject">
+                                <not>
+                                    <test
+                                        property="org.eclipse.core.resources.projectNature"
+                                        value="nu.bibi.twigcs.nature" />
+                                </not>
+                            </adapt>
+                        </iterate>
+                    </with>
+                </visibleWhen>
+            </command>
+        </menuContribution>
+    </extension>
+    <extension
+        id="marker"
+        name="%Marker_Name"
+        point="org.eclipse.core.resources.markers">
+        <super
+            type="org.eclipse.core.resources.problemmarker" />
+        <super
+              type="org.eclipse.core.resources.textmarker">
+        </super>
+        <persistent
+            value="true" />
+    </extension>
+    <extension
+        point="org.eclipse.core.runtime.preferences">
+        <initializer
+            class="nu.bibi.twigcs.preferences.PreferencesInitializer" />
+    </extension>
+    <extension
+        point="org.eclipse.ui.preferencePages">
+        <page
+            class="nu.bibi.twigcs.preferences.PreferencesPage"
+            id="nu.bibi.twigcs.preferences.PreferencesPage"
+            name="%Common_Name" />
+    </extension>
+    <extension
+        point="org.eclipse.ui.propertyPages">
+        <page
+            class="nu.bibi.twigcs.preferences.ProjectPropertyPage"
+            id="nu.bibi.twigcs.preferences.ProjectPropertyPage"
+            name="%Common_Name">
+            <filter
+                name="open"
+                value="true" />
+            <enabledWhen>
+                <and>
+                    <adapt
+                        type="org.eclipse.core.resources.IProject" />
+                    <test
+                        property="org.eclipse.core.resources.projectNature"
+                        value="nu.bibi.twigcs.nature" />
+                </and>
+            </enabledWhen>
+        </page>
+    </extension>
+    <extension
+          point="org.eclipse.ui.ide.markerResolution">
+       <markerResolutionGenerator
+             class="nu.bibi.twigcs.marker.MarkerResolutionGenerator"
+             markerType="nu.bibi.twigcs.marker">
+       </markerResolutionGenerator>
+    </extension>
+</plugin>

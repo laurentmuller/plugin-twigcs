@@ -1,0 +1,21 @@
+html {
+  position: relative;
+  min-height: 100%;
+}
+body {
+  margin-bottom: 30px;
+}
+.footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;  
+  padding: 3px 10px;
+  font-size: .8rem;    
+  background-color: var(--gray);
+}
+.footer a {
+    color: var(--white);  
+}
+.footer a:hover {
+    text-decoration: underline;
+}
