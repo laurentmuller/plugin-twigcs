@@ -17,29 +17,29 @@ import org.eclipse.core.runtime.CoreException;
 import nu.bibi.twigcs.internal.Messages;
 
 /**
- * Marker resolution for end line space error.
+ * Marker resolution for no space error.
  *
  * @author Laurent Muller
  * @version 1.0
  */
-public class EndLineSpaceResolution extends AbstractResolution {
+public class NoSpaceResolution extends AbstractResolution {
 
 	/*
 	 * the shared instance
 	 */
-	private static volatile EndLineSpaceResolution instance;
+	private static volatile NoSpaceResolution instance;
 
 	/**
 	 * Gets the shared instance.
 	 *
 	 * @return the shared instance.
 	 */
-	public static synchronized EndLineSpaceResolution instance() {
+	public static synchronized NoSpaceResolution instance() {
 		// double check locking
 		if (instance == null) {
-			synchronized (EndLineSpaceResolution.class) {
+			synchronized (NoSpaceResolution.class) {
 				if (instance == null) {
-					instance = new EndLineSpaceResolution();
+					instance = new NoSpaceResolution();
 				}
 			}
 		}
@@ -51,27 +51,22 @@ public class EndLineSpaceResolution extends AbstractResolution {
 	 */
 	@Override
 	public String getLabel() {
-		return Messages.Resolution_End_Line_Space;
+		return Messages.Resolution_No_Space;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void resolve(final IFile file, final IMarker marker, int start,
-			int end) throws CoreException {
+	protected void resolve(final IFile file, final IMarker marker,
+			final int start, int end) throws CoreException {
 		// get contents
 		final byte[] content = getFileContentsAsByte(file);
 		final int len = content.length;
 
-		// new line?
-		if (isNewLine(content, start)) {
-			end--;
-		}
-
-		// find space before
-		while (start > 0 && isWhitespace(content, start - 1)) {
-			start--;
+		// find space after
+		while (end < len && isWhitespace(content, end)) {
+			end++;
 		}
 
 		// remove spaces

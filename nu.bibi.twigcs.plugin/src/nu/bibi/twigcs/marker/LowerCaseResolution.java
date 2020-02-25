@@ -1,5 +1,10 @@
 /**
+ * This file is part of the twigcs-plugin package.
  *
+ * (c) Laurent Muller <bibi@bibi.nu>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
 package nu.bibi.twigcs.marker;
 
@@ -7,30 +12,53 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
 
+import nu.bibi.twigcs.internal.Messages;
+
 /**
  * Marker resolution for lower case error.
  *
  * @author Laurent Muller
- *
  */
 public class LowerCaseResolution extends AbstractResolution {
 
-	@Override
-	public String getLabel() {
-		return "Update variable name";
+	/*
+	 * the shared instance
+	 */
+	private static volatile LowerCaseResolution instance;
+
+	/**
+	 * Gets the shared instance.
+	 *
+	 * @return the shared instance.
+	 */
+	public static synchronized LowerCaseResolution instance() {
+		// double check locking
+		if (instance == null) {
+			synchronized (LowerCaseResolution.class) {
+				if (instance == null) {
+					instance = new LowerCaseResolution();
+				}
+			}
+		}
+		return instance;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
-	protected void resolve(final IFile file, final IMarker marker)
-			throws CoreException {
-		final int start = getCharStart(marker);
-		final int end = getCharEnd(marker);
-		if (start == INVALID_POS || end == INVALID_POS) {
-			return;
-		}
+	public String getLabel() {
+		return Messages.Resolution_Lower_Case;
+	}
 
-		// get content
-		final String content = getFileContent(file);
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected void resolve(final IFile file, final IMarker marker,
+			final int start, final int end) throws CoreException {
+		// get contents
+		final String content = getFileContentsAsString(file);
 
 		// get variable
 		final String oldVariable = content.substring(start, end);
@@ -39,7 +67,7 @@ public class LowerCaseResolution extends AbstractResolution {
 		// new variable not present?
 		if (content.indexOf(newVariable) == -1) {
 			final String newContent = content.replace(oldVariable, newVariable);
-			setFileContent(file, newContent);
+			setFileContents(file, newContent);
 		} else {
 
 		}

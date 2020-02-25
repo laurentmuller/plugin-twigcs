@@ -162,6 +162,7 @@ public class TwigcsValidationVisitor extends AbstractResouceVisitor
 		final int line = violation.getLine();
 		final int offset = violation.getOffset(text);
 		final int length = getOffsetLength(message);
+		final int errorId = getErrorId(message);
 
 		// create
 		final IMarker marker = file.createMarker(MARKER_TYPE);
@@ -170,21 +171,7 @@ public class TwigcsValidationVisitor extends AbstractResouceVisitor
 		marker.setAttribute(IMarker.LINE_NUMBER, line);
 		marker.setAttribute(IMarker.CHAR_START, offset);
 		marker.setAttribute(IMarker.CHAR_END, offset + length);
-
-		// error type
-		if (isLowerCase(message)) {
-			marker.setAttribute(ERROR_ID, ERROR_LOWER_CASE);
-		} else if (isUnunsedMacro(message)) {
-			marker.setAttribute(ERROR_ID, ERROR_UNUSED_MACRO);
-		} else if (isUnunsedVariable(message)) {
-			marker.setAttribute(ERROR_ID, ERROR_UNUSED_VARIABLE);
-		} else if (isSpaceBefore(message)) {
-			marker.setAttribute(ERROR_ID, ERROR_SPACE_BEFORE);
-		} else if (isSpaceAfter(message)) {
-			marker.setAttribute(ERROR_ID, ERROR_SPACE_AFTER);
-		} else if (isEndLineSpace(message)) {
-			marker.setAttribute(ERROR_ID, ERROR_LINE_END_SPACE);
-		}
+		marker.setAttribute(ERROR_ID, errorId);
 
 		return marker;
 	}
@@ -226,6 +213,31 @@ public class TwigcsValidationVisitor extends AbstractResouceVisitor
 	}
 
 	/**
+	 * Gets the error identifier.
+	 *
+	 * @param message
+	 *            the error message.
+	 * @return the error identifier, if any; -1 otherwise.
+	 */
+	private int getErrorId(final String message) {
+		if (isLowerCase(message)) {
+			return ERROR_LOWER_CASE;
+		} else if (isUnunsedMacro(message)) {
+			return ERROR_UNUSED_MACRO;
+		} else if (isUnunsedVariable(message)) {
+			return ERROR_UNUSED_VARIABLE;
+		} else if (isEndLineSpace(message)) {
+			return ERROR_LINE_END_SPACE;
+		} else if (isNoSpace(message)) {
+			return ERROR_NO_SPACE;
+		} else if (isOneSpace(message)) {
+			return ERROR_ONE_SPACE;
+		} else {
+			return ERROR_INVALID;
+		}
+	}
+
+	/**
 	 * Gets the GSON parser.
 	 *
 	 * @return the GSON parser.
@@ -244,7 +256,6 @@ public class TwigcsValidationVisitor extends AbstractResouceVisitor
 	 *
 	 * @param message
 	 *            the violation message.
-	 *
 	 * @return the offset length.
 	 */
 	private int getOffsetLength(final String message) {
@@ -263,24 +274,19 @@ public class TwigcsValidationVisitor extends AbstractResouceVisitor
 	}
 
 	private boolean isEndLineSpace(final String message) {
-		return message.contains("A line should not end with blank space(s).");
+		return message.contains("A line should not end with blank space");
 	}
 
 	private boolean isLowerCase(final String message) {
 		return message.contains("variable should be in lower case");
 	}
 
-	private boolean isSpaceAfter(final String message) {
-		// There should be 1 space after the "="
-		// final Pattern pattern = Pattern.compile(
-		// "There should be \\d+ space after the",
-		// Pattern.CASE_INSENSITIVE);
-		return message.matches("There should be \\d+ space after the .*");
+	private boolean isNoSpace(final String message) {
+		return message.contains("0 space");
 	}
 
-	private boolean isSpaceBefore(final String message) {
-		// There should be 1 space before the "="
-		return message.matches("There should be \\d+ space before the .*");
+	private boolean isOneSpace(final String message) {
+		return message.contains("1 space");
 	}
 
 	private boolean isUnunsedMacro(final String message) {
@@ -375,7 +381,7 @@ public class TwigcsValidationVisitor extends AbstractResouceVisitor
 					}
 				}
 
-			} else if (exitCode != 0) { // error or invalid files?
+			} else if (exitCode != 0) { // error?
 				IOException e = null;
 				final String error = executor.getError();
 				if (error != null && !error.isEmpty()) {
@@ -384,19 +390,13 @@ public class TwigcsValidationVisitor extends AbstractResouceVisitor
 				final String msg = String.format(
 						Messages.ValidationVisitor_Error_Validate_Code,
 						file.getName(), exitCode);
-				throw createCoreException(msg, e);
+				handleStatus(createErrorStatus(msg, e));
 			}
-		} catch (final JsonSyntaxException e) {
+		} catch (final IOException | JsonSyntaxException e) {
 			final String msg = String.format(
 					Messages.ValidationVisitor_Error_Validate_Name,
 					file.getName());
 			handleStatus(createErrorStatus(msg, e));
-
-		} catch (final IOException e) {
-			final String msg = String.format(
-					Messages.ValidationVisitor_Error_Validate_Name,
-					file.getName());
-			throw createCoreException(msg, e);
 		}
 	}
 }

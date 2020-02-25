@@ -1,5 +1,10 @@
 /**
+ * This file is part of the twigcs-plugin package.
  *
+ * (c) Laurent Muller <bibi@bibi.nu>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
 package nu.bibi.twigcs.marker;
 
@@ -18,110 +23,92 @@ import org.eclipse.ui.IMarkerResolution;
 
 import nu.bibi.twigcs.core.IConstants;
 import nu.bibi.twigcs.core.ICoreException;
+import nu.bibi.twigcs.internal.Messages;
 
 /**
- * @author Laurent Muller
+ * Abstract marker resolution.
  *
+ * @author Laurent Muller
+ * @version 1.0
  */
 public abstract class AbstractResolution
 		implements IMarkerResolution, IConstants, ICoreException {
 
-	/**
-	 * The invalid position for start and end character attributes.
+	/*
+	 * the invalid position for start and end character attributes.
 	 */
-	protected final int INVALID_POS = -1;
+	private final int INVALID_POS = -1;
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void run(final IMarker marker) {
+		// get file
 		final IFile file = getFile(marker);
 		if (file == null) {
 			return;
 		}
 
+		// get positions
+		final int start = getCharStart(marker);
+		final int end = getCharEnd(marker);
+		if (start == INVALID_POS || end == INVALID_POS) {
+			return;
+		}
+
+		// resolve
 		try {
-			resolve(file, marker);
+			resolve(file, marker, start, end);
 		} catch (final CoreException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			handleStatus(e.getStatus());
 		}
 	}
 
 	/**
-	 * Gets the end character attribute for the given marker.
-	 *
-	 * @param marker
-	 *            the marker to read attribute from.
-	 * @return the start character attribute, if found; <code>-1</code>
-	 *         otherwise
-	 */
-	protected int getCharEnd(final IMarker marker) {
-		return marker.getAttribute(IMarker.CHAR_END, INVALID_POS);
-	}
-
-	/**
-	 * Gets the start character attribute for the given marker.
-	 *
-	 * @param marker
-	 *            the marker to read attribute from.
-	 * @return the start character attribute, if found; <code>-1</code>
-	 *         otherwise
-	 */
-	protected int getCharStart(final IMarker marker) {
-		return marker.getAttribute(IMarker.CHAR_START, INVALID_POS);
-	}
-
-	/**
-	 * Gets the marker's file.
-	 *
-	 * @param marker
-	 *            the marker to get file for.
-	 * @return the marker's file, if applicable; <code>null</code> otherwise.
-	 */
-	protected IFile getFile(final IMarker marker) {
-		final IResource resource = marker.getResource();
-		if (resource != null && resource.exists()
-				&& resource instanceof IFile) {
-			return (IFile) resource;
-		}
-		return null;
-	}
-
-	/**
-	 * Gets the content of the file.
+	 * Gets the contents of the file.
 	 *
 	 * @param file
 	 *            the file to read from.
-	 * @return the file content
+	 * @return the file contents.
 	 * @throws CoreException
 	 *             if this method fails.
 	 */
-	protected String getFileContent(final IFile file) throws CoreException {
-
-		try {
-			final byte[] buffer = getFileContentAsByte(file);
-			return new String(buffer, file.getCharset());
-		} catch (final UnsupportedEncodingException e) {
-			final String msg = NLS.bind(
-					"Unable to read the content of the file '{0}'.",
-					file.getName());
-			throw createCoreException(msg, e);
-		}
-	}
-
-	protected byte[] getFileContentAsByte(final IFile file)
+	protected byte[] getFileContentsAsByte(final IFile file)
 			throws CoreException {
 		int len;
 		final byte[] buffer = new byte[8192];
 		final ByteArrayOutputStream output = new ByteArrayOutputStream(8192);
+
 		try (InputStream contents = file.getContents()) {
 			while ((len = contents.read(buffer)) != -1) {
 				output.write(buffer, 0, len);
 			}
 			return output.toByteArray();
-
 		} catch (final IOException e) {
-			final String msg = NLS.bind(
-					"Unable to get content of the file '{0}'.", file.getName());
+			final String msg = NLS.bind(Messages.Resolution_Error_Read,
+					file.getName());
+			throw createCoreException(msg, e);
+		}
+	}
+
+	/**
+	 * Gets the contents of the file.
+	 *
+	 * @param file
+	 *            the file to read from.
+	 * @return the file contents.
+	 * @throws CoreException
+	 *             if this method fails.
+	 */
+	protected String getFileContentsAsString(final IFile file)
+			throws CoreException {
+		try {
+			final byte[] buffer = getFileContentsAsByte(file);
+			return new String(buffer, file.getCharset());
+		} catch (final UnsupportedEncodingException e) {
+			final String msg = NLS.bind(Messages.Resolution_Error_Read,
+					file.getName());
 			throw createCoreException(msg, e);
 		}
 	}
@@ -137,7 +124,7 @@ public abstract class AbstractResolution
 	 *            the character to compare to.
 	 * @return <code>true</code> if same character.
 	 */
-	protected boolean isChar(final byte[] content, final int index,
+	protected boolean isEqualsChar(final byte[] content, final int index,
 			final char ch) {
 		if (index >= 0 && index < content.length) {
 			return content[index] == ch;
@@ -156,7 +143,8 @@ public abstract class AbstractResolution
 	 * @return <code>true</code> if new line or carriage return character.
 	 */
 	protected boolean isNewLine(final byte[] content, final int index) {
-		return isChar(content, index, '\n') || isChar(content, index, '\r');
+		return isEqualsChar(content, index, '\n')
+				|| isEqualsChar(content, index, '\r');
 	}
 
 	/**
@@ -169,47 +157,100 @@ public abstract class AbstractResolution
 	 * @return <code>true</code> if space character.
 	 */
 	protected boolean isWhitespace(final byte[] content, final int index) {
-		return isChar(content, index, ' ');
+		return isEqualsChar(content, index, ' ');
 	}
 
-	protected abstract void resolve(IFile file, IMarker marker)
-			throws CoreException;
+	/**
+	 * Resolves the problem.
+	 *
+	 * @param file
+	 *            the marker's file.
+	 * @param marker
+	 *            the marker.
+	 * @param start
+	 *            the start character attribute.
+	 * @param end
+	 *            the end character attribute.
+	 * @throws CoreException
+	 *             if the resolution fails.
+	 */
+	protected abstract void resolve(IFile file, IMarker marker, int start,
+			int end) throws CoreException;
 
 	/**
-	 * Sets content of the given file.
+	 * Sets contents of the given file.
 	 *
 	 * @param file
 	 *            the file to update.
-	 * @param content
-	 *            the content to set.
+	 * @param contents
+	 *            the contents to set.
 	 * @throws CoreException
 	 *             if this method fails.
 	 */
-	protected void setFileContent(final IFile file, final byte[] content)
+	protected void setFileContents(final IFile file, final byte[] contents)
 			throws CoreException {
-		final ByteArrayInputStream source = new ByteArrayInputStream(content);
+		final ByteArrayInputStream source = new ByteArrayInputStream(contents);
 		file.setContents(source, true, true, null);
-		// file.refreshLocal(IResource.DEPTH_ZERO, null);
 	}
 
 	/**
-	 * Sets content of the given file.
+	 * Sets contents of the given file.
 	 *
 	 * @param file
 	 *            the file to update.
-	 * @param content
-	 *            the content to set.
+	 * @param contents
+	 *            the contents to set.
 	 * @throws CoreException
 	 *             if this method fails.
 	 */
-	protected void setFileContent(final IFile file, final String content)
+	protected void setFileContents(final IFile file, final String contents)
 			throws CoreException {
 		try {
-			setFileContent(file, content.getBytes(file.getCharset()));
+			setFileContents(file, contents.getBytes(file.getCharset()));
 		} catch (final UnsupportedEncodingException e) {
-			final String msg = NLS.bind(
-					"Unable to set content of the file '{0}'.", file.getName());
+			final String msg = NLS.bind(Messages.Resolution_Error_Write,
+					file.getName());
 			throw createCoreException(msg, e);
 		}
+	}
+
+	/**
+	 * Gets the end character attribute for the given marker.
+	 *
+	 * @param marker
+	 *            the marker to read attribute from.
+	 * @return the start character attribute, if found; <code>-1</code>
+	 *         otherwise
+	 */
+	private int getCharEnd(final IMarker marker) {
+		return marker.getAttribute(IMarker.CHAR_END, INVALID_POS);
+	}
+
+	/**
+	 * Gets the start character attribute for the given marker.
+	 *
+	 * @param marker
+	 *            the marker to read attribute from.
+	 * @return the start character attribute, if found; <code>-1</code>
+	 *         otherwise
+	 */
+	private int getCharStart(final IMarker marker) {
+		return marker.getAttribute(IMarker.CHAR_START, INVALID_POS);
+	}
+
+	/**
+	 * Gets the marker's file.
+	 *
+	 * @param marker
+	 *            the marker to get file for.
+	 * @return the marker's file, if applicable; <code>null</code> otherwise.
+	 */
+	private IFile getFile(final IMarker marker) {
+		final IResource resource = marker.getResource();
+		if (resource != null && resource.exists()
+				&& resource instanceof IFile) {
+			return (IFile) resource;
+		}
+		return null;
 	}
 }

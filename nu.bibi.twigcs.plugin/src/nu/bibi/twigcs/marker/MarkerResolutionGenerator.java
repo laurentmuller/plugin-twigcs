@@ -16,6 +16,7 @@ import org.eclipse.ui.IMarkerResolutionGenerator2;
  * Marker resolution generator for Twigcs.
  *
  * @author Laurent Muller
+ * @version 1.0
  */
 public class MarkerResolutionGenerator
 		implements IMarkerResolutionGenerator2, IMarkerConstants {
@@ -25,29 +26,35 @@ public class MarkerResolutionGenerator
 	 */
 	private static final IMarkerResolution[] EMPTY_RESOLUTIONS = {};
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public IMarkerResolution[] getResolutions(final IMarker marker) {
 		switch (getErrorId(marker)) {
 		case ERROR_LOWER_CASE:
-			return toArray(new LowerCaseResolution());
+			return toArray(LowerCaseResolution.instance());
 		case ERROR_UNUSED_MACRO:
-			return toArray(new UnusedMacroResolution());
+			return toArray(UnusedMacroResolution.instance());
 		case ERROR_UNUSED_VARIABLE:
-			return toArray(new UnusedVariableResolution());
-		case ERROR_SPACE_BEFORE:
-			return toArray(new SpaceBeforeResolution());
-		case ERROR_SPACE_AFTER:
-			return toArray(new SpaceAfterResolution());
+			return toArray(UnusedVariableResolution.instance());
 		case ERROR_LINE_END_SPACE:
-			return toArray(new EndLineSpaceResolution());
+			return toArray(EndLineSpaceResolution.instance());
+		case ERROR_NO_SPACE:
+			return toArray(NoSpaceResolution.instance());
+		case ERROR_ONE_SPACE:
+			return toArray(OneSpaceResolution.instance());
 		default:
 			return EMPTY_RESOLUTIONS;
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public boolean hasResolutions(final IMarker marker) {
-		return getErrorId(marker) != -1;
+		return getErrorId(marker) != ERROR_INVALID;
 	}
 
 	/**
@@ -58,7 +65,7 @@ public class MarkerResolutionGenerator
 	 * @return the error identifier or -1 if none.
 	 */
 	private int getErrorId(final IMarker marker) {
-		return marker.getAttribute(ERROR_ID, -1);
+		return marker.getAttribute(ERROR_ID, ERROR_INVALID);
 	}
 
 	/**

@@ -347,7 +347,8 @@ public class TwigcsProcessor implements ICoreException {
 	 */
 	private String toRealPath() throws CoreException {
 		try {
-			return Paths.get(programPath).toRealPath().toString();
+			final Path realPath = Paths.get(programPath).toRealPath();
+			return realPath.toString().replace('\\', '/');
 		} catch (final IOException e) {
 			throw createCoreException(Messages.TwigcsProcessor_Error_Real_Path,
 					e);
