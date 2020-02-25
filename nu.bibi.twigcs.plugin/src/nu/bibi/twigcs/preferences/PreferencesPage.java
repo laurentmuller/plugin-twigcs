@@ -8,14 +8,19 @@
  */
 package nu.bibi.twigcs.preferences;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.ComboFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.FileFieldEditor;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
@@ -25,7 +30,9 @@ import org.eclipse.ui.preferences.ScopedPreferenceStore;
 import nu.bibi.twigcs.TwigcsPlugin;
 import nu.bibi.twigcs.core.ICoreException;
 import nu.bibi.twigcs.core.TwigcsBuilder;
+import nu.bibi.twigcs.core.TwigcsProcessor;
 import nu.bibi.twigcs.internal.Messages;
+import nu.bibi.twigcs.io.IOExecutor;
 import nu.bibi.twigcs.model.TwigDisplay;
 import nu.bibi.twigcs.model.TwigReporter;
 import nu.bibi.twigcs.model.TwigSeverity;
@@ -72,6 +79,21 @@ public class PreferencesPage extends FieldEditorPreferencePage implements
 				+ text.substring(1).replace('_', ' ').toLowerCase();
 	}
 
+	/*
+	 * the test button
+	 */
+	private Button btnTest;
+
+	/*
+	 * the Twigcs file editor
+	 */
+	private FileFieldEditor fileEditor;
+
+	/*
+	 * the template file name
+	 */
+	private String templateFile;
+
 	/**
 	 * Creates a new instance of this class.
 	 */
@@ -91,12 +113,10 @@ public class PreferencesPage extends FieldEditorPreferencePage implements
 				TwigVersion.class);
 		addEnumEditor(P_SEVERITY, Messages.PreferencesPage_Severity,
 				TwigSeverity.class);
-		final ComboFieldEditor reporter = addEnumEditor(P_REPORTER,
-				Messages.PreferencesPage_Reporter, TwigReporter.class);
-		reporter.setEnabled(false, getFieldEditorParent());
-		final ComboFieldEditor display = addEnumEditor(P_DISPLAY,
-				Messages.PreferencesPage_Display, TwigDisplay.class);
-		display.setEnabled(false, getFieldEditorParent());
+		addEnumEditor(P_REPORTER, Messages.PreferencesPage_Reporter,
+				TwigReporter.class).setEnabled(false, getFieldEditorParent());
+		addEnumEditor(P_DISPLAY, Messages.PreferencesPage_Display,
+				TwigDisplay.class).setEnabled(false, getFieldEditorParent());
 	}
 
 	/**
@@ -114,6 +134,9 @@ public class PreferencesPage extends FieldEditorPreferencePage implements
 	public void init(final IWorkbench workbench) {
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public boolean performOk() {
 		// default
@@ -142,6 +165,34 @@ public class PreferencesPage extends FieldEditorPreferencePage implements
 	}
 
 	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void setValid(final boolean b) {
+		super.setValid(b);
+		if (btnTest != null) {
+			btnTest.setEnabled(b);
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected void contributeButtons(final Composite parent) {
+		super.contributeButtons(parent);
+		((GridLayout) parent.getLayout()).numColumns++;
+
+		btnTest = new Button(parent, SWT.PUSH);
+		btnTest.setText(Messages.PreferencesPage_Test);
+		btnTest.setEnabled(isValid());
+		btnTest.addListener(SWT.Selection, e -> {
+			testCommand();
+		});
+		setButtonLayoutData(btnTest);
+	}
+
+	/**
 	 * Adds a combo field editor for the given enumeration class
 	 *
 	 * @param key
@@ -164,7 +215,7 @@ public class PreferencesPage extends FieldEditorPreferencePage implements
 	 * Adds the file field editor for the executable path.
 	 */
 	private void addFileEditor() {
-		final FileFieldEditor editor = new FileFieldEditor(P_EXECUTABLE_PATH,
+		fileEditor = new FileFieldEditor(P_EXECUTABLE_PATH,
 				Messages.PreferencesPage_Path, true, getFieldEditorParent()) {
 			@Override
 			protected Text createTextWidget(final Composite parent) {
@@ -175,8 +226,65 @@ public class PreferencesPage extends FieldEditorPreferencePage implements
 				return text;
 			}
 		};
-		editor.setErrorMessage(Messages.PreferencesPage_Error_Path);
-		editor.setEmptyStringAllowed(false);
-		addField(editor);
+		fileEditor.setErrorMessage(Messages.PreferencesPage_Error_Path);
+		fileEditor.setEmptyStringAllowed(false);
+		addField(fileEditor);
+	}
+
+	/**
+	 * Creates an empty template file.
+	 *
+	 * @return the template file.
+	 * @throws IOException
+	 *             If a file could not be created.
+	 */
+	private String createTemplate() throws IOException {
+		// already created?
+		if (templateFile != null) {
+			return templateFile;
+		}
+
+		// create empty file
+		final File file = File.createTempFile("template", "twig");
+		file.deleteOnExit();
+		templateFile = file.getAbsolutePath();
+
+		return templateFile;
+	}
+
+	/**
+	 * Tests the Twigcs command.
+	 */
+	private void testCommand() {
+		final String fileName = fileEditor.getStringValue();
+		if (fileName == null || fileName.isEmpty()) {
+			MessageDialog.openError(getShell(), getTitle(),
+					Messages.PreferencesPage_Error_Path);
+			return;
+		}
+
+		try {
+			// processor
+			final TwigcsProcessor processor = new TwigcsProcessor();
+			processor.setSearchPath(createTemplate());
+			processor.setProgramPath(fileName);
+
+			// execute
+			final List<String> command = processor.buildCommand();
+			final IOExecutor executor = new IOExecutor();
+			final int exitCode = executor.run(command);
+
+			if (exitCode == 0) {
+				MessageDialog.openInformation(getShell(), getTitle(),
+						Messages.PreferencesPage_Test_Success);
+			} else {
+				MessageDialog.openError(getShell(), getTitle(),
+						Messages.PreferencesPage_Test_Error);
+			}
+
+		} catch (final CoreException | IOException e) {
+			MessageDialog.openError(getShell(), getTitle(),
+					Messages.PreferencesPage_Test_Error);
+		}
 	}
 }

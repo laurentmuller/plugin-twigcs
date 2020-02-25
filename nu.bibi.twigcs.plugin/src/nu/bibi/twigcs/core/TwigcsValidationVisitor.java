@@ -189,7 +189,6 @@ public class TwigcsValidationVisitor extends AbstractResouceVisitor
 		if (processor == null) {
 			processor = TwigcsProcessor.instance();
 			processor.setTwigVersion(version);
-			// processor.setSeverity(severity);
 		}
 
 		// update
