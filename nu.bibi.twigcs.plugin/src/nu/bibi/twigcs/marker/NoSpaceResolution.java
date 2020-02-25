@@ -50,6 +50,14 @@ public class NoSpaceResolution extends AbstractResolution {
 	 * {@inheritDoc}
 	 */
 	@Override
+	public int getErrorId() {
+		return ERROR_NO_SPACE;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public String getLabel() {
 		return Messages.Resolution_No_Space;
 	}

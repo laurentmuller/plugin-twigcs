@@ -381,10 +381,10 @@ public class TwigcsValidationVisitor extends AbstractResouceVisitor
 				}
 
 			} else if (exitCode != 0) { // error?
-				IOException e = null;
+				IOException e = executor.getErrorException();
 				final String error = executor.getError();
 				if (error != null && !error.isEmpty()) {
-					e = new IOException(error);
+					e = new IOException(error, e);
 				}
 				final String msg = String.format(
 						Messages.ValidationVisitor_Error_Validate_Code,

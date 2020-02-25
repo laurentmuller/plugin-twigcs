@@ -11,6 +11,7 @@ package nu.bibi.twigcs.io;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 
 /**
  * Input/Output stream.
@@ -19,6 +20,30 @@ import java.io.InputStream;
  * @version 1.0
  */
 public class IOStream implements Runnable {
+
+	/**
+	 * The default buffer site.
+	 */
+	public static final int BUFFER_SIZE = 8192;
+
+	/**
+	 * Copy all the content of the input stream to the output stream.
+	 *
+	 * @param input
+	 *            the input stream to read from.
+	 * @param output
+	 *            the output stream to write to.
+	 * @throws IOException
+	 *             if an I/O exception occurs.
+	 */
+	public static void readAll(final InputStream input,
+			final OutputStream output) throws IOException {
+		int len;
+		final byte[] buffer = new byte[BUFFER_SIZE];
+		while ((len = input.read(buffer)) != -1) {
+			output.write(buffer, 0, len);
+		}
+	}
 
 	/*
 	 * the input stream
@@ -43,7 +68,7 @@ public class IOStream implements Runnable {
 	 */
 	public IOStream(final InputStream input) {
 		this.input = input;
-		output = new ByteArrayOutputStream(8192);
+		output = new ByteArrayOutputStream(BUFFER_SIZE);
 	}
 
 	/**
@@ -61,10 +86,7 @@ public class IOStream implements Runnable {
 	@Override
 	public void run() {
 		try {
-			int c;
-			while ((c = input.read()) != -1) {
-				output.write(c);
-			}
+			readAll(input, output);
 		} catch (final IOException e) {
 			exception = e;
 		}

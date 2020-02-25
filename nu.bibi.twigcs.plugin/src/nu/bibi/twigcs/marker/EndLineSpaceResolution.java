@@ -50,6 +50,14 @@ public class EndLineSpaceResolution extends AbstractResolution {
 	 * {@inheritDoc}
 	 */
 	@Override
+	public int getErrorId() {
+		return ERROR_LINE_END_SPACE;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public String getLabel() {
 		return Messages.Resolution_End_Line_Space;
 	}

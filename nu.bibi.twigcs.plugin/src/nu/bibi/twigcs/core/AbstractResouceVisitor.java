@@ -34,7 +34,7 @@ public abstract class AbstractResouceVisitor
 	 */
 	@Override
 	public final boolean visit(final IResource resource) throws CoreException {
-		if (resource != null && resource.exists()) {
+		if (resource != null && resource.isAccessible()) {
 			return doVisit(resource);
 		}
 		return false;

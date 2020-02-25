@@ -54,7 +54,7 @@ public class ResourceText implements ICoreException {
 	 * Creates a new instance of this class.
 	 *
 	 * @param file
-	 *            the file to get content.
+	 *            the file to get contents.
 	 * @throws CoreException
 	 *             if the get contents method fails.
 	 */

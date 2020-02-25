@@ -48,6 +48,14 @@ public class UnusedVariableResolution extends AbstractResolution {
 	 * {@inheritDoc}
 	 */
 	@Override
+	public int getErrorId() {
+		return ERROR_UNUSED_VARIABLE;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public String getLabel() {
 		return Messages.Resolution_Unused_Variable;
 	}

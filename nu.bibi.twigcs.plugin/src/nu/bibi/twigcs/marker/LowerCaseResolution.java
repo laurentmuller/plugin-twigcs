@@ -47,6 +47,14 @@ public class LowerCaseResolution extends AbstractResolution {
 	 * {@inheritDoc}
 	 */
 	@Override
+	public int getErrorId() {
+		return ERROR_LOWER_CASE;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public String getLabel() {
 		return Messages.Resolution_Lower_Case;
 	}

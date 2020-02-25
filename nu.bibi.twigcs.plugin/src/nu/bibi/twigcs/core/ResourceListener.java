@@ -140,14 +140,14 @@ public class ResourceListener implements IResourceChangeListener,
 			throws CoreException {
 		// validate resource
 		final IResource resource = delta.getResource();
-		if (resource == null || !resource.exists()
+		if (resource == null || !resource.isAccessible()
 				|| !(resource instanceof IContainer)) {
 			return null;
 		}
 
 		// validate project
 		final IProject project = resource.getProject();
-		if (project == null || !project.exists()
+		if (project == null || !project.isAccessible()
 				|| !project.hasNature(IConstants.NATURE_ID)) {
 			return null;
 		}

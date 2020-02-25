@@ -10,6 +10,7 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<final.name>${project.artifactId}_${project.version}</final.name>
 		<maven.descriptor>false</maven.descriptor>
 		<tycho-version>1.6.0</tycho-version>
 		
@@ -82,6 +83,7 @@
 				<artifactId>tycho-packaging-plugin</artifactId>
 				<version>${tycho-version}</version>
 				<configuration>
+					<finalName>${final.name}</finalName>
 					<archive>
 						<addMavenDescriptor>${maven.descriptor}</addMavenDescriptor>
 					</archive>
@@ -93,6 +95,7 @@
 				<artifactId>tycho-source-plugin</artifactId>
 				<version>${tycho-version}</version>
 				<configuration>
+					<finalName>${final.name}</finalName>
 					<archive>
 						<addMavenDescriptor>${maven.descriptor}</addMavenDescriptor>
 					</archive>

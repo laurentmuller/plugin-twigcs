@@ -50,6 +50,14 @@ public class OneSpaceResolution extends AbstractResolution {
 	 * {@inheritDoc}
 	 */
 	@Override
+	public int getErrorId() {
+		return ERROR_ONE_SPACE;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public String getLabel() {
 		return Messages.Resolution_One_Space;
 	}

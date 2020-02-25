@@ -143,7 +143,7 @@ public class IOExecutor {
 			// wait
 			exitCode = process.waitFor();
 
-			// Handle condition where the process ends before the threads finish
+			// handle condition where the process ends before the threads finish
 			outputThread.join();
 			errorThread.join();
 

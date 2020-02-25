@@ -13,17 +13,27 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.function.Predicate;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.osgi.util.NLS;
-import org.eclipse.ui.IMarkerResolution;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.ui.views.markers.WorkbenchMarkerResolution;
 
 import nu.bibi.twigcs.core.IConstants;
 import nu.bibi.twigcs.core.ICoreException;
 import nu.bibi.twigcs.internal.Messages;
+import nu.bibi.twigcs.io.IOStream;
 
 /**
  * Abstract marker resolution.
@@ -31,13 +41,57 @@ import nu.bibi.twigcs.internal.Messages;
  * @author Laurent Muller
  * @version 1.0
  */
-public abstract class AbstractResolution
-		implements IMarkerResolution, IConstants, ICoreException {
+public abstract class AbstractResolution extends WorkbenchMarkerResolution
+		implements IMarkerConstants, IConstants, ICoreException {
+
+	/*
+	 * the empty marker array
+	 */
+	private static final IMarker[] EMPTY_MARKERS = {};
 
 	/*
 	 * the invalid position for start and end character attributes.
 	 */
-	private final int INVALID_POS = -1;
+	private static final int INVALID_POS = -1;
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public IMarker[] findOtherMarkers(final IMarker[] markers) {
+		if (markers.length > 1) {
+			final int id = getErrorId();
+			final Predicate<IMarker> predicate = marker -> marker
+					.getAttribute(ERROR_ID, ERROR_INVALID) == id;
+			return Arrays.stream(markers).filter(predicate)
+					.toArray(IMarker[]::new);
+		} else {
+			return EMPTY_MARKERS;
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String getDescription() {
+		return null;
+	}
+
+	/**
+	 * Gets the error identifier.
+	 *
+	 * @return the error identifier.
+	 */
+	public abstract int getErrorId();
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Image getImage() {
+		return null;
+	}
 
 	/**
 	 * {@inheritDoc}
@@ -66,6 +120,20 @@ public abstract class AbstractResolution
 	}
 
 	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void run(final IMarker[] markers, final IProgressMonitor monitor) {
+		final Map<IFile, List<IMarker>> map = createMarkerMap(markers);
+
+		monitor.beginTask(getLabel(), map.size());
+		for (final Entry<IFile, List<IMarker>> entry : map.entrySet()) {
+			fixMarkersInFile(entry.getKey(), entry.getValue(), monitor);
+		}
+		monitor.done();
+	}
+
+	/**
 	 * Gets the contents of the file.
 	 *
 	 * @param file
@@ -76,21 +144,44 @@ public abstract class AbstractResolution
 	 */
 	protected byte[] getFileContentsAsByte(final IFile file)
 			throws CoreException {
-		int len;
-		final byte[] buffer = new byte[8192];
-		final ByteArrayOutputStream output = new ByteArrayOutputStream(8192);
 
-		try (InputStream contents = file.getContents()) {
-			while ((len = contents.read(buffer)) != -1) {
-				output.write(buffer, 0, len);
-			}
+		final ByteArrayOutputStream output = new ByteArrayOutputStream(
+				IOStream.BUFFER_SIZE);
+
+		try (InputStream input = file.getContents()) {
+			IOStream.readAll(input, output);
 			return output.toByteArray();
+
 		} catch (final IOException e) {
 			final String msg = NLS.bind(Messages.Resolution_Error_Read,
 					file.getName());
 			throw createCoreException(msg, e);
 		}
 	}
+
+	// public boolean isValidOther(final IMarker marker) {
+	// // is it the originalMarker, we don't want duplicates!
+	// // if(markerToCheck.equals(originalMarker)) {
+	// // return false;
+	// // }
+	// // is it in the same file as original marker?
+	// // if (!marker.getResource().equals(originalMarker.getResource())) {
+	// // return false;
+	// // }
+	// // is it the same validator?
+	// // final String checkerName = LightOutputRatioChecker.class.getName();
+	// // if (!checkerName.equals(getCheckerName(marker))) {
+	// // return false;
+	// // }
+	// // is it the same error found?
+	// // final String checkerMessage = getCheckerMessage(marker);
+	// // if (!checkerMessage
+	// // .startsWith(LightOutputRatioChecker.DIRECT_RATIO_1)) {
+	// // return false;
+	// // }
+	// // return true;
+	// return false;
+	// }
 
 	/**
 	 * Gets the contents of the file.
@@ -105,7 +196,9 @@ public abstract class AbstractResolution
 			throws CoreException {
 		try {
 			final byte[] buffer = getFileContentsAsByte(file);
-			return new String(buffer, file.getCharset());
+			final String charset = file.getCharset();
+			return new String(buffer, charset);
+
 		} catch (final UnsupportedEncodingException e) {
 			final String msg = NLS.bind(Messages.Resolution_Error_Read,
 					file.getName());
@@ -206,7 +299,10 @@ public abstract class AbstractResolution
 	protected void setFileContents(final IFile file, final String contents)
 			throws CoreException {
 		try {
-			setFileContents(file, contents.getBytes(file.getCharset()));
+			final String charset = file.getCharset();
+			final byte[] buffer = contents.getBytes(charset);
+			setFileContents(file, buffer);
+
 		} catch (final UnsupportedEncodingException e) {
 			final String msg = NLS.bind(Messages.Resolution_Error_Write,
 					file.getName());
@@ -247,10 +343,59 @@ public abstract class AbstractResolution
 	 */
 	private IFile getFile(final IMarker marker) {
 		final IResource resource = marker.getResource();
-		if (resource != null && resource.exists()
-				&& resource instanceof IFile) {
+		if (resource instanceof IFile && resource.isAccessible()) {
 			return (IFile) resource;
 		}
 		return null;
+	}
+
+	int compareAttributes(final IMarker o1, final IMarker o2,
+			final String name) {
+		final int x1 = o1.getAttribute(name, -1);
+		final int x2 = o2.getAttribute(name, -1);
+		return Integer.compare(x2, x1);
+	}
+
+	/**
+	 * Gets a map grouping the markers by their file.
+	 *
+	 * @return the map.
+	 */
+	Map<IFile, List<IMarker>> createMarkerMap(final IMarker[] markers) {
+		// sort markers in reverse
+		Arrays.sort(markers, (o1, o2) -> {
+			int result = compareAttributes(o1, o2, IMarker.LINE_NUMBER);
+			if (result == 0) {
+				result = compareAttributes(o1, o2, IMarker.CHAR_END);
+			}
+			if (result == 0) {
+				result = compareAttributes(o1, o2, IMarker.CHAR_START);
+			}
+			return result;
+		});
+
+		final Map<IFile, List<IMarker>> map = new HashMap<>();
+		for (final IMarker marker : markers) {
+			final IResource resource = marker.getResource();
+			if (resource instanceof IFile && resource.isAccessible()) {
+				final IFile key = (IFile) resource;
+				List<IMarker> value = map.get(key);
+				if (value == null) {
+					value = new ArrayList<>();
+					map.put(key, value);
+				}
+				value.add(marker);
+			}
+		}
+		return map;
+	}
+
+	void fixMarkersInFile(final IFile file, final List<IMarker> markers,
+			final IProgressMonitor monitor) {
+		monitor.subTask(file.getFullPath().toOSString());
+		for (final IMarker marker : markers) {
+			run(marker);
+		}
+		monitor.worked(1);
 	}
 }
