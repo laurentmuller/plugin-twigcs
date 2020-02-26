@@ -6,14 +6,15 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-package nu.bibi.twigcs.marker;
+package nu.bibi.twigcs.resolution;
 
 import java.util.Arrays;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.swt.graphics.Image;
 
+import nu.bibi.twigcs.TwigcsPlugin;
 import nu.bibi.twigcs.internal.Messages;
 
 /**
@@ -58,6 +59,14 @@ public class OneSpaceResolution extends AbstractResolution {
 	 * {@inheritDoc}
 	 */
 	@Override
+	public Image getImage() {
+		return TwigcsPlugin.getDefault().getQuickFixError();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public String getLabel() {
 		return Messages.Resolution_One_Space;
 	}
@@ -66,33 +75,31 @@ public class OneSpaceResolution extends AbstractResolution {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void resolve(final IFile file, final IMarker marker,
+	protected byte[] resolveContents(final IFile file, final byte[] contents,
 			final int start, int end) throws CoreException {
-		// get contents
-		final byte[] content = getFileContentsAsByte(file);
-		final int len = content.length;
-		byte[] newContent = null;
+		byte[] newContents = null;
+		final int len = contents.length;
 
-		if (isWhitespace(content, end)) {
+		if (isWhitespace(contents, end)) {
 			// more than one space -> trim
-			while (end < len - 1 && isWhitespace(content, end + 1)) {
+			while (end < len - 1 && isWhitespace(contents, end + 1)) {
 				end++;
 			}
 
 			// remove spaces
 			final int newLength = len - (end - start);
-			newContent = Arrays.copyOf(content, newLength);
-			System.arraycopy(content, end, newContent, start, len - end);
+			newContents = Arrays.copyOf(contents, newLength);
+			System.arraycopy(contents, end, newContents, start, len - end);
 
 		} else {
 			// no space -> insert one
 			final int newLength = len + 1;
-			newContent = Arrays.copyOf(content, newLength);
-			System.arraycopy(content, start, newContent, start + 1, len - end);
-			newContent[start] = ' ';
+			newContents = Arrays.copyOf(contents, newLength);
+			System.arraycopy(contents, start, newContents, start + 1,
+					len - end);
+			newContents[start] = ' ';
 		}
 
-		// save
-		setFileContents(file, newContent);
+		return newContents;
 	}
 }

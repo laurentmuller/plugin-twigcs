@@ -6,7 +6,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-package nu.bibi.twigcs.marker;
+package nu.bibi.twigcs.resolution;
 
 /**
  * Constants for marker resolutions.
@@ -14,15 +14,11 @@ package nu.bibi.twigcs.marker;
  * @author Laurent Muller
  * @version 1.0
  */
-public interface IMarkerConstants {
+public interface IResolutionConstants {
 
 	/**
-	 * The error identifier attribute.
-	 */
-	String ERROR_ID = "errorId"; //$NON-NLS-1$
-
-	/**
-	 * The error identifier when invalid.
+	 * The invalid error identifier. Used for markers when no quick fix is
+	 * available.
 	 */
 	int ERROR_INVALID = -1;
 

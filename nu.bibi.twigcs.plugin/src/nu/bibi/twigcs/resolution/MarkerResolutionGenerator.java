@@ -6,7 +6,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-package nu.bibi.twigcs.marker;
+package nu.bibi.twigcs.resolution;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.ui.IMarkerResolution;
@@ -19,7 +19,7 @@ import org.eclipse.ui.IMarkerResolutionGenerator2;
  * @version 1.0
  */
 public class MarkerResolutionGenerator
-		implements IMarkerResolutionGenerator2, IMarkerConstants {
+		implements IMarkerResolutionGenerator2, IResolutionConstants {
 
 	/*
 	 * the empty resolutions
@@ -58,14 +58,14 @@ public class MarkerResolutionGenerator
 	}
 
 	/**
-	 * Get the error identifier.
+	 * Get the source error identifier.
 	 *
 	 * @param marker
 	 *            the marker to get identifier for.
 	 * @return the error identifier or -1 if none.
 	 */
 	private int getErrorId(final IMarker marker) {
-		return marker.getAttribute(ERROR_ID, ERROR_INVALID);
+		return marker.getAttribute(IMarker.SOURCE_ID, ERROR_INVALID);
 	}
 
 	/**

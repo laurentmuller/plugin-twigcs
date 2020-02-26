@@ -6,12 +6,11 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-package nu.bibi.twigcs.marker;
+package nu.bibi.twigcs.resolution;
 
 import java.util.Arrays;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
 
 import nu.bibi.twigcs.internal.Messages;
@@ -66,28 +65,24 @@ public class EndLineSpaceResolution extends AbstractResolution {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void resolve(final IFile file, final IMarker marker, int start,
-			int end) throws CoreException {
-		// get contents
-		final byte[] content = getFileContentsAsByte(file);
-		final int len = content.length;
-
+	protected byte[] resolveContents(final IFile file, final byte[] contents,
+			int start, int end) throws CoreException {
 		// new line?
-		if (isNewLine(content, start)) {
+		if (isNewLine(contents, start)) {
 			end--;
 		}
 
 		// find space before
-		while (start > 0 && isWhitespace(content, start - 1)) {
+		while (start > 0 && isWhitespace(contents, start - 1)) {
 			start--;
 		}
 
 		// remove spaces
+		final int len = contents.length;
 		final int newLength = len - (end - start);
-		final byte[] newContent = Arrays.copyOf(content, newLength);
-		System.arraycopy(content, end, newContent, start, len - end);
+		final byte[] newContents = Arrays.copyOf(contents, newLength);
+		System.arraycopy(contents, end, newContents, start, len - end);
 
-		// save
-		setFileContents(file, newContent);
+		return newContents;
 	}
 }

@@ -11,7 +11,6 @@ package nu.bibi.twigcs.io;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 
 /**
  * Input/Output stream.
@@ -22,27 +21,29 @@ import java.io.OutputStream;
 public class IOStream implements Runnable {
 
 	/**
-	 * The default buffer site.
+	 * The default buffer size.
 	 */
 	public static final int BUFFER_SIZE = 8192;
 
 	/**
-	 * Copy all the content of the input stream to the output stream.
+	 * Gets all the contents of the given input stream.
 	 *
 	 * @param input
 	 *            the input stream to read from.
-	 * @param output
-	 *            the output stream to write to.
+	 * @return the input stream contents.
 	 * @throws IOException
 	 *             if an I/O exception occurs.
 	 */
-	public static void readAll(final InputStream input,
-			final OutputStream output) throws IOException {
+	public static byte[] readAll(final InputStream input) throws IOException {
 		int len;
 		final byte[] buffer = new byte[BUFFER_SIZE];
+		final ByteArrayOutputStream output = new ByteArrayOutputStream(
+				BUFFER_SIZE);
 		while ((len = input.read(buffer)) != -1) {
 			output.write(buffer, 0, len);
 		}
+
+		return output.toByteArray();
 	}
 
 	/*
@@ -51,9 +52,9 @@ public class IOStream implements Runnable {
 	private final InputStream input;
 
 	/*
-	 * the output stream
+	 * the output contents
 	 */
-	private final ByteArrayOutputStream output;
+	private byte[] output;
 
 	/*
 	 * the I/O exception
@@ -68,7 +69,6 @@ public class IOStream implements Runnable {
 	 */
 	public IOStream(final InputStream input) {
 		this.input = input;
-		output = new ByteArrayOutputStream(BUFFER_SIZE);
 	}
 
 	/**
@@ -86,7 +86,7 @@ public class IOStream implements Runnable {
 	@Override
 	public void run() {
 		try {
-			readAll(input, output);
+			output = readAll(input);
 		} catch (final IOException e) {
 			exception = e;
 		}
@@ -95,11 +95,13 @@ public class IOStream implements Runnable {
 	/**
 	 * {@inheritDoc}
 	 * <p>
-	 * This implementation returns the content read from the input stream.
+	 * The implementation of <code>IOStream</code> returns the contents (if any)
+	 * read from the input stream. Returns an empty string ("") if not yet
+	 * started.
 	 * </p>
 	 */
 	@Override
 	public String toString() {
-		return output.toString();
+		return output != null ? new String(output) : "";
 	}
 }

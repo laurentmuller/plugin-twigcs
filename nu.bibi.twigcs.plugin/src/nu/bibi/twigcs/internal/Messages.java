@@ -41,10 +41,10 @@ public final class Messages extends NLS {
 	public static String PreferencesPage_Path;
 	public static String PreferencesPage_Reporter;
 	public static String PreferencesPage_Severity;
-	public static String PreferencesPage_Version;
 	public static String PreferencesPage_Test;
 	public static String PreferencesPage_Test_Error;
 	public static String PreferencesPage_Test_Success;
+	public static String PreferencesPage_Version;
 	public static String ProjectPropertyPage_Add;
 	public static String ProjectPropertyPage_Description;
 	public static String ProjectPropertyPage_Edit;
@@ -53,6 +53,7 @@ public final class Messages extends NLS {
 	public static String ProjectPropertyPage_Override;
 	public static String ProjectPropertyPage_Remove;
 	public static String Resolution_End_Line_Space;
+	public static String Resolution_Error_Charset;
 	public static String Resolution_Error_Read;
 	public static String Resolution_Error_Write;
 	public static String Resolution_Lower_Case;

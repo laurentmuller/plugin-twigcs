@@ -8,12 +8,18 @@
  */
 package nu.bibi.twigcs;
 
+import java.util.Optional;
+
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.resource.ImageRegistry;
+import org.eclipse.jface.resource.ResourceLocator;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.ui.preferences.ScopedPreferenceStore;
 import org.osgi.framework.BundleContext;
@@ -29,6 +35,12 @@ import nu.bibi.twigcs.core.ResourceListener;
  */
 public class TwigcsPlugin extends AbstractUIPlugin implements IConstants {
 
+	public static final String QUICK_FIX = "icons/quickfix.png"; //$NON-NLS-1$
+
+	public static final String QUICK_FIX_ERROR = "icons/quickfix_error.png"; //$NON-NLS-1$
+
+	public static final String QUICK_FIX_WARNING = "icons/quickfix_warning.png"; //$NON-NLS-1$
+
 	/*
 	 * The shared instance
 	 */
@@ -42,6 +54,40 @@ public class TwigcsPlugin extends AbstractUIPlugin implements IConstants {
 	public static TwigcsPlugin getDefault() {
 		return plugin;
 	}
+
+	// /**
+	// * Returns an image for the image file at the given plug-in relative path
+	// *
+	// * @param imageFilePath
+	// * the path of the image file, relative to the root of this
+	// * bundle.
+	// * @return an image, or <code>null</code> if no image could be found.
+	// */
+	// public static Image getImage(final String imageFilePath) {
+	// final Optional<ImageDescriptor> descriptor = getImageDescriptor(
+	// imageFilePath);
+	// if (descriptor.isPresent()) {
+	// return descriptor.get().createImage();
+	// }
+	// return null;
+	// }
+	//
+	// /**
+	// * Returns a new
+	// * <code>{@link Optional}&lt;{@link ImageDescriptor}&gt;</code> for an
+	// image
+	// * file located within this bundle or {@link Optional#empty()}.
+	// *
+	// * @param path
+	// * the path of the image file, relative to the root of this
+	// * bundle.
+	// * @return <code>{@link Optional}&lt;{@link ImageDescriptor}&gt;</code> or
+	// * {@link Optional#empty()}.
+	// */
+	// public static Optional<ImageDescriptor> getImageDescriptor(
+	// final String path) {
+	// return ResourceLocator.imageDescriptorFromBundle(PLUGIN_ID, path);
+	// }
 
 	/**
 	 * Logs the given exception.
@@ -93,6 +139,33 @@ public class TwigcsPlugin extends AbstractUIPlugin implements IConstants {
 	}
 
 	/**
+	 * Gets the quick fix image.
+	 *
+	 * @return the image, if found; <code>null</code> otherwise.
+	 */
+	public Image getQuickFix() {
+		return getImageRegistry().get(QUICK_FIX);
+	}
+
+	/**
+	 * Gets the error quick fix image.
+	 *
+	 * @return the image, if found; <code>null</code> otherwise.
+	 */
+	public Image getQuickFixError() {
+		return getImageRegistry().get(QUICK_FIX_ERROR);
+	}
+
+	/**
+	 * Gets the warning quick fix image.
+	 *
+	 * @return the image, if found; <code>null</code> otherwise.
+	 */
+	public Image getQuickFixWarning() {
+		return getImageRegistry().get(QUICK_FIX_WARNING);
+	}
+
+	/**
 	 * {@inheritDoc}
 	 */
 	@Override
@@ -118,6 +191,35 @@ public class TwigcsPlugin extends AbstractUIPlugin implements IConstants {
 			final IWorkspace workspace = ResourcesPlugin.getWorkspace();
 			workspace.removeResourceChangeListener(listener);
 			listener = null;
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected ImageRegistry createImageRegistry() {
+		final ImageRegistry registry = super.createImageRegistry();
+		putImage(registry, QUICK_FIX);
+		putImage(registry, QUICK_FIX_ERROR);
+		putImage(registry, QUICK_FIX_WARNING);
+		return registry;
+	}
+
+	/**
+	 * Put the given image to the registry.
+	 *
+	 * @param registry
+	 *            the registry to update.
+	 * @param path
+	 *            the path of the image file, relative to the root of this
+	 *            bundle. The path is also used as key.
+	 */
+	private void putImage(final ImageRegistry registry, final String path) {
+		final Optional<ImageDescriptor> descriptor = ResourceLocator
+				.imageDescriptorFromBundle(PLUGIN_ID, path);
+		if (descriptor.isPresent()) {
+			registry.put(path, descriptor.get());
 		}
 	}
 }

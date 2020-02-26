@@ -19,7 +19,7 @@ import org.eclipse.ui.statushandlers.StatusManager;
  * @author Laurent Muller
  * @version 1.0
  */
-public interface ICoreException /*extends IConstants*/ {
+public interface ICoreException {
 
 	/**
 	 * Creates a core exception.

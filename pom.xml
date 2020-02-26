@@ -1,28 +1,34 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	
+
 	<groupId>nu.bibi.twigcs</groupId>
 	<artifactId>nu.bibi.twigcs.parent</artifactId>
 	<version>1.0.0</version>
 	<packaging>pom</packaging>
 
 	<properties>
+		<!--  global properties -->
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<final.name>${project.artifactId}_${project.version}</final.name>
-		<maven.descriptor>false</maven.descriptor>
-		<tycho-version>1.6.0</tycho-version>
 		
+		<!-- maven properties -->
+		<maven.descriptor>false</maven.descriptor>
+		<maven.deploy.skip>true</maven.deploy.skip>		
+		<final.name>${project.artifactId}_${unqualifiedVersion}${buildQualifier}</final.name>
+		
+		<!--  versions -->
+		<tycho-version>1.6.0</tycho-version>
+
 		<!-- repositories -->
 		<eclipse.repo>http://download.eclipse.org/releases/latest</eclipse.repo>
 		<orbit.repo>https://download.eclipse.org/tools/orbit/downloads/drops/R20191126223242/repository</orbit.repo>
-		
-		<!-- FTP -->
-		<ftp.serverId>infomaniak</ftp.serverId>		
+
+		<!-- FTP properties -->
+		<ftp.serverId>infomaniak</ftp.serverId>
 		<ftp.url>ftp://tj8om.ftp.infomaniak.com/web</ftp.url>
-		<ftp.fromDir>${project.basedir}/nu.bibi.twigcs.repository/target/repository</ftp.fromDir>
-		<ftp.toDir>twigcs/v${project.version}</ftp.toDir>
+		<ftp.from>${project.basedir}/nu.bibi.twigcs.repository/target/repository</ftp.from>
+		<ftp.to>twigcs/v${project.version}</ftp.to>
 	</properties>
 
 	<modules>
@@ -30,11 +36,7 @@
 		<module>nu.bibi.twigcs.feature</module>
 		<module>nu.bibi.twigcs.repository</module>
 	</modules>
-
-	<prerequisites>
-		<maven>3.0</maven>
-	</prerequisites>
-
+ 
 	<repositories>
 		<repository>
 			<id>eclipse-repo</id>
@@ -47,30 +49,54 @@
 			<url>${orbit.repo}</url>
 		</repository>
 	</repositories>
-	 
-	<distributionManagement>
-		<repository>
-			<id>${ftp.serverId}</id>
-		</repository>
-	</distributionManagement>
- 	
- 
+
 	<build>
 		<!-- used to deploy update site -->
 		<extensions>
 			<extension>
-    			<groupId>org.apache.maven.wagon</groupId>
-    			<artifactId>wagon-ssh</artifactId>
+				<groupId>org.apache.maven.wagon</groupId>
+				<artifactId>wagon-ssh</artifactId>
 				<version>3.3.4</version>
 			</extension>
 			<extension>
-                <groupId>org.apache.maven.wagon</groupId>
-                <artifactId>wagon-ftp</artifactId>
-                <version>3.3.4</version>
-            </extension>
+				<groupId>org.apache.maven.wagon</groupId>
+				<artifactId>wagon-ftp</artifactId>
+				<version>3.3.4</version>
+			</extension>
 		</extensions>
-		 
+
 		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-enforcer-plugin</artifactId>
+				<version>3.0.0-M3</version>
+				<executions>
+					<execution>
+						<id>enforce-maven</id>
+						<goals>
+							<goal>enforce</goal>
+						</goals>
+						<configuration>
+							<rules>
+								<requireMavenVersion>
+									<version>3.0</version>
+								</requireMavenVersion>
+							</rules>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>		
+			
+			<!-- skip local artifacts install -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-install-plugin</artifactId>
+				<version>3.0.0-M1</version>
+				<configuration>
+					<skip>true</skip>
+				</configuration>
+			</plugin>
+
 			<plugin>
 				<groupId>org.eclipse.tycho</groupId>
 				<artifactId>tycho-maven-plugin</artifactId>
@@ -78,6 +104,15 @@
 				<extensions>true</extensions>
 			</plugin>
 
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-compiler-plugin</artifactId>
+				<version>${tycho-version}</version>
+				<configuration>
+					<useProjectSettings>false</useProjectSettings>
+				</configuration>
+			</plugin>
+			
 			<plugin>
 				<groupId>org.eclipse.tycho</groupId>
 				<artifactId>tycho-packaging-plugin</artifactId>
@@ -117,24 +152,26 @@
 				<configuration>
 					<environments>
 						<environment>
+							<os>linux</os>
+							<ws>gtk</ws>
+							<arch>x86_64</arch>
+						</environment>
+						<environment>
 							<os>win32</os>
 							<ws>win32</ws>
+							<arch>x86_64</arch>
+						</environment>
+						<environment>
+							<os>macosx</os>
+							<ws>cocoa</ws>
 							<arch>x86_64</arch>
 						</environment>
 					</environments>
 				</configuration>
 			</plugin>
-						 
-			<!--  skip deploying artifacts -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-deploy-plugin</artifactId>
-				<version>2.8.2</version>
-				<configuration>
-					<skip>true</skip>
-				</configuration>
-			</plugin>
-			
+
+			<!-- skip deploying artifacts <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-deploy-plugin</artifactId> <version>2.8.2</version> <configuration> <skip>true</skip> </configuration> </plugin> -->
+
 			<!-- deploy to update site -->
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
@@ -142,7 +179,7 @@
 				<version>2.0.0</version>
 				<executions>
 					<execution>
-						<id>upload-update</id>
+						<id>upload</id>
 						<phase>deploy</phase>
 						<goals>
 							<goal>upload</goal>
@@ -150,8 +187,8 @@
 						<configuration>
 							<serverId>${ftp.serverId}</serverId>
 							<url>${ftp.url}</url>
-							<fromDir>${ftp.fromDir}</fromDir>
-							<toDir>${ftp.toDir}</toDir>
+							<fromDir>${ftp.from}</fromDir>
+							<toDir>${ftp.to}</toDir>
 						</configuration>
 					</execution>
 				</executions>

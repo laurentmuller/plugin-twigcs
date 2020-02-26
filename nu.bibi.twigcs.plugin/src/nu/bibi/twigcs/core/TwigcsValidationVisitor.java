@@ -27,13 +27,13 @@ import com.google.gson.JsonSyntaxException;
 import nu.bibi.twigcs.gson.SeverityDeserializer;
 import nu.bibi.twigcs.internal.Messages;
 import nu.bibi.twigcs.io.IOExecutor;
-import nu.bibi.twigcs.marker.IMarkerConstants;
 import nu.bibi.twigcs.model.TwigFile;
 import nu.bibi.twigcs.model.TwigResult;
 import nu.bibi.twigcs.model.TwigSeverity;
 import nu.bibi.twigcs.model.TwigVersion;
 import nu.bibi.twigcs.model.TwigViolation;
 import nu.bibi.twigcs.preferences.ProjectPreferences;
+import nu.bibi.twigcs.resolution.IResolutionConstants;
 
 /**
  * Resource visitor to validate Twig files.
@@ -42,7 +42,7 @@ import nu.bibi.twigcs.preferences.ProjectPreferences;
  * @version 1.0
  */
 public class TwigcsValidationVisitor extends AbstractResouceVisitor
-		implements IConstants, ICoreException, IMarkerConstants {
+		implements IConstants, IResolutionConstants, ICoreException {
 
 	/*
 	 * the double quote character
@@ -57,7 +57,7 @@ public class TwigcsValidationVisitor extends AbstractResouceVisitor
 	 * @return <code>true</code> if a Twig file.
 	 */
 	public static boolean isTwigFile(final IResource resource) {
-		return resource instanceof IFile
+		return resource instanceof IFile && resource.isAccessible()
 				&& TWIG_EXTENSION.equals(resource.getFileExtension());
 	}
 
@@ -123,7 +123,7 @@ public class TwigcsValidationVisitor extends AbstractResouceVisitor
 	protected boolean doVisit(final IResource resource) throws CoreException {
 		if (isTwigFile(resource)) {
 			final IFile file = (IFile) resource;
-			monitor.subTask(file.getName());
+			monitor.subTask(file.getFullPath().toOSString());
 			deleteMarkers(file);
 			if (mustProcess(file)) {
 				process(file);
@@ -171,7 +171,7 @@ public class TwigcsValidationVisitor extends AbstractResouceVisitor
 		marker.setAttribute(IMarker.LINE_NUMBER, line);
 		marker.setAttribute(IMarker.CHAR_START, offset);
 		marker.setAttribute(IMarker.CHAR_END, offset + length);
-		marker.setAttribute(ERROR_ID, errorId);
+		marker.setAttribute(IMarker.SOURCE_ID, errorId);
 
 		return marker;
 	}

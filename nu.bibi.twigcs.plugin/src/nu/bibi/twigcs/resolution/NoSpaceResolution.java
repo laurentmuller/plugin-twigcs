@@ -6,14 +6,15 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-package nu.bibi.twigcs.marker;
+package nu.bibi.twigcs.resolution;
 
 import java.util.Arrays;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.swt.graphics.Image;
 
+import nu.bibi.twigcs.TwigcsPlugin;
 import nu.bibi.twigcs.internal.Messages;
 
 /**
@@ -58,6 +59,14 @@ public class NoSpaceResolution extends AbstractResolution {
 	 * {@inheritDoc}
 	 */
 	@Override
+	public Image getImage() {
+		return TwigcsPlugin.getDefault().getQuickFixError();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public String getLabel() {
 		return Messages.Resolution_No_Space;
 	}
@@ -66,23 +75,20 @@ public class NoSpaceResolution extends AbstractResolution {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void resolve(final IFile file, final IMarker marker,
+	protected byte[] resolveContents(final IFile file, final byte[] contents,
 			final int start, int end) throws CoreException {
-		// get contents
-		final byte[] content = getFileContentsAsByte(file);
-		final int len = content.length;
 
 		// find space after
-		while (end < len && isWhitespace(content, end)) {
+		final int len = contents.length;
+		while (end < len && isWhitespace(contents, end)) {
 			end++;
 		}
 
 		// remove spaces
 		final int newLength = len - (end - start);
-		final byte[] newContent = Arrays.copyOf(content, newLength);
-		System.arraycopy(content, end, newContent, start, len - end);
+		final byte[] newContent = Arrays.copyOf(contents, newLength);
+		System.arraycopy(contents, end, newContent, start, len - end);
 
-		// save
-		setFileContents(file, newContent);
+		return contents;
 	}
 }

@@ -6,12 +6,16 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-package nu.bibi.twigcs.marker;
+package nu.bibi.twigcs.resolution;
+
+import java.io.UnsupportedEncodingException;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.osgi.util.NLS;
+import org.eclipse.swt.graphics.Image;
 
+import nu.bibi.twigcs.TwigcsPlugin;
 import nu.bibi.twigcs.internal.Messages;
 
 /**
@@ -55,6 +59,14 @@ public class LowerCaseResolution extends AbstractResolution {
 	 * {@inheritDoc}
 	 */
 	@Override
+	public Image getImage() {
+		return TwigcsPlugin.getDefault().getQuickFixError();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public String getLabel() {
 		return Messages.Resolution_Lower_Case;
 	}
@@ -63,21 +75,37 @@ public class LowerCaseResolution extends AbstractResolution {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void resolve(final IFile file, final IMarker marker,
+	protected boolean canGrouping() {
+		return false;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected byte[] resolveContents(final IFile file, final byte[] contents,
 			final int start, final int end) throws CoreException {
-		// get contents
-		final String content = getFileContentsAsString(file);
+		try {
+			// get contents as string
+			final String text = new String(contents, file.getCharset());
 
-		// get variable
-		final String oldVariable = content.substring(start, end);
-		final String newVariable = convertVariable(oldVariable);
+			// update variable
+			final String oldVariable = text.substring(start, end);
+			final String newVariable = convertVariable(oldVariable);
 
-		// new variable not present?
-		if (content.indexOf(newVariable) == -1) {
-			final String newContent = content.replace(oldVariable, newVariable);
-			setFileContents(file, newContent);
-		} else {
+			// new variable present?
+			if (text.indexOf(newVariable) != -1) {
+				return contents;
+			}
 
+			// replace all
+			final String newContent = text.replace(oldVariable, newVariable);
+			return newContent.getBytes(file.getCharset());
+
+		} catch (final UnsupportedEncodingException e) {
+			final String msg = NLS.bind(Messages.Resolution_Error_Charset,
+					file.getName());
+			throw createCoreException(msg, e);
 		}
 	}
 

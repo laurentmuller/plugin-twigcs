@@ -18,8 +18,8 @@ Export-Package: nu.bibi.twigcs,
  nu.bibi.twigcs.internal;x-internal:=true,
  nu.bibi.twigcs.internal.test;x-internal:=true,
  nu.bibi.twigcs.io,
- nu.bibi.twigcs.marker,
  nu.bibi.twigcs.model,
  nu.bibi.twigcs.preferences,
+ nu.bibi.twigcs.resolution,
  nu.bibi.twigcs.ui
 Bundle-Activator: nu.bibi.twigcs.TwigcsPlugin

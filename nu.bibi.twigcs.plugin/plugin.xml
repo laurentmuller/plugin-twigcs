@@ -130,7 +130,7 @@
     <extension
           point="org.eclipse.ui.ide.markerResolution">
        <markerResolutionGenerator
-             class="nu.bibi.twigcs.marker.MarkerResolutionGenerator"
+             class="nu.bibi.twigcs.resolution.MarkerResolutionGenerator"
              markerType="nu.bibi.twigcs.marker">
        </markerResolutionGenerator>
     </extension>
