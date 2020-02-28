@@ -9,7 +9,6 @@
 package nu.bibi.twigcs.core;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.Arrays;
@@ -18,10 +17,14 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 
 import nu.bibi.twigcs.internal.Messages;
+import nu.bibi.twigcs.io.IOStream;
 
 /**
  * Wrapper class for the {@link IFile} content. This class is used to read the
  * content and to track line offsets.
+ *
+ * @author Laurent Muller
+ * @version 1.0
  */
 public class ResourceText implements ICoreException {
 
@@ -38,7 +41,12 @@ public class ResourceText implements ICoreException {
 	/*
 	 * the number of lines
 	 */
-	private int count = 1;
+	private int count;
+
+	/*
+	 * the content
+	 */
+	private byte[] content;
 
 	/*
 	 * the content length
@@ -59,8 +67,9 @@ public class ResourceText implements ICoreException {
 	 *             if the get contents method fails.
 	 */
 	public ResourceText(final IFile file) throws CoreException {
-		try (InputStream input = file.getContents();
-				InputStreamReader reader = new InputStreamReader(input)) {
+		try (InputStreamReader reader = new InputStreamReader(
+				file.getContents(), file.getCharset())) {
+
 			read(reader);
 
 		} catch (final IOException e) {
@@ -77,6 +86,15 @@ public class ResourceText implements ICoreException {
 	 */
 	public int count() {
 		return count;
+	}
+
+	/**
+	 * Gets the file content.
+	 *
+	 * @return the file content.
+	 */
+	public byte[] getContent() {
+		return content;
 	}
 
 	/**
@@ -148,14 +166,19 @@ public class ResourceText implements ICoreException {
 	 * Reads all the content.
 	 *
 	 * @param reader
-	 *            the reader.
+	 *            the reader to read data from.
 	 * @throws IOException
 	 *             if an I/O exception occurs.
 	 */
 	private void read(final Reader reader) throws IOException {
+		// reset
+		count = 1;
+		contentLength = 0;
+		content = new byte[] {};
+
 		int ch;
 		int previous = 0;
-		contentLength = 0;
+		final StringBuffer buffer = new StringBuffer(IOStream.BUFFER_SIZE);
 
 		while ((ch = reader.read()) != -1) {
 			if (ch == LINE_FEED) {
@@ -167,6 +190,7 @@ public class ResourceText implements ICoreException {
 			}
 			previous = ch;
 			contentLength++;
+			buffer.append((char) ch);
 		}
 
 		// check last character (Mac)
@@ -177,6 +201,8 @@ public class ResourceText implements ICoreException {
 		// content?
 		if (contentLength == 0) {
 			count = 0;
+		} else {
+			content = buffer.toString().getBytes();
 		}
 	}
 }

@@ -97,6 +97,11 @@ public abstract class AbstractResolution extends WorkbenchMarkerResolution
 
 	/**
 	 * {@inheritDoc}
+	 *
+	 * <p>
+	 * This method is normally never called but the
+	 * {@link #run(IMarker[], IProgressMonitor)} method instead.
+	 * </p>
 	 */
 	@Override
 	public void run(final IMarker marker) {
@@ -107,13 +112,13 @@ public abstract class AbstractResolution extends WorkbenchMarkerResolution
 		}
 
 		try {
-			// update contents
+			// fix
 			final byte[] contents = getFileContents(file);
 			final byte[] newContents = fixMarker(file, marker, contents);
 
 			// save if change
 			if (!Arrays.equals(contents, newContents)) {
-				setFileContents(file, newContents);
+				setFileContents(file, newContents, null);
 			}
 
 		} catch (final CoreException e) {
@@ -126,8 +131,11 @@ public abstract class AbstractResolution extends WorkbenchMarkerResolution
 	 */
 	@Override
 	public void run(final IMarker[] markers, final IProgressMonitor monitor) {
+
 		final Map<IFile, List<IMarker>> map = createMarkerMap(markers);
-		monitor.beginTask(getLabel(), map.size());
+		final int totalWork = map.size() * 2 + markers.length;
+
+		monitor.beginTask(getLabel(), totalWork);
 		for (final Entry<IFile, List<IMarker>> entry : map.entrySet()) {
 			try {
 				fixMarkers(entry.getKey(), entry.getValue(), monitor);
@@ -148,53 +156,6 @@ public abstract class AbstractResolution extends WorkbenchMarkerResolution
 	 */
 	protected boolean canGrouping() {
 		return true;
-	}
-
-	/**
-	 * Returns if the byte at the given index is the given character.
-	 *
-	 * @param content
-	 *            the content to get character for.
-	 * @param index
-	 *            the index to validate.
-	 * @param ch
-	 *            the character to compare to.
-	 * @return <code>true</code> if same character.
-	 */
-	protected boolean isEqualsChar(final byte[] content, final int index,
-			final char ch) {
-		if (index >= 0 && index < content.length) {
-			return content[index] == ch;
-		}
-		return false;
-	}
-
-	/**
-	 * Returns if the byte at the given index is a new line or a carriage return
-	 * character.
-	 *
-	 * @param content
-	 *            the content to get character for.
-	 * @param index
-	 *            the index to validate.
-	 * @return <code>true</code> if new line or carriage return character.
-	 */
-	protected boolean isNewLine(final byte[] content, final int index) {
-		return isEqualsChar(content, index, '\n')
-				|| isEqualsChar(content, index, '\r');
-	}
-
-	/**
-	 * Returns if the byte at the given index is a space character.
-	 *
-	 * @param content
-	 *            the content to get character for.
-	 * @param index
-	 *            the index to validate.
-	 * @return <code>true</code> if space character.
-	 */
-	protected boolean isWhitespace(final byte[] content, final int index) {
-		return isEqualsChar(content, index, ' ');
 	}
 
 	/**
@@ -221,9 +182,9 @@ public abstract class AbstractResolution extends WorkbenchMarkerResolution
 	 * Compare attributes in reverse mode.
 	 *
 	 * @param o1
-	 *            the first marker.
+	 *            the first marker to compare.
 	 * @param o2
-	 *            the second marker.
+	 *            the second marker to compare.
 	 * @param name
 	 *            the attribute name.
 	 * @return the comparison result.
@@ -309,20 +270,22 @@ public abstract class AbstractResolution extends WorkbenchMarkerResolution
 	private void fixMarkers(final IFile file, final List<IMarker> markers,
 			final IProgressMonitor monitor) throws CoreException {
 
-		monitor.subTask(file.getFullPath().toOSString());
+		monitor.subTask(file.getProjectRelativePath().toOSString());
 
-		// get contents
+		// get content
 		final byte[] contents = getFileContents(file);
-		byte[] newContents = Arrays.copyOf(contents, contents.length);
+		monitor.worked(1);
 
-		// resolve
+		// fix
+		byte[] newContents = Arrays.copyOf(contents, contents.length);
 		for (final IMarker marker : markers) {
 			newContents = fixMarker(file, marker, newContents);
+			monitor.worked(1);
 		}
 
 		// save if change
 		if (!Arrays.equals(contents, newContents)) {
-			setFileContents(file, newContents);
+			setFileContents(file, newContents, null);
 		}
 		monitor.worked(1);
 	}
@@ -355,6 +318,28 @@ public abstract class AbstractResolution extends WorkbenchMarkerResolution
 		return null;
 	}
 
+	// /**
+	// * Gets the contents of the document.
+	// *
+	// * @param file
+	// * the parent file.
+	// * @param document
+	// * the document to read from.
+	// * @return the document contents.
+	// * @throws CoreException
+	// * if this method fails.
+	// */
+	// private byte[] getDocumentContents(final IFile file,
+	// final IDocument document) throws CoreException {
+	// try {
+	// return document.get().getBytes(file.getCharset());
+	// } catch (final IOException e) {
+	// final String msg = NLS.bind(Messages.Resolution_Error_Read,
+	// file.getName());
+	// throw createCoreException(msg, e);
+	// }
+	// }
+
 	/**
 	 * Gets the contents of the file.
 	 *
@@ -383,12 +368,20 @@ public abstract class AbstractResolution extends WorkbenchMarkerResolution
 	 *            the file to update.
 	 * @param contents
 	 *            the contents to set.
+	 * @param monitor
+	 *            a progress monitor, or <code>null</code> if progress reporting
+	 *            is not desired
 	 * @throws CoreException
 	 *             if this method fails.
 	 */
-	private void setFileContents(final IFile file, final byte[] contents)
-			throws CoreException {
+	private void setFileContents(final IFile file, final byte[] contents,
+			final IProgressMonitor monitor) throws CoreException {
 		final InputStream source = new ByteArrayInputStream(contents);
 		file.setContents(source, true, true, null);
 	}
+
+	// int countMarkers(final Map<IFile, List<IMarker>> map) {
+	// return (int) map.values().stream()
+	// .collect(Collectors.summarizingInt(List::size)).getSum();
+	// }
 }

@@ -156,7 +156,7 @@ public class ProjectPreferences
 	 * @return the Twig severity.
 	 */
 	public TwigSeverity getTwigSeverity() {
-		final String name = preferences.get(P_SEVERITY, "");
+		final String name = preferences.get(P_SEVERITY, ""); //$NON-NLS-1$
 		if (!name.isEmpty()) {
 			return TwigSeverity.valueOf(name);
 		}
@@ -169,7 +169,7 @@ public class ProjectPreferences
 	 * @return the Twig version.
 	 */
 	public TwigVersion getTwigVersion() {
-		final String name = preferences.get(P_VERSION, "");
+		final String name = preferences.get(P_VERSION, ""); //$NON-NLS-1$
 		if (!name.isEmpty()) {
 			return TwigVersion.valueOf(name);
 		}
@@ -267,7 +267,7 @@ public class ProjectPreferences
 	 *            the value to be associated with the specified key.
 	 */
 	private void doPut(final String key, final String value) {
-		final String oldValue = preferences.get(key, "");
+		final String oldValue = preferences.get(key, ""); //$NON-NLS-1$
 		if (!value.equals(oldValue)) {
 			preferences.put(key, value);
 			dirty = true;
@@ -282,7 +282,7 @@ public class ProjectPreferences
 	 *            the key whose mapping is to be removed from this node.
 	 */
 	private void doRemove(final String key) {
-		final String oldValue = preferences.get(key, "");
+		final String oldValue = preferences.get(key, ""); //$NON-NLS-1$
 		if (!oldValue.isEmpty()) {
 			preferences.remove(key);
 			dirty = true;

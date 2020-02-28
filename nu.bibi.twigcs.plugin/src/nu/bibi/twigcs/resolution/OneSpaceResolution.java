@@ -76,15 +76,15 @@ public class OneSpaceResolution extends AbstractResolution {
 	 */
 	@Override
 	protected byte[] resolveContents(final IFile file, final byte[] contents,
-			final int start, int end) throws CoreException {
+			final int start, final int end) throws CoreException {
 		byte[] newContents = null;
 		final int len = contents.length;
 
-		if (isWhitespace(contents, end)) {
+		if (isWhitespace(contents, start)) {
 			// more than one space -> trim
-			while (end < len - 1 && isWhitespace(contents, end + 1)) {
-				end++;
-			}
+			// while (end < len && isWhitespace(contents, end)) {
+			// end++;
+			// }
 
 			// remove spaces
 			final int newLength = len - (end - start);

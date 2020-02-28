@@ -16,6 +16,8 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.preferences.IScopeContext;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.resource.ResourceLocator;
@@ -35,10 +37,19 @@ import nu.bibi.twigcs.core.ResourceListener;
  */
 public class TwigcsPlugin extends AbstractUIPlugin implements IConstants {
 
-	public static final String QUICK_FIX = "icons/quickfix.png"; //$NON-NLS-1$
+	/**
+	 * The default quick fix image identifier.
+	 */
+	public static final String QUICK_FIX_DEFAULT = "icons/quickfix.png"; //$NON-NLS-1$
 
+	/**
+	 * The error quick fix image identifier.
+	 */
 	public static final String QUICK_FIX_ERROR = "icons/quickfix_error.png"; //$NON-NLS-1$
 
+	/**
+	 * The warning quick fix image identifier.
+	 */
 	public static final String QUICK_FIX_WARNING = "icons/quickfix_warning.png"; //$NON-NLS-1$
 
 	/*
@@ -54,40 +65,6 @@ public class TwigcsPlugin extends AbstractUIPlugin implements IConstants {
 	public static TwigcsPlugin getDefault() {
 		return plugin;
 	}
-
-	// /**
-	// * Returns an image for the image file at the given plug-in relative path
-	// *
-	// * @param imageFilePath
-	// * the path of the image file, relative to the root of this
-	// * bundle.
-	// * @return an image, or <code>null</code> if no image could be found.
-	// */
-	// public static Image getImage(final String imageFilePath) {
-	// final Optional<ImageDescriptor> descriptor = getImageDescriptor(
-	// imageFilePath);
-	// if (descriptor.isPresent()) {
-	// return descriptor.get().createImage();
-	// }
-	// return null;
-	// }
-	//
-	// /**
-	// * Returns a new
-	// * <code>{@link Optional}&lt;{@link ImageDescriptor}&gt;</code> for an
-	// image
-	// * file located within this bundle or {@link Optional#empty()}.
-	// *
-	// * @param path
-	// * the path of the image file, relative to the root of this
-	// * bundle.
-	// * @return <code>{@link Optional}&lt;{@link ImageDescriptor}&gt;</code> or
-	// * {@link Optional#empty()}.
-	// */
-	// public static Optional<ImageDescriptor> getImageDescriptor(
-	// final String path) {
-	// return ResourceLocator.imageDescriptorFromBundle(PLUGIN_ID, path);
-	// }
 
 	/**
 	 * Logs the given exception.
@@ -125,7 +102,15 @@ public class TwigcsPlugin extends AbstractUIPlugin implements IConstants {
 		}
 	}
 
+	/*
+	 * the resource listener
+	 */
 	private ResourceListener listener;
+
+	/*
+	 * the preference store
+	 */
+	private ScopedPreferenceStore preferenceStore;
 
 	/**
 	 * Creates a new instance of this class.
@@ -133,9 +118,31 @@ public class TwigcsPlugin extends AbstractUIPlugin implements IConstants {
 	public TwigcsPlugin() {
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * <p>
+	 * The implementation of <code>TwigcsPlugin</code> overrides the default
+	 * behavior because saving strings always change the dirty state to
+	 * <code>true</code>.
+	 * </p>
+	 */
 	@Override
 	public ScopedPreferenceStore getPreferenceStore() {
-		return (ScopedPreferenceStore) super.getPreferenceStore();
+		// return (ScopedPreferenceStore) super.getPreferenceStore();
+		if (preferenceStore == null) {
+			final IScopeContext context = InstanceScope.INSTANCE;
+			final String qualifier = getBundle().getSymbolicName();
+			preferenceStore = new ScopedPreferenceStore(context, qualifier) {
+				@Override
+				public void setValue(final String name, final String value) {
+					final String oldValue = getString(name);
+					if (!oldValue.equals(value)) {
+						super.setValue(name, value);
+					}
+				}
+			};
+		}
+		return preferenceStore;
 	}
 
 	/**
@@ -144,7 +151,7 @@ public class TwigcsPlugin extends AbstractUIPlugin implements IConstants {
 	 * @return the image, if found; <code>null</code> otherwise.
 	 */
 	public Image getQuickFix() {
-		return getImageRegistry().get(QUICK_FIX);
+		return getImageRegistry().get(QUICK_FIX_DEFAULT);
 	}
 
 	/**
@@ -200,14 +207,14 @@ public class TwigcsPlugin extends AbstractUIPlugin implements IConstants {
 	@Override
 	protected ImageRegistry createImageRegistry() {
 		final ImageRegistry registry = super.createImageRegistry();
-		putImage(registry, QUICK_FIX);
-		putImage(registry, QUICK_FIX_ERROR);
-		putImage(registry, QUICK_FIX_WARNING);
+		putImageDescriptor(registry, QUICK_FIX_DEFAULT);
+		putImageDescriptor(registry, QUICK_FIX_ERROR);
+		putImageDescriptor(registry, QUICK_FIX_WARNING);
 		return registry;
 	}
 
 	/**
-	 * Put the given image to the registry.
+	 * Put an image descriptor to the given registry.
 	 *
 	 * @param registry
 	 *            the registry to update.
@@ -215,7 +222,8 @@ public class TwigcsPlugin extends AbstractUIPlugin implements IConstants {
 	 *            the path of the image file, relative to the root of this
 	 *            bundle. The path is also used as key.
 	 */
-	private void putImage(final ImageRegistry registry, final String path) {
+	private void putImageDescriptor(final ImageRegistry registry,
+			final String path) {
 		final Optional<ImageDescriptor> descriptor = ResourceLocator
 				.imageDescriptorFromBundle(PLUGIN_ID, path);
 		if (descriptor.isPresent()) {

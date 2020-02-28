@@ -38,8 +38,6 @@ public class MarkerResolutionGenerator
 			return toArray(UnusedMacroResolution.instance());
 		case ERROR_UNUSED_VARIABLE:
 			return toArray(UnusedVariableResolution.instance());
-		case ERROR_LINE_END_SPACE:
-			return toArray(EndLineSpaceResolution.instance());
 		case ERROR_NO_SPACE:
 			return toArray(NoSpaceResolution.instance());
 		case ERROR_ONE_SPACE:
@@ -72,10 +70,14 @@ public class MarkerResolutionGenerator
 	 * Convert the given resolution to an array.
 	 *
 	 * @param resolution
-	 *            the resolution to convert.
+	 *            the resolution to convert or <code>null</code> if none.
 	 * @return the array of resolutions.
 	 */
 	private IMarkerResolution[] toArray(final IMarkerResolution resolution) {
-		return new IMarkerResolution[] { resolution };
+		if (resolution != null) {
+			return new IMarkerResolution[] { resolution };
+		} else {
+			return EMPTY_RESOLUTIONS;
+		}
 	}
 }

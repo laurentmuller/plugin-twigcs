@@ -140,7 +140,7 @@ public class PreferencesPage extends FieldEditorPreferencePage implements
 	@Override
 	public boolean performOk() {
 		// default
-		final boolean result = super.performOk();
+		boolean result = super.performOk();
 
 		// changes?
 		final ScopedPreferenceStore store = getPreferenceStore();
@@ -155,10 +155,10 @@ public class PreferencesPage extends FieldEditorPreferencePage implements
 			} catch (final IOException e) {
 				handleStatusShow(
 						createErrorStatus(Messages.Preferences_Error_Save, e));
-				return false;
+				result = false;
 			} catch (final CoreException e) {
 				handleStatusShow(e.getStatus());
-				return false;
+				result = false;
 			}
 		}
 		return result;
@@ -245,7 +245,7 @@ public class PreferencesPage extends FieldEditorPreferencePage implements
 		}
 
 		// create empty file
-		final File file = File.createTempFile("template", "twig");
+		final File file = File.createTempFile("template", "twig"); //$NON-NLS-1$ //$NON-NLS-2$
 		file.deleteOnExit();
 		templateFile = file.getAbsolutePath();
 

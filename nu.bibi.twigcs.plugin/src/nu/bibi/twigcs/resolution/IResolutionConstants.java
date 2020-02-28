@@ -50,15 +50,6 @@ public interface IResolutionConstants {
 	int ERROR_UNUSED_VARIABLE = 3;
 
 	/**
-	 * The end line space error identifier. The error message is like:
-	 *
-	 * <pre>
-	 * A line should not end with blank space
-	 * </pre>
-	 */
-	int ERROR_LINE_END_SPACE = 4;
-
-	/**
 	 * The error identifier when no space is required. The error message is
 	 * like:
 	 *
@@ -66,7 +57,7 @@ public interface IResolutionConstants {
 	 * ... 0 space ...
 	 * </pre>
 	 */
-	int ERROR_NO_SPACE = 5;
+	int ERROR_NO_SPACE = 4;
 
 	/**
 	 * The error identifier when one space is required. The error message is
@@ -76,5 +67,94 @@ public interface IResolutionConstants {
 	 *  ... 1 space ...
 	 * </pre>
 	 */
-	int ERROR_ONE_SPACE = 6;
+	int ERROR_ONE_SPACE = 5;
+
+	/**
+	 * Returns if the byte at the given index is the given character.
+	 *
+	 * @param content
+	 *            the content to get character for.
+	 * @param index
+	 *            the index to validate.
+	 * @param ch
+	 *            the character to compare to.
+	 * @return <code>true</code> if same character.
+	 */
+	default boolean isEqualsChar(final byte[] content, final int index,
+			final char ch) {
+		return index >= 0 && index < content.length && content[index] == ch;
+	}
+
+	/**
+	 * Returns if the character at the given index is the given character.
+	 *
+	 * @param content
+	 *            the content to get character for.
+	 * @param index
+	 *            the index to validate.
+	 * @param ch
+	 *            the character to compare to.
+	 * @return <code>true</code> if same character.
+	 */
+	default boolean isEqualsChar(final String content, final int index,
+			final char ch) {
+		return index >= 0 && index < content.length()
+				&& content.charAt(index) == ch;
+	}
+
+	/**
+	 * Returns if the byte at the given index is a new line character or a
+	 * carriage return character.
+	 *
+	 * @param content
+	 *            the content to get character for.
+	 * @param index
+	 *            the index to validate.
+	 * @return <code>true</code> if new line or carriage return character.
+	 */
+	default boolean isNewLine(final byte[] content, final int index) {
+		return isEqualsChar(content, index, '\n')
+				|| isEqualsChar(content, index, '\r');
+	}
+
+	/**
+	 * Returns if the character at the given index is a new line character or a
+	 * carriage return character.
+	 *
+	 * @param content
+	 *            the content to get character for.
+	 * @param index
+	 *            the index to validate.
+	 * @return <code>true</code> if new line or carriage return character.
+	 */
+	default boolean isNewLine(final String content, final int index) {
+		return isEqualsChar(content, index, '\n')
+				|| isEqualsChar(content, index, '\r');
+	}
+
+	/**
+	 * Returns if the byte at the given index is a space character.
+	 *
+	 * @param content
+	 *            the content to get character for.
+	 * @param index
+	 *            the index to validate.
+	 * @return <code>true</code> if space character.
+	 */
+	default boolean isWhitespace(final byte[] content, final int index) {
+		return isEqualsChar(content, index, ' ');
+	}
+
+	/**
+	 * Returns if the character at the given index is a space character.
+	 *
+	 * @param content
+	 *            the content to get character for.
+	 * @param index
+	 *            the index to validate.
+	 * @return <code>true</code> if space character.
+	 */
+	default boolean isWhitespace(final String content, final int index) {
+		return isEqualsChar(content, index, ' ');
+	}
 }

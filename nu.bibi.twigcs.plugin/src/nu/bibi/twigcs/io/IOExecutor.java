@@ -14,7 +14,11 @@ import java.util.List;
 import nu.bibi.twigcs.internal.Messages;
 
 /**
- * Class to execute a process.
+ * Class to execute a {@link Process}.
+ * <p>
+ * When the {@link #run(List)} method is invoked, an output string and error
+ * string is available.
+ * </p>
  *
  * @author Laurent Muller
  * @version 1.0
@@ -47,12 +51,12 @@ public class IOExecutor {
 	private int exitCode;
 
 	/**
-	 * Gets the error message.
+	 * Gets the error contents.
 	 *
-	 * @return the error message.
+	 * @return the error contents, if any; an empty string ("") otherwise.
 	 */
 	public String getError() {
-		return error;
+		return error != null ? error : ""; //$NON-NLS-1$
 	}
 
 	/**
@@ -75,12 +79,12 @@ public class IOExecutor {
 	}
 
 	/**
-	 * Gets the output message.
+	 * Gets the output contents.
 	 *
-	 * @return the output message.
+	 * @return the output contents, if any; an empty string ("") otherwise.
 	 */
 	public String getOutput() {
-		return output;
+		return output != null ? output : ""; //$NON-NLS-1$
 	}
 
 	/**
@@ -96,31 +100,18 @@ public class IOExecutor {
 	 * Runs the given command.
 	 *
 	 * @param command
-	 *            a string list containing the program and its arguments.
+	 *            the list containing the program and its arguments.
 	 * @return the exit code. By convention, the value 0 indicates normal
 	 *         termination.
+	 * @throws NullPointerException
+	 *             if the argument is <code>null</code>.
 	 * @throws IOException
-	 *             if I/O exception occurs.
+	 *             if an I/O exception occurs.
 	 */
 	public int run(final List<String> command) throws IOException {
-		return this.run(command.toArray(new String[command.size()]));
-	}
-
-	/**
-	 * Runs the given command.
-	 *
-	 * @param command
-	 *            a string array containing the program and its arguments.
-	 * @return the exit code. By convention, the value 0 indicates normal
-	 *         termination.
-	 * @throws IOException
-	 *             if I/O exception occurs.
-	 */
-	public int run(final String... command) throws IOException {
-
 		// clear
 		exitCode = 0;
-		output = error = null;
+		output = error = ""; //$NON-NLS-1$ ;
 		outputException = errorException = null;
 
 		// start

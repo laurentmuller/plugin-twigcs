@@ -131,5 +131,7 @@ public class PreferencesInitializer extends AbstractPreferenceInitializer
 				store.setDefault(P_EXECUTABLE_PATH, file.getAbsolutePath());
 			}
 		}
+
+		// TODO find path for Linux or Mac
 	}
 }

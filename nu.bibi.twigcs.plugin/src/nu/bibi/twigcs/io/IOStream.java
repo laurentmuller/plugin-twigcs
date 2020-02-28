@@ -14,6 +14,10 @@ import java.io.InputStream;
 
 /**
  * Input/Output stream.
+ * <p>
+ * The {@link #run()} method read all contents of the input stream. After the
+ * run method is called, the contents is available in the {@link #toString()}
+ * method.
  *
  * @author Laurent Muller
  * @version 1.0
@@ -81,7 +85,9 @@ public class IOStream implements Runnable {
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * The implementation of <code>IOStream</code> class read all the contents
+	 * of the input stream given as constructor parameter. The contents is
+	 * available in the {@link #toString()} method.
 	 */
 	@Override
 	public void run() {
@@ -93,15 +99,12 @@ public class IOStream implements Runnable {
 	}
 
 	/**
-	 * {@inheritDoc}
-	 * <p>
 	 * The implementation of <code>IOStream</code> returns the contents (if any)
 	 * read from the input stream. Returns an empty string ("") if not yet
 	 * started.
-	 * </p>
 	 */
 	@Override
 	public String toString() {
-		return output != null ? new String(output) : "";
+		return output != null ? new String(output) : ""; //$NON-NLS-1$
 	}
 }

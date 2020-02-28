@@ -78,7 +78,7 @@ public class NoSpaceResolution extends AbstractResolution {
 	protected byte[] resolveContents(final IFile file, final byte[] contents,
 			final int start, int end) throws CoreException {
 
-		// find space after
+		// find spaces after
 		final int len = contents.length;
 		while (end < len && isWhitespace(contents, end)) {
 			end++;
@@ -89,6 +89,6 @@ public class NoSpaceResolution extends AbstractResolution {
 		final byte[] newContent = Arrays.copyOf(contents, newLength);
 		System.arraycopy(contents, end, newContent, start, len - end);
 
-		return contents;
+		return newContent;
 	}
 }

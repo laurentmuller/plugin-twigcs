@@ -90,8 +90,7 @@
         <super
             type="org.eclipse.core.resources.problemmarker" />
         <super
-              type="org.eclipse.core.resources.textmarker">
-        </super>
+            type="org.eclipse.core.resources.textmarker" />
         <persistent
             value="true" />
     </extension>
@@ -128,10 +127,9 @@
         </page>
     </extension>
     <extension
-          point="org.eclipse.ui.ide.markerResolution">
-       <markerResolutionGenerator
-             class="nu.bibi.twigcs.resolution.MarkerResolutionGenerator"
-             markerType="nu.bibi.twigcs.marker">
-       </markerResolutionGenerator>
+        point="org.eclipse.ui.ide.markerResolution">
+        <markerResolutionGenerator
+            class="nu.bibi.twigcs.resolution.MarkerResolutionGenerator"
+            markerType="nu.bibi.twigcs.marker" />
     </extension>
 </plugin>

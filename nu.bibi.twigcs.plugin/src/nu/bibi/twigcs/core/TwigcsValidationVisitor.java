@@ -160,8 +160,9 @@ public class TwigcsValidationVisitor extends AbstractResouceVisitor
 		final String message = violation.getMessage();
 		final int severity = violation.getMarkerSeverity();
 		final int line = violation.getLine();
-		final int offset = violation.getOffset(text);
-		final int length = getOffsetLength(message);
+		final int column = violation.getColumn();
+		final int offset = getOffset(message, text, line, column);
+		final int length = getOffsetLength(message, text, offset);
 		final int errorId = getErrorId(message);
 
 		// create
@@ -225,9 +226,7 @@ public class TwigcsValidationVisitor extends AbstractResouceVisitor
 			return ERROR_UNUSED_MACRO;
 		} else if (isUnunsedVariable(message)) {
 			return ERROR_UNUSED_VARIABLE;
-		} else if (isEndLineSpace(message)) {
-			return ERROR_LINE_END_SPACE;
-		} else if (isNoSpace(message)) {
+		} else if (isEndLineSpace(message) || isNoSpace(message)) {
 			return ERROR_NO_SPACE;
 		} else if (isOneSpace(message)) {
 			return ERROR_ONE_SPACE;
@@ -251,13 +250,48 @@ public class TwigcsValidationVisitor extends AbstractResouceVisitor
 	}
 
 	/**
+	 * Gets the offset for the given violation message.
+	 *
+	 * @param message
+	 *            the violation message.
+	 * @param text
+	 *            the parsed file content.
+	 * @param line
+	 *            the violation line.
+	 * @param column
+	 *            the violation column.
+	 * @return the offset.
+	 */
+	private int getOffset(final String message, final ResourceText text,
+			final int line, final int column) {
+		int offset = text.getOffset(line - 1) + column;
+		if (isEndLineSpace(message)) {
+			final byte[] content = text.getContent();
+			while (offset > 0 && isWhitespace(content, offset - 1)) {
+				offset--;
+			}
+		} else if (isOneSpace(message)) {
+			final byte[] content = text.getContent();
+			if (isWhitespace(content, offset)) {
+				offset++;
+			}
+		}
+		return offset;
+	}
+
+	/**
 	 * Gets the offset length for the given violation message.
 	 *
 	 * @param message
 	 *            the violation message.
+	 * @param text
+	 *            the parsed file content.
+	 * @param offset
+	 *            the start violation offset.
 	 * @return the offset length.
 	 */
-	private int getOffsetLength(final String message) {
+	private int getOffsetLength(final String message, final ResourceText text,
+			final int offset) {
 		int length = 1;
 		if (isUnunsedVariable(message) //
 				|| isUnunsedMacro(message) //
@@ -267,33 +301,96 @@ public class TwigcsValidationVisitor extends AbstractResouceVisitor
 			if (start != -1 && end != -1) {
 				length = end - start - 1;
 			}
+		} else if (isNoSpace(message)) {
+			int end = offset;
+			final byte[] content = text.getContent();
+			while (isWhitespace(content, end)) {
+				end++;
+			}
+			length = end - offset;
+		} else if (isOneSpace(message)) {
+			int end = offset + 1;
+			final byte[] content = text.getContent();
+			while (isWhitespace(content, end)) {
+				end++;
+			}
+			length = end - offset;
+		} else if (isEndLineSpace(message)) {
+			int end = offset + 1;
+			final byte[] content = text.getContent();
+			while (isWhitespace(content, end)) {
+				end++;
+			}
+			length = end - offset;
 		}
 
 		return Math.max(length, 1);
 	}
 
+	/**
+	 * Returns if the given message concern the end line space error.
+	 *
+	 * @param message
+	 *            the message to be tested.
+	 * @return <code>true</code> if end line space error.
+	 */
 	private boolean isEndLineSpace(final String message) {
-		return message.contains("A line should not end with blank space");
+		return message.contains("A line should not end with blank space"); //$NON-NLS-1$
 	}
 
+	/**
+	 * Returns if the given message concern the lower case variable error.
+	 *
+	 * @param message
+	 *            the message to be tested.
+	 * @return <code>true</code> if lower case variable error.
+	 */
 	private boolean isLowerCase(final String message) {
-		return message.contains("variable should be in lower case");
+		return message.contains("variable should be in lower case"); //$NON-NLS-1$
 	}
 
+	/**
+	 * Returns if the given message concern the no space error.
+	 *
+	 * @param message
+	 *            the message to be tested.
+	 * @return <code>true</code> if no space error.
+	 */
 	private boolean isNoSpace(final String message) {
-		return message.contains("0 space");
+		return message.contains("0 space"); //$NON-NLS-1$
 	}
 
+	/**
+	 * Returns if the given message concern the one space error.
+	 *
+	 * @param message
+	 *            the message to be tested.
+	 * @return <code>true</code> if one space error.
+	 */
 	private boolean isOneSpace(final String message) {
-		return message.contains("1 space");
+		return message.contains("1 space"); //$NON-NLS-1$
 	}
 
+	/**
+	 * Returns if the given message concern the unused macro.
+	 *
+	 * @param message
+	 *            the message to be tested.
+	 * @return <code>true</code> if unused macro error.
+	 */
 	private boolean isUnunsedMacro(final String message) {
-		return message.contains("Unused macro");
+		return message.contains("Unused macro"); //$NON-NLS-1$
 	}
 
+	/**
+	 * Returns if the given message concern the unused variable.
+	 *
+	 * @param message
+	 *            the message to be tested.
+	 * @return <code>true</code> if unused variable error.
+	 */
 	private boolean isUnunsedVariable(final String message) {
-		return message.contains("Unused variable");
+		return message.contains("Unused variable"); //$NON-NLS-1$
 	}
 
 	/**
@@ -369,7 +466,7 @@ public class TwigcsValidationVisitor extends AbstractResouceVisitor
 
 			// output?
 			final String output = executor.getOutput();
-			if (output != null && !output.isEmpty()) {
+			if (!output.isEmpty()) {
 				// convert
 				final TwigFile result = parseResult(output);
 				if (result != null) {
@@ -383,7 +480,7 @@ public class TwigcsValidationVisitor extends AbstractResouceVisitor
 			} else if (exitCode != 0) { // error?
 				IOException e = executor.getErrorException();
 				final String error = executor.getError();
-				if (error != null && !error.isEmpty()) {
+				if (!error.isEmpty()) {
 					e = new IOException(error, e);
 				}
 				final String msg = String.format(

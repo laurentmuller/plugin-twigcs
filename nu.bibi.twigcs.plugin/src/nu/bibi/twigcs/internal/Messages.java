@@ -52,7 +52,6 @@ public final class Messages extends NLS {
 	public static String ProjectPropertyPage_Include;
 	public static String ProjectPropertyPage_Override;
 	public static String ProjectPropertyPage_Remove;
-	public static String Resolution_End_Line_Space;
 	public static String Resolution_Error_Charset;
 	public static String Resolution_Error_Read;
 	public static String Resolution_Error_Write;

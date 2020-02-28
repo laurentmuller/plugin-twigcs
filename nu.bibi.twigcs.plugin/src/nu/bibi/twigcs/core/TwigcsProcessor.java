@@ -169,7 +169,7 @@ public class TwigcsProcessor implements ICoreException {
 		command.add(severity.name());
 
 		// display
-		command.add("-d");
+		command.add("-d"); //$NON-NLS-1$
 		command.add(display.name());
 
 		return command;

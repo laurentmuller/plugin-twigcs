@@ -12,8 +12,6 @@ import java.util.Objects;
 
 import org.eclipse.core.resources.IMarker;
 
-import nu.bibi.twigcs.core.ResourceText;
-
 /**
  * Represents a single file violation.
  *
@@ -116,17 +114,6 @@ public class TwigViolation implements Comparable<TwigViolation> {
 	 */
 	public String getMessage() {
 		return message;
-	}
-
-	/**
-	 * Gets the start violation offset.
-	 *
-	 * @param text
-	 *            the text to get the line offset.
-	 * @return the start violation offset.
-	 */
-	public int getOffset(final ResourceText text) {
-		return text.getOffset(line - 1) + column;
 	}
 
 	/**
