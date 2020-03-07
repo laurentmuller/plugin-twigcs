@@ -1,4 +1,5 @@
 # Plugin-Twigcs
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/5ec47fa9084c4f3b803ef35c6b770ecd)](https://app.codacy.com/manual/laurentmuller/plugin-twigcs?utm_source=github.com&utm_medium=referral&utm_content=laurentmuller/plugin-twigcs&utm_campaign=Badge_Grade_Dashboard)
 [![Build Status](https://travis-ci.org/laurentmuller/plugin-twigcs.svg?branch=master)](https://travis-ci.org/laurentmuller/plugin-twigcs)
 
 An Eclipse plugin to validate Twig (*.twig) files with the [Twigcs](https://github.com/friendsoftwig/twigcs) component.
