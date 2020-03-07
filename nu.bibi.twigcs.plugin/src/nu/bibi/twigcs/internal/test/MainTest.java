@@ -18,8 +18,8 @@ import nu.bibi.twigcs.model.TwigViolation;
 
 public class MainTest {
 
-	static final String EXEC_PATH = "C:/Users/bibi/AppData/Roaming/Composer/vendor/bin/twigcs.bat"; //$NON-NLS-1$
-	static final String TWIG_FILE = "D:/Temp/WorkspaceTestOxygen/TestJS/templates/user/user_comment.html.twig"; //$NON-NLS-1$
+	private static final String EXEC_PATH = "C:/Users/bibi/AppData/Roaming/Composer/vendor/bin/twigcs.bat"; //$NON-NLS-1$
+	private static final String TWIG_FILE = "D:/Temp/WorkspaceTestOxygen/TestJS/templates/user/user_comment.html.twig"; //$NON-NLS-1$
 
 	public static void main(final String[] args) {
 		int exitCode = 0;
@@ -68,18 +68,18 @@ public class MainTest {
 			e.printStackTrace();
 		} finally {
 			System.out.println("Exit Code: " + exitCode); //$NON-NLS-1$
-			System.exit(exitCode);
+			// System.exit(exitCode);
 		}
 	}
 
-	static Gson getGson() {
+	private static Gson getGson() {
 		final GsonBuilder gsonBuilder = new GsonBuilder();
 		gsonBuilder.registerTypeAdapter(TwigSeverity.class,
 				new SeverityDeserializer());
 		return gsonBuilder.create();
 	}
 
-	static TwigcsProcessor getProcessor() {
+	private static TwigcsProcessor getProcessor() {
 		final TwigcsProcessor processor = new TwigcsProcessor();
 		processor.setProgramPath(EXEC_PATH);
 		processor.setTwigSeverity(TwigSeverity.warning);

@@ -18,7 +18,6 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.SWTException;
 import org.eclipse.swt.widgets.Composite;
 
 /**
@@ -65,7 +64,7 @@ public class FolderTableViewer extends TableViewer {
 	 *
 	 * @param layoutData
 	 *            the new layout data for the receiver.
-	 * @exception SWTException
+	 * @exception org.eclipse.swt.SWTException
 	 *                <ul>
 	 *                <li>ERROR_WIDGET_DISPOSED - if the table has been
 	 *                disposed</li>

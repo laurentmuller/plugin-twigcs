@@ -45,12 +45,6 @@ public class ResourceListener implements IResourceChangeListener,
 		IResourceDeltaVisitor, ICoreException {
 
 	/**
-	 * Creates a new instance of this class.
-	 */
-	public ResourceListener() {
-	}
-
-	/**
 	 * {@inheritDoc}
 	 */
 	@Override

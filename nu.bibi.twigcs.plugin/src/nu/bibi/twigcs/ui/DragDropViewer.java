@@ -9,6 +9,7 @@
 package nu.bibi.twigcs.ui;
 
 import java.util.List;
+import java.util.Objects;
 
 import org.eclipse.jface.util.LocalSelectionTransfer;
 import org.eclipse.jface.viewers.ISelection;
@@ -39,7 +40,7 @@ public class DragDropViewer<E> {
 	/*
 	 * the DND transfer
 	 */
-	static final LocalSelectionTransfer DND_TRANSFER = LocalSelectionTransfer
+	private static final LocalSelectionTransfer DND_TRANSFER = LocalSelectionTransfer
 			.getTransfer();
 
 	/**
@@ -165,9 +166,9 @@ public class DragDropViewer<E> {
 				}
 
 				// move
-				if (dragViewer == sourceViewer) {
+				if (Objects.equals(dragViewer, sourceViewer)) {
 					return moveToTargetViewer();
-				} else if (dragViewer == targetViewer) {
+				} else if (Objects.equals(dragViewer, targetViewer)) {
 					return moveToSourceViewer();
 				} else {
 					return false;
@@ -181,7 +182,7 @@ public class DragDropViewer<E> {
 					return false;
 				} else {
 					// prevent self-drop
-					return dragViewer != viewer;
+					return !Objects.equals(dragViewer, viewer);
 				}
 			}
 		};
@@ -213,7 +214,8 @@ public class DragDropViewer<E> {
 		}
 
 		// move
-		int fromIdx, toIdx;
+		int fromIdx;
+		int toIdx;
 		boolean moved = false;
 		final List<?> elements = selection.toList();
 		for (final Object element : elements) {

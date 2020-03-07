@@ -9,6 +9,7 @@
 package nu.bibi.twigcs.ui;
 
 import java.util.Arrays;
+import java.util.Objects;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFolder;
@@ -124,6 +125,6 @@ public class FolderContentProvider implements ITreeContentProvider {
 	 * @return <code>true</code> to display.
 	 */
 	private boolean select(final IResource resource) {
-		return resource == project || resource instanceof IFolder;
+		return Objects.equals(resource, project) || resource instanceof IFolder;
 	}
 }

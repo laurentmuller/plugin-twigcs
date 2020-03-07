@@ -58,37 +58,42 @@ public class TwigcsProcessor implements ICoreException {
 	/*
 	 * the Twig version
 	 */
-	private TwigVersion version = TwigVersion.VERSION_3;
+	private TwigVersion version;
 
 	/*
 	 * the minimum Twig severity level
 	 */
-	private TwigSeverity severity = TwigSeverity.warning;
+	private TwigSeverity severity;
 
 	/*
 	 * the output Twig reporter
 	 */
-	private TwigReporter reporter = TwigReporter.json;
+	private TwigReporter reporter;
 
 	/*
 	 * the display output
 	 */
-	private TwigDisplay display = TwigDisplay.blocking;
+	private TwigDisplay display;
 
 	/*
 	 * the search paths
 	 */
-	private final List<String> searchPaths = new ArrayList<>();
+	private final List<String> searchPaths;
 
 	/*
 	 * the exclude paths
 	 */
-	private final List<String> excludePaths = new ArrayList<>();
+	private final List<String> excludePaths;
 
 	/**
 	 * Creates a new instance of this class.
 	 */
 	public TwigcsProcessor() {
+		version = TwigVersion.VERSION_3;
+		reporter = TwigReporter.json;
+		display = TwigDisplay.blocking;
+		searchPaths = new ArrayList<>();
+		excludePaths = new ArrayList<>();
 	}
 
 	/**

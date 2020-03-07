@@ -484,19 +484,17 @@ public class ProjectPropertyPage extends PropertyPage
 
 		// get new selection
 		final IResource newResource = selectFolder(oldResource);
-		if (newResource == null || newResource == oldResource) {
+		if (newResource == null || newResource.equals(oldResource)) {
 			return;
 		}
 
 		// remove if present in the other list
-		if (list == includeList) {
-			if (excludeList.remove(oldResource)) {
-				excludeViewer.refresh();
-			}
-		} else if (list == excludeList) {
-			if (includeList.remove(oldResource)) {
-				includeViewer.refresh();
-			}
+		if (list.equals(includeList) //
+				&& excludeList.remove(oldResource)) {
+			excludeViewer.refresh();
+		} else if (list.equals(excludeList)
+				&& includeList.remove(oldResource)) {
+			includeViewer.refresh();
 		}
 
 		list.remove(oldResource);

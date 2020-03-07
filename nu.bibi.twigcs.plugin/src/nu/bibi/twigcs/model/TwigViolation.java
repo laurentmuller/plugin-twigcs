@@ -40,12 +40,6 @@ public class TwigViolation implements Comparable<TwigViolation> {
 	private String message;
 
 	/**
-	 * Creates a new instance of this class.
-	 */
-	public TwigViolation() {
-	}
-
-	/**
 	 * {@inheritDoc}
 	 */
 	@Override

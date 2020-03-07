@@ -25,12 +25,6 @@ public class TwigCounterVisitor extends AbstractResouceVisitor {
 	private int files = 0;
 
 	/**
-	 * Creates a new instance of this class.
-	 */
-	public TwigCounterVisitor() {
-	}
-
-	/**
 	 * Gets the number of visited files.
 	 *
 	 * @return the number of files.
