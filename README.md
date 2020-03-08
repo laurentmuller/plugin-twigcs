@@ -78,11 +78,9 @@ The workspace preferences allow user to define how the Twigcs component run. The
 
 To enable validation, You must add the Twigcs nature to the project.
 
-  - Select the project You want to update in the **Explorer View**.
-
-  - Display the context menu.
-
-  - Select **Configure** -> **Enable Twigcs validation**.
+- Select the project You want to update in the **Explorer View**.
+- Display the context menu.
+- Select **Configure** -> **Enable Twigcs validation**.
 
 ![Enable Twigcs](docs/images/enable_twigcs.png)
 
