@@ -20,7 +20,7 @@ Some **Quick Fix** are also available.
 
 ### Installation of Twigcs
 
-- Install Twigcs component globally as explain in the [Twigcs Github site](https://github.com/friendsoftwig/twigcs).
+  - Install Twigcs component globally as explain in the [Twigcs Github site](https://github.com/friendsoftwig/twigcs).
 
     ```bash
     composer global require friendsoftwig/twigcs
@@ -28,45 +28,45 @@ Some **Quick Fix** are also available.
 
 ### Installation from the Update Site
 
-- Start Eclipse PDT and select the menu **Help** -> **Install New Software...**
+  - Start Eclipse PDT and select the menu **Help** -> **Install New Software...**
 
-- Click the **Add....** button.
+  - Click the **Add....** button.
 
-- Enter the location as the image below.
+  - Enter the location as the image below.
 
-![Add Site Repository](docs/images/add_repository_site.png)
+  ![Add Site Repository](docs/images/add_repository_site.png)
 
-- Select the newly added repository.
+  - Select the newly added repository.
 
-- Check the Twigcs category check box.
+  - Check the Twigcs category check box.
 
-![Install](docs/images/update.png)
+  ![Install](docs/images/update.png)
 
-- Follow the wizard instructions. The Eclipse will be restarted.
+  - Follow the wizard instructions. The Eclipse will be restarted.
 
-- Update the [Workspace Preferences](#workspace-preferences) to define the path to the Twigcs batch file.
+  - Update the [Workspace Preferences](#workspace-preferences) to define the path to the Twigcs batch file.
 
-- Enable [Twigcs nature](#enable-twigcs-nature)  to the project.
+  - Enable [Twigcs nature](#enable-twigcs-nature)  to the project.
 
-- Update the [Project Properties](#project-properties) to define witch folders are validate.
+  - Update the [Project Properties](#project-properties) to define witch folders are validate.
 
 ### Installation from the Zip file
 
-- Download the update site zip file from the releases tab.
+  - Download the update site zip file from the releases tab.
 
-- Start Eclipse PDT and select the menu **Help** -> **Install New Software...**
+  - Start Eclipse PDT and select the menu **Help** -> **Install New Software...**
 
-- Click the **Add....** button.
+  - Click the **Add....** button.
 
-- Click the **Archive...** button and select the downloaded zip file.
+  - Click the **Archive...** button and select the downloaded zip file.
 
     ![Add Zip Repository](docs/images/add_repository_zip.png)
 
-- Select the newly added repository.
+  - Select the newly added repository.
 
-- Check the Twigcs category check box.
+  - Check the Twigcs category check box.
 
-- Follow the wizard instructions.
+  - Follow the wizard instructions.
 
 ## Workspace preferences
 
@@ -78,9 +78,11 @@ The workspace preferences allow user to define how the Twigcs component run. The
 
 To enable validation, You must add the Twigcs nature to the project.
 
-- Select the project You want to update in the **Explorer View**.
-- Display the context menu.
-- Select **Configure** -> **Enable Twigcs validation**.
+  - Select the project You want to update in the **Explorer View**.
+
+  - Display the context menu.
+
+  - Select **Configure** -> **Enable Twigcs validation**.
 
 ![Enable Twigcs](docs/images/enable_twigcs.png)
 
