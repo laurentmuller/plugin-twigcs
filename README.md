@@ -4,15 +4,15 @@
 
 An Eclipse plugin to validate Twig (*.twig) files with the [Twigcs](https://github.com/friendsoftwig/twigcs) component.
 
-Errors are visible in the **Editor**.
+- Errors are visible in the **Editor**.
 
 ![Editor](docs/images/editor.png)
 
-And displayed in the **Problems** view.
+- And displayed in the **Problems** view.
 
 ![Problems View](docs/images/problems.png)
 
-Some **Quick Fix** are also available.
+- Some **Quick Fix** are also available.
 
 ![Quick Fix](docs/images/quickfix.png)
 
@@ -20,7 +20,7 @@ Some **Quick Fix** are also available.
 
 ### Installation of Twigcs
 
-  - Install Twigcs component globally as explain in the [Twigcs Github site](https://github.com/friendsoftwig/twigcs).
+- Install Twigcs component globally as explain in the [Twigcs Github site](https://github.com/friendsoftwig/twigcs).
 
     ```bash
     composer global require friendsoftwig/twigcs
@@ -28,45 +28,45 @@ Some **Quick Fix** are also available.
 
 ### Installation from the Update Site
 
-  - Start Eclipse PDT and select the menu **Help** -> **Install New Software...**
+- Start Eclipse PDT and select the menu **Help** -> **Install New Software...**
 
-  - Click the **Add....** button.
+- Click the **Add....** button.
 
-  - Enter the location as the image below.
+- Enter the location as the image below.
 
-  ![Add Site Repository](docs/images/add_repository_site.png)
+![Add Site Repository](docs/images/add_repository_site.png)
 
-  - Select the newly added repository.
+- Select the newly added repository.
 
-  - Check the Twigcs category check box.
+- Check the Twigcs category check box.
 
-  ![Install](docs/images/update.png)
+![Install](docs/images/update.png)
 
-  - Follow the wizard instructions. The Eclipse will be restarted.
+- Follow the wizard instructions. The Eclipse will be restarted.
 
-  - Update the [Workspace Preferences](#workspace-preferences) to define the path to the Twigcs batch file.
+- Update the [Workspace Preferences](#workspace-preferences) to define the path to the Twigcs batch file.
 
-  - Enable [Twigcs nature](#enable-twigcs-nature)  to the project.
+- Enable [Twigcs nature](#enable-twigcs-nature)  to the project.
 
-  - Update the [Project Properties](#project-properties) to define witch folders are validate.
+- Update the [Project Properties](#project-properties) to define witch folders are validate.
 
 ### Installation from the Zip file
 
-  - Download the update site zip file from the releases tab.
+- Download the update site zip file from the releases tab.
 
-  - Start Eclipse PDT and select the menu **Help** -> **Install New Software...**
+- Start Eclipse PDT and select the menu **Help** -> **Install New Software...**
 
-  - Click the **Add....** button.
+- Click the **Add....** button.
 
-  - Click the **Archive...** button and select the downloaded zip file.
+- Click the **Archive...** button and select the downloaded zip file.
 
-    ![Add Zip Repository](docs/images/add_repository_zip.png)
+![Add Zip Repository](docs/images/add_repository_zip.png)
 
-  - Select the newly added repository.
+- Select the newly added repository.
 
-  - Check the Twigcs category check box.
+- Check the Twigcs category check box.
 
-  - Follow the wizard instructions.
+- Follow the wizard instructions.
 
 ## Workspace preferences
 
