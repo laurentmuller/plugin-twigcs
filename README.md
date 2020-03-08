@@ -1,4 +1,5 @@
 # Plugin-Twigcs
+
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/5ec47fa9084c4f3b803ef35c6b770ecd)](https://app.codacy.com/manual/laurentmuller/plugin-twigcs?utm_source=github.com&utm_medium=referral&utm_content=laurentmuller/plugin-twigcs&utm_campaign=Badge_Grade_Dashboard) [![Build Status](https://travis-ci.org/laurentmuller/plugin-twigcs.svg?branch=master)](https://travis-ci.org/laurentmuller/plugin-twigcs)
 
 An Eclipse plugin to validate Twig (*.twig) files with the [Twigcs](https://github.com/friendsoftwig/twigcs) component.
@@ -33,13 +34,13 @@ Some **Quick Fix** are also available.
 
 - Enter the location as the image below.
 
-    ![Add Site Repository](docs/images/add_repository_site.png)
+![Add Site Repository](docs/images/add_repository_site.png)
 
 - Select the newly added repository.
 
 - Check the Twigcs category check box.
 
-    ![Install](docs/images/update.png)
+![Install](docs/images/update.png)
 
 - Follow the wizard instructions. The Eclipse will be restarted.
 
@@ -77,9 +78,9 @@ The workspace preferences allow user to define how the Twigcs component run. The
 
 To enable validation, You must add the Twigcs nature to the project.
 
-  - Select the project You want to update in the **Explorer View**.
-  - Display the context menu.
-  - Select **Configure** -> **Enable Twigcs validation**.
+- Select the project You want to update in the **Explorer View**.
+- Display the context menu.
+- Select **Configure** -> **Enable Twigcs validation**.
 
 ![Enable Twigcs](docs/images/enable_twigcs.png)
 
