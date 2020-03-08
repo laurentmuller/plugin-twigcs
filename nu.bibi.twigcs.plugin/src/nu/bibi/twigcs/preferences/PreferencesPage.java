@@ -132,6 +132,7 @@ public class PreferencesPage extends FieldEditorPreferencePage implements
 	 */
 	@Override
 	public void init(final IWorkbench workbench) {
+		// noop
 	}
 
 	/**
