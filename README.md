@@ -6,15 +6,15 @@ An Eclipse plugin to validate Twig (*.twig) files with the [Twigcs](https://gith
 
 - Errors are visible in the **Editor**.
 
-![Editor](docs/images/editor.png)
+  ![Editor](docs/images/editor.png)
 
 - And displayed in the **Problems** view.
 
-![Problems View](docs/images/problems.png)
+  ![Problems View](docs/images/problems.png)
 
 - Some **Quick Fix** are also available.
 
-![Quick Fix](docs/images/quickfix.png)
+  ![Quick Fix](docs/images/quickfix.png)
 
 ## Installation
 
@@ -34,13 +34,13 @@ An Eclipse plugin to validate Twig (*.twig) files with the [Twigcs](https://gith
 
 - Enter the location as the image below.
 
-![Add Site Repository](docs/images/add_repository_site.png)
+  ![Add Site Repository](docs/images/add_repository_site.png)
 
 - Select the newly added repository.
 
 - Check the Twigcs category check box.
 
-![Install](docs/images/update.png)
+  ![Install](docs/images/update.png)
 
 - Follow the wizard instructions. The Eclipse will be restarted.
 
@@ -60,7 +60,7 @@ An Eclipse plugin to validate Twig (*.twig) files with the [Twigcs](https://gith
 
 - Click the **Archive...** button and select the downloaded zip file.
 
-![Add Zip Repository](docs/images/add_repository_zip.png)
+  ![Add Zip Repository](docs/images/add_repository_zip.png)
 
 - Select the newly added repository.
 
@@ -72,7 +72,7 @@ An Eclipse plugin to validate Twig (*.twig) files with the [Twigcs](https://gith
 
 The workspace preferences allow user to define how the Twigcs component run. The most important and required property is the path to the batch file.
 
-![Workspace Preferences](docs/images/preferences.png)
+  ![Workspace Preferences](docs/images/preferences.png)
 
 ## Enable Twigcs Nature
 
@@ -82,7 +82,7 @@ To enable validation, You must add the Twigcs nature to the project.
 - Display the context menu.
 - Select **Configure** -> **Enable Twigcs validation**.
 
-![Enable Twigcs](docs/images/enable_twigcs.png)
+  ![Enable Twigcs](docs/images/enable_twigcs.png)
 
 ## Project properties
 
@@ -90,4 +90,4 @@ For each project, user can select witch folders are included for the validation 
 
 If needed, the user can also override the default Twigcs preferences.
 
-![Project Properties](docs/images/properties.png)
+  ![Project Properties](docs/images/properties.png)
