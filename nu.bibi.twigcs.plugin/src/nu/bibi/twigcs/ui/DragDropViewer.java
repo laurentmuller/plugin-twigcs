@@ -96,10 +96,19 @@ public class DragDropViewer<E> {
 		this.targetList = targetList;
 
 		// initialize
-		addDragSupport(sourceViewer);
-		addDropSupport(sourceViewer);
-		addDragSupport(targetViewer);
-		addDropSupport(targetViewer);
+		addDragAndDropSupport(sourceViewer);
+		addDragAndDropSupport(targetViewer);
+	}
+
+	/**
+	 * Adds drag and drop support.
+	 *
+	 * @param viewer
+	 *            the viewer to handle.
+	 */
+	private void addDragAndDropSupport(final TableViewer viewer) {
+		addDragSupport(viewer);
+		addDropSupport(viewer);
 	}
 
 	/**
