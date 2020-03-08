@@ -113,12 +113,6 @@ public class TwigcsPlugin extends AbstractUIPlugin implements IConstants {
 	private ScopedPreferenceStore preferenceStore;
 
 	/**
-	 * Creates a new instance of this class.
-	 */
-	public TwigcsPlugin() {
-	}
-
-	/**
 	 * {@inheritDoc}
 	 * <p>
 	 * The implementation of <code>TwigcsPlugin</code> overrides the default

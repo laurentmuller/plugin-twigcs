@@ -118,7 +118,7 @@ public abstract class AbstractResolution extends WorkbenchMarkerResolution
 
 			// save if change
 			if (!Arrays.equals(contents, newContents)) {
-				setFileContents(file, newContents, null);
+				setFileContents(file, newContents);
 			}
 
 		} catch (final CoreException e) {
@@ -285,7 +285,7 @@ public abstract class AbstractResolution extends WorkbenchMarkerResolution
 
 		// save if change
 		if (!Arrays.equals(contents, newContents)) {
-			setFileContents(file, newContents, null);
+			setFileContents(file, newContents);
 		}
 		monitor.worked(1);
 	}
@@ -368,20 +368,12 @@ public abstract class AbstractResolution extends WorkbenchMarkerResolution
 	 *            the file to update.
 	 * @param contents
 	 *            the contents to set.
-	 * @param monitor
-	 *            a progress monitor, or <code>null</code> if progress reporting
-	 *            is not desired
 	 * @throws CoreException
 	 *             if this method fails.
 	 */
-	private void setFileContents(final IFile file, final byte[] contents,
-			final IProgressMonitor monitor) throws CoreException {
+	private void setFileContents(final IFile file, final byte[] contents)
+			throws CoreException {
 		final InputStream source = new ByteArrayInputStream(contents);
 		file.setContents(source, true, true, null);
 	}
-
-	// int countMarkers(final Map<IFile, List<IMarker>> map) {
-	// return (int) map.values().stream()
-	// .collect(Collectors.summarizingInt(List::size)).getSum();
-	// }
 }
