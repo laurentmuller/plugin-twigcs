@@ -4,15 +4,15 @@
 
 An Eclipse plugin to validate Twig (*.twig) files with the [Twigcs](https://github.com/friendsoftwig/twigcs) component.
 
--   Errors are visible in the **Editor**.
+- Errors are visible in the **Editor**.
 
 ![Editor](docs/images/editor.png)
 
--   And displayed in the **Problems** view.
+- And displayed in the **Problems** view.
 
 ![Problems View](docs/images/problems.png)
 
--   Some **Quick Fix** are also available.
+- Some **Quick Fix** are also available.
 
 ![Quick Fix](docs/images/quickfix.png)
 
