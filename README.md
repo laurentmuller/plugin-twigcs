@@ -32,7 +32,7 @@ An Eclipse plugin to validate Twig (*.twig) files with the [Twigcs](https://gith
 
 - Click the **Add....** button.
 
-- Enter the location https://www.bibi.nu/twigcs/v1.0.0 as the image below.
+- Enter the location [https://www.bibi.nu/twigcs/v1.0.0](https://www.bibi.nu/twigcs/v1.0.0) as the image below.
 
   ![Add Site Repository](docs/images/add_repository_site.png)
 
