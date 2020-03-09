@@ -16,18 +16,16 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.preferences.IScopeContext;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.resource.ResourceLocator;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
-import org.eclipse.ui.preferences.ScopedPreferenceStore;
 import org.osgi.framework.BundleContext;
 
 import nu.bibi.twigcs.core.IConstants;
 import nu.bibi.twigcs.core.ResourceListener;
+import nu.bibi.twigcs.preferences.PluginScopedPreferenceStore;
 
 /**
  * The Twigcs Plugin.
@@ -110,7 +108,7 @@ public class TwigcsPlugin extends AbstractUIPlugin implements IConstants {
 	/*
 	 * the preference store
 	 */
-	private ScopedPreferenceStore preferenceStore;
+	private PluginScopedPreferenceStore preferenceStore;
 
 	/**
 	 * {@inheritDoc}
@@ -121,20 +119,9 @@ public class TwigcsPlugin extends AbstractUIPlugin implements IConstants {
 	 * </p>
 	 */
 	@Override
-	public ScopedPreferenceStore getPreferenceStore() {
-		// return (ScopedPreferenceStore) super.getPreferenceStore();
+	public PluginScopedPreferenceStore getPreferenceStore() {
 		if (preferenceStore == null) {
-			final IScopeContext context = InstanceScope.INSTANCE;
-			final String qualifier = getBundle().getSymbolicName();
-			preferenceStore = new ScopedPreferenceStore(context, qualifier) {
-				@Override
-				public void setValue(final String name, final String value) {
-					final String oldValue = getString(name);
-					if (!oldValue.equals(value)) {
-						super.setValue(name, value);
-					}
-				}
-			};
+			preferenceStore = new PluginScopedPreferenceStore(this);
 		}
 		return preferenceStore;
 	}
@@ -173,6 +160,7 @@ public class TwigcsPlugin extends AbstractUIPlugin implements IConstants {
 	public void start(final BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
+
 		if (listener == null) {
 			listener = new ResourceListener();
 			final IWorkspace workspace = ResourcesPlugin.getWorkspace();
@@ -188,6 +176,7 @@ public class TwigcsPlugin extends AbstractUIPlugin implements IConstants {
 	public void stop(final BundleContext context) throws Exception {
 		plugin = null;
 		super.stop(context);
+
 		if (listener != null) {
 			final IWorkspace workspace = ResourcesPlugin.getWorkspace();
 			workspace.removeResourceChangeListener(listener);

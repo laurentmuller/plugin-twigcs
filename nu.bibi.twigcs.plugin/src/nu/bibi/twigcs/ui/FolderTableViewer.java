@@ -46,12 +46,11 @@ public class FolderTableViewer extends TableViewer {
 	}
 
 	/**
-	 * Returns the first resource in this selection, or <code>null</code> if the
-	 * selection is empty.
+	 * Gets the selected value
 	 *
-	 * @return a resource or <code>null</code> if none.
+	 * @return the selected value, if any; <code>null</code> otherwise.
 	 */
-	public IResource getFirstElement() {
+	public IResource getSelectedValue() {
 		final Object element = getStructuredSelection().getFirstElement();
 		if (element instanceof IResource) {
 			return (IResource) element;
@@ -77,14 +76,14 @@ public class FolderTableViewer extends TableViewer {
 	}
 
 	/**
-	 * Sets a new selection for this viewer and makes it visible.
+	 * Sets the selected value.
 	 *
 	 * @param resource
-	 *            the new selection or <code>null</code> if none.
+	 *            the value to select or <code>null</code> if none.
 	 */
-	public void setSelection(final IResource resource) {
+	public void setSelectedValue(final IResource resource) {
 		if (resource == null) {
-			setSelection(StructuredSelection.EMPTY);
+			setSelection(StructuredSelection.EMPTY, true);
 		} else {
 			setSelection(new StructuredSelection(resource), true);
 		}

@@ -80,7 +80,7 @@ public class PreferencesInitializer extends AbstractPreferenceInitializer
 	 * @return the Twig version.
 	 */
 	public static TwigVersion getTwigVersion() {
-		return valueOf(P_VERSION, TwigVersion.class, TwigVersion.VERSION_3);
+		return valueOf(P_VERSION, TwigVersion.class, TwigVersion.VERSION_2);
 	}
 
 	/**

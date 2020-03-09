@@ -66,7 +66,6 @@ public class FolderContentProvider implements ITreeContentProvider {
 	 */
 	@Override
 	public Object[] getElements(final Object element) {
-		// return getChildren(element);
 		if (element instanceof IWorkspaceRoot) {
 			return new IResource[] { project };
 		}

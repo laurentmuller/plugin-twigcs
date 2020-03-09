@@ -14,14 +14,9 @@ import java.util.List;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.viewers.ArrayContentProvider;
-import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.LabelProvider;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -39,6 +34,7 @@ import nu.bibi.twigcs.internal.Messages;
 import nu.bibi.twigcs.model.TwigSeverity;
 import nu.bibi.twigcs.model.TwigVersion;
 import nu.bibi.twigcs.ui.DragDropViewer;
+import nu.bibi.twigcs.ui.EnumComboViewer;
 import nu.bibi.twigcs.ui.FolderSelectionDialog;
 import nu.bibi.twigcs.ui.FolderTableViewer;
 
@@ -55,14 +51,14 @@ public class ProjectPropertyPage extends PropertyPage
 	private FolderTableViewer includeViewer;
 	private FolderTableViewer excludeViewer;
 
-	// modified lists
+	// lists
 	private List<IResource> includeList;
 	private List<IResource> excludeList;
 
 	// overrides
 	private Button chkOverride;
-	private ComboViewer twigViewer;
-	private ComboViewer severityViewer;
+	private EnumComboViewer<TwigVersion> twigVersionViewer;
+	private EnumComboViewer<TwigSeverity> twigSeverityViewer;
 
 	/**
 	 * Creates a new instance of this class.
@@ -74,15 +70,14 @@ public class ProjectPropertyPage extends PropertyPage
 
 	/**
 	 * {@inheritDoc}
+	 * <p>
+	 * The implementation of <code>ProjectPropertyPage</code> cast the element
+	 * to an {@link IProject}.
+	 * </p>
 	 */
 	@Override
 	public IProject getElement() {
-		final IAdaptable element = super.getElement();
-		if (element instanceof IProject) {
-			return (IProject) element;
-		} else {
-			return element.getAdapter(IProject.class);
-		}
+		return (IProject) super.getElement();
 	}
 
 	/**
@@ -102,10 +97,8 @@ public class ProjectPropertyPage extends PropertyPage
 			TwigVersion version = null;
 			TwigSeverity severity = null;
 			if (chkOverride.getSelection()) {
-				version = (TwigVersion) twigViewer.getStructuredSelection()
-						.getFirstElement();
-				severity = (TwigSeverity) severityViewer
-						.getStructuredSelection().getFirstElement();
+				version = twigVersionViewer.getSelectedValue();
+				severity = twigSeverityViewer.getSelectedValue();
 			}
 			preferences.setTwigVersion(version);
 			preferences.setTwigSeverity(severity);
@@ -113,7 +106,7 @@ public class ProjectPropertyPage extends PropertyPage
 			// save and build if dirty
 			if (preferences.isDirty()) {
 				preferences.flush();
-				TwigcsBuilder.triggerCleanBuild(getElement());
+				TwigcsBuilder.triggerCleanBuild(preferences.getProject());
 			}
 
 		} catch (final CoreException e) {
@@ -165,31 +158,32 @@ public class ProjectPropertyPage extends PropertyPage
 		excludeList.clear();
 
 		// find templates folder
-		final IResource templates = getElement().findMember("templates"); //$NON-NLS-1$
+		final IProject project = getElement();
+		final IResource templates = project.findMember("templates"); //$NON-NLS-1$
 		if (templates != null) {
 			includeList.add(templates);
 			includeViewer.refresh();
-			includeViewer.setSelection(templates);
+			includeViewer.setSelectedValue(templates);
 		} else {
 			includeViewer.refresh();
 		}
 
 		// find vendor folder
-		final IResource vendor = getElement().findMember("vendor"); //$NON-NLS-1$
+		final IResource vendor = project.findMember("vendor"); //$NON-NLS-1$
 		if (vendor != null) {
 			excludeList.add(vendor);
 			excludeViewer.refresh();
-			excludeViewer.setSelection(vendor);
+			excludeViewer.setSelectedValue(vendor);
 		} else {
 			excludeViewer.refresh();
 		}
 
 		// override
 		chkOverride.setSelection(false);
-		twigViewer.setSelection(new StructuredSelection(
-				PreferencesInitializer.getTwigVersion()));
-		severityViewer.setSelection(new StructuredSelection(
-				PreferencesInitializer.getTwigSeverity()));
+		twigVersionViewer
+				.setSelectedValue(PreferencesInitializer.getTwigVersion());
+		twigSeverityViewer
+				.setSelectedValue(PreferencesInitializer.getTwigSeverity());
 		chkOverride.notifyListeners(SWT.Selection, null);
 
 		super.performDefaults();
@@ -211,7 +205,7 @@ public class ProjectPropertyPage extends PropertyPage
 				list.add(resource);
 				viewer.refresh();
 			}
-			viewer.setSelection(resource);
+			viewer.setSelectedValue(resource);
 		}
 	}
 
@@ -249,30 +243,18 @@ public class ProjectPropertyPage extends PropertyPage
 	 *            the default selection.
 	 * @return the combo viewer.
 	 */
-	private <E extends Enum<E>> ComboViewer createEnumViewer(
+	private <E extends Enum<E>> EnumComboViewer<E> createEnumViewer(
 			final Composite parent, final Class<E> clazz, final String text,
 			final E selection) {
 		// label
 		createLabel(parent, text, 1);
 
 		// viewer
-		final ComboViewer viewer = new ComboViewer(parent, SWT.READ_ONLY);
-		GridDataFactory.swtDefaults().hint(120, SWT.DEFAULT)
-				.applyTo(viewer.getControl());
-
-		// UI
-		viewer.setContentProvider(ArrayContentProvider.getInstance());
-		viewer.setLabelProvider(new LabelProvider() {
-			@Override
-			public String getText(final Object element) {
-				final String name = ((Enum<?>) element).name();
-				return PreferencesPage.toProperCase(name);
-			}
-		});
-
-		// content
-		viewer.setInput(clazz.getEnumConstants());
-		viewer.setSelection(new StructuredSelection(selection), true);
+		final EnumComboViewer<E> viewer = new EnumComboViewer<>(parent, clazz);
+		final GridData gd = new GridData();
+		gd.widthHint = 120;
+		viewer.setLayoutData(gd);
+		viewer.setSelectedValue(selection);
 
 		return viewer;
 	}
@@ -322,13 +304,14 @@ public class ProjectPropertyPage extends PropertyPage
 
 		// twig version
 		final TwigVersion version = preferences.getTwigVersion();
-		twigViewer = createEnumViewer(overrideContainer, TwigVersion.class,
-				Messages.PreferencesPage_Version, version);
+		twigVersionViewer = createEnumViewer(overrideContainer,
+				TwigVersion.class, Messages.PreferencesPage_Version, version);
 
 		// twig severity
 		final TwigSeverity severity = preferences.getTwigSeverity();
-		severityViewer = createEnumViewer(overrideContainer, TwigSeverity.class,
-				Messages.PreferencesPage_Severity, severity);
+		twigSeverityViewer = createEnumViewer(overrideContainer,
+				TwigSeverity.class, Messages.PreferencesPage_Severity,
+				severity);
 
 		// add listener
 		chkOverride.addListener(SWT.Selection, e -> {
@@ -417,7 +400,7 @@ public class ProjectPropertyPage extends PropertyPage
 
 		// update
 		viewer.setInput(list);
-		viewer.setSelection(list.isEmpty() ? null : list.get(0));
+		viewer.setSelectedValue(list.isEmpty() ? null : list.get(0));
 
 		return viewer;
 	}
@@ -477,7 +460,7 @@ public class ProjectPropertyPage extends PropertyPage
 	private void editResources(final FolderTableViewer viewer,
 			final List<IResource> list) {
 		// get current selection
-		final IResource oldResource = viewer.getFirstElement();
+		final IResource oldResource = viewer.getSelectedValue();
 		if (oldResource == null) {
 			return;
 		}
@@ -501,7 +484,7 @@ public class ProjectPropertyPage extends PropertyPage
 		if (!list.contains(newResource)) {
 			list.add(newResource);
 			viewer.refresh();
-			viewer.setSelection(newResource);
+			viewer.setSelectedValue(newResource);
 		}
 	}
 

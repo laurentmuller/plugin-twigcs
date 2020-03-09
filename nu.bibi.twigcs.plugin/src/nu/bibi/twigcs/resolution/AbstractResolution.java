@@ -44,16 +44,16 @@ public abstract class AbstractResolution extends WorkbenchMarkerResolution
 		implements IResolutionConstants, IConstants, ICoreException {
 
 	/*
-	 * the empty marker array
-	 */
-	private static final IMarker[] EMPTY_MARKERS = {};
-
-	/*
 	 * the attribute names used to compare markers
 	 */
 	private static final String[] ATTRIBUTE_NAMES = { //
 			IMarker.LINE_NUMBER, IMarker.CHAR_END, IMarker.CHAR_START //
 	};
+
+	/*
+	 * the empty marker array
+	 */
+	private static final IMarker[] EMPTY_MARKERS = {};
 
 	/**
 	 * {@inheritDoc}
@@ -97,7 +97,6 @@ public abstract class AbstractResolution extends WorkbenchMarkerResolution
 
 	/**
 	 * {@inheritDoc}
-	 *
 	 * <p>
 	 * This method is normally never called but the
 	 * {@link #run(IMarker[], IProgressMonitor)} method instead.
@@ -203,16 +202,18 @@ public abstract class AbstractResolution extends WorkbenchMarkerResolution
 	 */
 	private Map<IFile, List<IMarker>> createMarkerMap(final IMarker[] markers) {
 		// sort markers in reverse position
-		Arrays.sort(markers, (o1, o2) -> {
-			int result = 0;
-			for (final String name : ATTRIBUTE_NAMES) {
-				result = compareAttributes(o1, o2, name);
-				if (result != 0) {
-					return result;
+		if (markers.length > 1) {
+			Arrays.sort(markers, (o1, o2) -> {
+				int result = 0;
+				for (final String name : ATTRIBUTE_NAMES) {
+					result = compareAttributes(o1, o2, name);
+					if (result != 0) {
+						return result;
+					}
 				}
-			}
-			return 0;
-		});
+				return 0;
+			});
+		}
 
 		// create map
 		final Map<IFile, List<IMarker>> map = new HashMap<>(markers.length);
@@ -283,7 +284,7 @@ public abstract class AbstractResolution extends WorkbenchMarkerResolution
 			monitor.worked(1);
 		}
 
-		// save if change
+		// save if changed
 		if (!Arrays.equals(contents, newContents)) {
 			setFileContents(file, newContents);
 		}
@@ -317,28 +318,6 @@ public abstract class AbstractResolution extends WorkbenchMarkerResolution
 		}
 		return null;
 	}
-
-	// /**
-	// * Gets the contents of the document.
-	// *
-	// * @param file
-	// * the parent file.
-	// * @param document
-	// * the document to read from.
-	// * @return the document contents.
-	// * @throws CoreException
-	// * if this method fails.
-	// */
-	// private byte[] getDocumentContents(final IFile file,
-	// final IDocument document) throws CoreException {
-	// try {
-	// return document.get().getBytes(file.getCharset());
-	// } catch (final IOException e) {
-	// final String msg = NLS.bind(Messages.Resolution_Error_Read,
-	// file.getName());
-	// throw createCoreException(msg, e);
-	// }
-	// }
 
 	/**
 	 * Gets the contents of the file.

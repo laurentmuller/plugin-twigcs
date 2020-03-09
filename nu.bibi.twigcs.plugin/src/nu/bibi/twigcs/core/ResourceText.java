@@ -15,6 +15,7 @@ import java.util.Arrays;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.osgi.util.NLS;
 
 import nu.bibi.twigcs.internal.Messages;
 import nu.bibi.twigcs.io.IOStream;
@@ -73,7 +74,7 @@ public class ResourceText implements ICoreException {
 			read(reader);
 
 		} catch (final IOException e) {
-			final String msg = String.format(Messages.ResourceText_Error_Read,
+			final String msg = NLS.bind(Messages.ResourceText_Error_Read,
 					file.getName());
 			throw createCoreException(msg, e);
 		}
@@ -158,7 +159,7 @@ public class ResourceText implements ICoreException {
 	private void checkLineIndex(final int index) {
 		if (index < 0 || index >= count) {
 			throw new IndexOutOfBoundsException(
-					String.format(Messages.ResourceText_Error_Index, index));
+					NLS.bind(Messages.ResourceText_Error_Index, index));
 		}
 	}
 

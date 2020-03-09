@@ -19,6 +19,7 @@ import org.eclipse.jface.preference.ComboFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.FileFieldEditor;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
@@ -47,45 +48,13 @@ import nu.bibi.twigcs.model.TwigVersion;
 public class PreferencesPage extends FieldEditorPreferencePage implements
 		IWorkbenchPreferencePage, PreferencesConstants, ICoreException {
 
-	/**
-	 * Gets the enumeration names to populate a combo field editor.
-	 *
-	 * @param clazz
-	 *            the enumeration class.
-	 * @return an array with the enumeration names.
-	 */
-	public static String[][] getEnumNames(
-			final Class<? extends Enum<?>> clazz) {
-		final Enum<?>[] values = clazz.getEnumConstants();
-		return Arrays.stream(values).map(e -> {
-			return new String[] { toProperCase(e.name()), e.name() };
-		}).toArray(String[][]::new);
-	}
-
-	/**
-	 * Replaces all underscore (<code>'_'</code>) characters by a space
-	 * (<code>' '</code>) character and converts to proper case. For example:
-	 *
-	 * <pre>
-	 * "TWIG_VERSION_1" -> "Twig version 1"
-	 * </pre>
-	 *
-	 * @param text
-	 *            the string to convert.
-	 * @return the converted string.
-	 */
-	public static String toProperCase(final String text) {
-		return Character.toUpperCase(text.charAt(0))
-				+ text.substring(1).replace('_', ' ').toLowerCase();
-	}
-
 	/*
 	 * the test button
 	 */
 	private Button btnTest;
 
 	/*
-	 * the Twigcs file editor
+	 * the file editors
 	 */
 	private FileFieldEditor fileEditor;
 
@@ -254,38 +223,99 @@ public class PreferencesPage extends FieldEditorPreferencePage implements
 	}
 
 	/**
+	 * Gets the enumeration names to populate a combo field editor.
+	 *
+	 * @param clazz
+	 *            the enumeration class.
+	 * @return an array with the enumeration names.
+	 */
+	private String[][] getEnumNames(final Class<? extends Enum<?>> clazz) {
+		final Enum<?>[] values = clazz.getEnumConstants();
+		return Arrays.stream(values).map(e -> {
+			return new String[] { toProperCase(e.name()), e.name() };
+		}).toArray(String[][]::new);
+	}
+
+	/**
+	 * Gets the Twigcs executable file path.
+	 *
+	 * @return the file path, if valid; <code>null</code> otherwise.
+	 */
+	private String getFilePath() {
+		final String path = fileEditor.getStringValue();
+		if (path == null || path.isEmpty()) {
+			return null;
+		}
+		final File file = new File(path);
+		if (!file.exists() || !file.isFile()) {
+			return null;
+		}
+
+		return path;
+	}
+
+	/**
 	 * Tests the Twigcs command.
 	 */
 	private void testCommand() {
-		final String fileName = fileEditor.getStringValue();
-		if (fileName == null || fileName.isEmpty()) {
+		// valid?
+		if (!isValid()) {
+			return;
+		}
+
+		// get path
+		final String filePath = getFilePath();
+		if (filePath == null) {
 			MessageDialog.openError(getShell(), getTitle(),
 					Messages.PreferencesPage_Error_Path);
 			return;
 		}
 
-		try {
-			// processor
-			final TwigcsProcessor processor = new TwigcsProcessor();
-			processor.setSearchPath(createTemplate());
-			processor.setProgramPath(fileName);
+		// execute
+		final Runnable runnable = new Runnable() {
+			@Override
+			public void run() {
+				try {
+					// processor
+					final TwigcsProcessor processor = new TwigcsProcessor();
+					processor.setSearchPath(createTemplate());
+					processor.setProgramPath(filePath);
 
-			// execute
-			final List<String> command = processor.buildCommand();
-			final IOExecutor executor = new IOExecutor();
-			final int exitCode = executor.run(command);
+					final List<String> command = processor.buildCommand();
+					final IOExecutor executor = new IOExecutor();
+					final int exitCode = executor.run(command);
 
-			if (exitCode == 0) {
-				MessageDialog.openInformation(getShell(), getTitle(),
-						Messages.PreferencesPage_Test_Success);
-			} else {
-				MessageDialog.openError(getShell(), getTitle(),
-						Messages.PreferencesPage_Test_Error);
+					if (exitCode == 0) {
+						MessageDialog.openInformation(getShell(), getTitle(),
+								Messages.PreferencesPage_Test_Success);
+					} else {
+						MessageDialog.openError(getShell(), getTitle(),
+								Messages.PreferencesPage_Test_Error);
+					}
+
+				} catch (final CoreException | IOException e) {
+					MessageDialog.openError(getShell(), getTitle(),
+							Messages.PreferencesPage_Test_Error);
+				}
 			}
+		};
+		BusyIndicator.showWhile(getShell().getDisplay(), runnable);
+	}
 
-		} catch (final CoreException | IOException e) {
-			MessageDialog.openError(getShell(), getTitle(),
-					Messages.PreferencesPage_Test_Error);
-		}
+	/**
+	 * Replaces all underscore (<code>'_'</code>) characters by a space
+	 * (<code>' '</code>) character and converts to proper case. For example:
+	 *
+	 * <pre>
+	 * "TWIG_VERSION_1" -> "Twig version 1"
+	 * </pre>
+	 *
+	 * @param text
+	 *            the string to convert.
+	 * @return the converted string.
+	 */
+	private String toProperCase(final String text) {
+		return Character.toUpperCase(text.charAt(0))
+				+ text.substring(1).replace('_', ' ').toLowerCase();
 	}
 }

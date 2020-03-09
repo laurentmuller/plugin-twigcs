@@ -10,11 +10,14 @@ package nu.bibi.twigcs.gson;
 
 import java.lang.reflect.Type;
 
+import org.eclipse.osgi.util.NLS;
+
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
 
+import nu.bibi.twigcs.internal.Messages;
 import nu.bibi.twigcs.model.TwigSeverity;
 
 /**
@@ -42,6 +45,6 @@ public final class SeverityDeserializer
 		}
 
 		throw new JsonParseException(
-				String.format("No severity match the value %d.", value)); //$NON-NLS-1$
+				NLS.bind(Messages.SeverityDeserializer_Error, value));
 	}
 }

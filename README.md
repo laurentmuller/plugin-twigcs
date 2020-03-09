@@ -1,6 +1,6 @@
 # Plugin-Twigcs
 
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/5ec47fa9084c4f3b803ef35c6b770ecd)](https://app.codacy.com/manual/laurentmuller/plugin-twigcs?utm_source=github.com&utm_medium=referral&utm_content=laurentmuller/plugin-twigcs&utm_campaign=Badge_Grade_Dashboard) [![Build Status](https://travis-ci.org/laurentmuller/plugin-twigcs.svg?branch=master)](https://travis-ci.org/laurentmuller/plugin-twigcs)
+[![Build Status](https://travis-ci.org/laurentmuller/plugin-twigcs.svg?branch=master)](https://travis-ci.org/laurentmuller/plugin-twigcs) [![Codacy Badge](https://api.codacy.com/project/badge/Grade/3b2fb01172a4477692dd7dd82899f85f)](https://app.codacy.com/manual/laurentmuller/plugin-twigcs?utm_source=github.com&utm_medium=referral&utm_content=laurentmuller/plugin-twigcs&utm_campaign=Badge_Grade_Dashboard)
 
 An Eclipse plugin to validate Twig (*.twig) files with the [Twigcs](https://github.com/friendsoftwig/twigcs) component.
 
@@ -20,7 +20,7 @@ An Eclipse plugin to validate Twig (*.twig) files with the [Twigcs](https://gith
 
 ### Installation of Twigcs
 
-- Install Twigcs component globally as explain in the [Twigcs Github site](https://github.com/friendsoftwig/twigcs).
+- Install Twigcs component globally as explain in the [Twigcs Github site](https://github.com/friendsoftwig/twigcs#how-to-install).
 
     ```bash
     composer global require friendsoftwig/twigcs
@@ -32,7 +32,7 @@ An Eclipse plugin to validate Twig (*.twig) files with the [Twigcs](https://gith
 
 - Click the **Add....** button.
 
-- Enter the location as the image below.
+- Enter the location https://www.bibi.nu/twigcs/v1.0.0 as the image below.
 
   ![Add Site Repository](docs/images/add_repository_site.png)
 

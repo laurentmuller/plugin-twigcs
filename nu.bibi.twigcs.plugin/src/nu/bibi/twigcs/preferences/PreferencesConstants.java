@@ -65,5 +65,4 @@ public interface PreferencesConstants {
 	 * The twig version property.
 	 */
 	String P_VERSION = "twigcs.version"; //$NON-NLS-1$
-
 }

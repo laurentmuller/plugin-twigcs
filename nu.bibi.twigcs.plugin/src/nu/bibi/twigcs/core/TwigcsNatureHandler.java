@@ -9,6 +9,8 @@
 package nu.bibi.twigcs.core;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -75,35 +77,29 @@ public class TwigcsNatureHandler extends AbstractHandler implements IConstants {
 	}
 
 	/**
-	 * Toggles Twigcs nature of the given project
+	 * Toggles Twigcs nature for the given project
 	 *
 	 * @param project
 	 *            the project to update.
 	 * @throws CoreException
-	 *             if an exception occurs while updating the project nature.
+	 *             if an exception occurs while updating the project
+	 *             description.
 	 */
 	private void toggleNature(final IProject project) throws CoreException {
+		// get natures
 		final IProjectDescription description = project.getDescription();
-		final String[] natures = description.getNatureIds();
+		final List<String> natures = Arrays.stream(description.getNatureIds())
+				.collect(Collectors.toList());
 
-		// check if exist
-		for (int i = 0; i < natures.length; ++i) {
-			if (NATURE_ID.equals(natures[i])) {
-				// remove the nature
-				final String[] newNatures = new String[natures.length - 1];
-				System.arraycopy(natures, 0, newNatures, 0, i);
-				System.arraycopy(natures, i + 1, newNatures, i,
-						natures.length - i - 1);
-				description.setNatureIds(newNatures);
-				project.setDescription(description, null);
-				return;
-			}
+		// toggle
+		if (natures.contains(NATURE_ID)) {
+			natures.remove(NATURE_ID);
+		} else {
+			natures.add(NATURE_ID);
 		}
 
-		// add the nature
-		final String[] newNatures = Arrays.copyOf(natures, natures.length + 1);
-		newNatures[natures.length] = NATURE_ID;
-		description.setNatureIds(newNatures);
+		// update
+		description.setNatureIds(natures.toArray(new String[natures.size()]));
 		project.setDescription(description, null);
 	}
 }

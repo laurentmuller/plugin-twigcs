@@ -9,12 +9,12 @@
 package nu.bibi.twigcs.core;
 
 import java.util.Arrays;
-import java.util.function.Predicate;
 
 import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IProjectNature;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 
 /**
@@ -38,16 +38,14 @@ public class TwigcsNature implements IProjectNature, IConstants {
 		final IProjectDescription desc = project.getDescription();
 		ICommand[] cmds = desc.getBuildSpec();
 
-		// already set?
-		if (Arrays.stream(cmds).anyMatch(this::match)) {
-			return;
+		// add if not already set?
+		if (!Arrays.stream(cmds).anyMatch(this::isBuilderId)) {
+			final int len = cmds.length;
+			cmds = Arrays.copyOf(cmds, len + 1);
+			cmds[len] = createCommand(desc);
+			desc.setBuildSpec(cmds);
+			project.setDescription(desc, null);
 		}
-
-		// add
-		cmds = Arrays.copyOf(cmds, cmds.length + 1);
-		cmds[cmds.length - 1] = createCommand(desc);
-		desc.setBuildSpec(cmds);
-		project.setDescription(desc, null);
 	}
 
 	/**
@@ -58,13 +56,13 @@ public class TwigcsNature implements IProjectNature, IConstants {
 		final IProjectDescription description = project.getDescription();
 		final ICommand[] oldCmds = description.getBuildSpec();
 		final ICommand[] newCmds = Arrays.stream(oldCmds)
-				.filter(((Predicate<ICommand>) this::match).negate())
-				.toArray(ICommand[]::new);
+				.filter(this::isNotBuilderId).toArray(ICommand[]::new);
 
-		// set?
+		// remove if set
 		if (oldCmds.length != newCmds.length) {
 			description.setBuildSpec(newCmds);
 			project.setDescription(description, null);
+			project.deleteMarkers(MARKER_TYPE, true, IResource.DEPTH_INFINITE);
 		}
 	}
 
@@ -85,7 +83,7 @@ public class TwigcsNature implements IProjectNature, IConstants {
 	}
 
 	/**
-	 * Creates a command with the Twigcs builder-
+	 * Creates a command with the Twigcs builder identifier.
 	 *
 	 * @param desc
 	 *            the project description used to build command.
@@ -98,14 +96,26 @@ public class TwigcsNature implements IProjectNature, IConstants {
 	}
 
 	/**
-	 * Checks if the given command builder name is equal to the Twigcs builder
-	 * identifier.
+	 * Checks if the builder name of the given command is equal to the Twigcs
+	 * builder identifier.
 	 *
 	 * @param command
 	 *            the command to validate.
 	 * @return <code>true</code> if equal.
 	 */
-	private boolean match(final ICommand command) {
-		return command.getBuilderName().equals(BUILDER_ID);
+	private boolean isBuilderId(final ICommand command) {
+		return BUILDER_ID.equals(command.getBuilderName());
+	}
+
+	/**
+	 * Checks if the builder name of then given command is not equal to the
+	 * Twigcs builder identifier.
+	 *
+	 * @param command
+	 *            the command to validate.
+	 * @return <code>true</code> if not equal.
+	 */
+	private boolean isNotBuilderId(final ICommand command) {
+		return !isBuilderId(command);
 	}
 }

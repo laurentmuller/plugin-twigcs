@@ -19,6 +19,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.osgi.util.NLS;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -483,13 +484,13 @@ public class TwigcsValidationVisitor extends AbstractResouceVisitor
 				if (!error.isEmpty()) {
 					e = new IOException(error, e);
 				}
-				final String msg = String.format(
+				final String msg = NLS.bind(
 						Messages.ValidationVisitor_Error_Validate_Code,
 						file.getName(), exitCode);
 				handleStatus(createErrorStatus(msg, e));
 			}
 		} catch (final IOException | JsonSyntaxException e) {
-			final String msg = String.format(
+			final String msg = NLS.bind(
 					Messages.ValidationVisitor_Error_Validate_Name,
 					file.getName());
 			handleStatus(createErrorStatus(msg, e));

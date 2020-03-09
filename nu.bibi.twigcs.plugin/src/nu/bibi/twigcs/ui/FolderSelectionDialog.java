@@ -20,6 +20,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.ViewerComparator;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.dialogs.ElementTreeSelectionDialog;
@@ -63,6 +64,7 @@ public class FolderSelectionDialog extends ElementTreeSelectionDialog
 		setInitialSelection(selection == null ? project : selection);
 		setComparator(new ViewerComparator(Collator.getInstance()));
 		setTitle(Messages.FolderSelectionDialog_Title);
+		setMessage(Messages.FolderSelectionDialog_Message);
 		setDoubleClickSelects(false);
 		setHelpAvailable(false);
 		setAllowMultiple(false);
@@ -78,8 +80,8 @@ public class FolderSelectionDialog extends ElementTreeSelectionDialog
 	/**
 	 * {@inheritDoc}
 	 * <p>
-	 * This implementation cast the first result, if any, to an
-	 * {@link IResource}.
+	 * The implementation of <code>FolderSelectionDialog</code> cast the first
+	 * result, if any, to an {@link IResource}.
 	 * </p>
 	 */
 	@Override
@@ -123,15 +125,15 @@ public class FolderSelectionDialog extends ElementTreeSelectionDialog
 	}
 
 	/**
-	 * Creates an error status for the given format and element.
+	 * Creates an error status for the given message and element.
 	 *
-	 * @param format
-	 *            the format string.
+	 * @param message
+	 *            the message string.
 	 * @param Object
 	 *            the element.
 	 * @return the error status.
 	 */
-	private IStatus createInvalidStatus(final String format,
+	private IStatus createInvalidStatus(final String message,
 			final Object element) {
 		String argument;
 		if (element instanceof IResource) {
@@ -139,7 +141,7 @@ public class FolderSelectionDialog extends ElementTreeSelectionDialog
 		} else {
 			argument = element.toString();
 		}
-		final String message = String.format(format, argument);
-		return createErrorStatus(message, null);
+		final String msg = NLS.bind(message, argument);
+		return createErrorStatus(msg, null);
 	}
 }

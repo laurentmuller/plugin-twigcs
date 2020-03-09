@@ -19,6 +19,7 @@ import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.osgi.util.NLS;
 
 import nu.bibi.twigcs.TwigcsPlugin;
 import nu.bibi.twigcs.internal.Messages;
@@ -27,8 +28,9 @@ import nu.bibi.twigcs.preferences.ProjectPreferences;
 /**
  * Resource listener to update include and exclude paths.
  * <p>
- * This listener must register with the {@link IResourceChangeEvent#POST_CHANGE}
- * event mask like the following example:
+ * This listener must be register with the
+ * {@link IResourceChangeEvent#POST_CHANGE} event mask like the following
+ * example:
  * </p>
  *
  * <pre>
@@ -185,13 +187,9 @@ public class ResourceListener implements IResourceChangeListener,
 			preferences.setExcludePaths(excludes);
 		}
 
-		// if (preferences.isDirty()) {
-		// preferences.flush();
-		// }
-
-		final String message = String.format(Messages.ResourceListener_Update, //
-				pathFrom.toPortableString(), //
-				pathTo.toPortableString());
+		final String message = NLS.bind(Messages.ResourceListener_Update,
+				pathFrom.toOSString(), //
+				pathTo.toOSString());
 		TwigcsPlugin.logInfo(message);
 	}
 }

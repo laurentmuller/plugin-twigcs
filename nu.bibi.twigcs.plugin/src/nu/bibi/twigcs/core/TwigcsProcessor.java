@@ -92,6 +92,7 @@ public class TwigcsProcessor implements ICoreException {
 		version = TwigVersion.VERSION_3;
 		reporter = TwigReporter.json;
 		display = TwigDisplay.blocking;
+		severity = TwigSeverity.warning;
 		searchPaths = new ArrayList<>();
 		excludePaths = new ArrayList<>();
 	}

@@ -151,6 +151,15 @@ public class ProjectPreferences
 	}
 
 	/**
+	 * Gets the project.
+	 * 
+	 * @return the project.
+	 */
+	public IProject getProject() {
+		return project;
+	}
+
+	/**
 	 * Gets the Twig severity.
 	 *
 	 * @return the Twig severity.

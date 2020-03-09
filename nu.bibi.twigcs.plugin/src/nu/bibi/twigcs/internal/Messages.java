@@ -1,37 +1,29 @@
-/*******************************************************************************
- * Copyright (c) 2011 HaslerRail AG and others.
+/**
+ * This file is part of the twigcs-plugin package.
  *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * (c) Laurent Muller <bibi@bibi.nu>
  *
- * Contributors:
- *     HaslerRail AG - initial API and implementation
- *******************************************************************************/
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 package nu.bibi.twigcs.internal;
 
 import org.eclipse.osgi.util.NLS;
 
 /**
  * Properties wrapper.
- */ 
+ */
 public final class Messages extends NLS {
-	
+
 	/*
 	 * the bundle name
 	 */
 	private static final String BUNDLE_NAME = "nu.bibi.twigcs.internal.messages"; //$NON-NLS-1$
-	
-	/*
-	 * prevent instance creation
-	 */
-	private Messages() {
-	}
-	
+
 	public static String FolderSelectionDialog_Error_Already_Selected;
 	public static String FolderSelectionDialog_Error_No_Selection;
 	public static String FolderSelectionDialog_Error_Not_A_Folder;
+	public static String FolderSelectionDialog_Message;
 	public static String FolderSelectionDialog_Title;
 	public static String IOExecutor_Error_Interrupted;
 	public static String Preferences_Error_Save;
@@ -63,6 +55,7 @@ public final class Messages extends NLS {
 	public static String ResourceListener_Update;
 	public static String ResourceText_Error_Index;
 	public static String ResourceText_Error_Read;
+	public static String SeverityDeserializer_Error;
 	public static String TwigcsBuilder_Process_Files;
 	public static String TwigcsNatureHandler_Error_Execute;
 	public static String TwigcsProcessor_Error_No_Path;
@@ -71,11 +64,16 @@ public final class Messages extends NLS {
 	public static String TwigcsProcessor_Error_Real_Path;
 	public static String ValidationVisitor_Error_Validate_Code;
 	public static String ValidationVisitor_Error_Validate_Name;
-
 	/*
 	 * initialise messages
 	 */
 	static {
 		NLS.initializeMessages(BUNDLE_NAME, Messages.class);
+	}
+
+	/*
+	 * prevent instance creation
+	 */
+	private Messages() {
 	}
 }
