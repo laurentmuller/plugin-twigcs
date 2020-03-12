@@ -46,9 +46,12 @@ public enum TwigSeverity {
 	 *
 	 * @param value
 	 *            the value to search for.
-	 * @return the severity, if found; <code>null</code> otherwise.
+	 * @param defaultValue
+	 *            the default value to return if the severity is not found.
+	 * @return the severity, if found; the default value otherwise.
 	 */
-	public static TwigSeverity valueOf(final int value) {
+	public static TwigSeverity valueOf(final int value,
+			final TwigSeverity defaultValue) {
 		final TwigSeverity[] severities = TwigSeverity.values();
 		for (final TwigSeverity severity : severities) {
 			if (severity.equals(value)) {
@@ -56,7 +59,7 @@ public enum TwigSeverity {
 			}
 		}
 
-		return null;
+		return defaultValue;
 	}
 
 	/**

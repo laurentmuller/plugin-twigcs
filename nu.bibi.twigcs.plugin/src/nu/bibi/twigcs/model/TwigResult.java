@@ -13,8 +13,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import com.google.gson.annotations.SerializedName;
-
 /**
  * Represents the result of parsing Twig files.
  *
@@ -24,10 +22,9 @@ import com.google.gson.annotations.SerializedName;
 public class TwigResult implements Iterable<TwigFile> {
 
 	/*
-	 * the number of violations
+	 * the number of failures (violations)
 	 */
-	@SerializedName("failures")
-	private int violations;
+	private int failures;
 
 	/*
 	 * the parsed files
@@ -39,6 +36,18 @@ public class TwigResult implements Iterable<TwigFile> {
 	 */
 	public TwigResult() {
 		files = new ArrayList<>();
+	}
+
+	/**
+	 * Appends the specified file to the end of this list of files.
+	 *
+	 * @param file
+	 *            the file to be appended.
+	 * @return <tt>true</tt> if this list of files changed as a result of the
+	 *         call.
+	 */
+	public boolean addFile(final TwigFile file) {
+		return file != null && files.add(file);
 	}
 
 	/**
@@ -54,21 +63,21 @@ public class TwigResult implements Iterable<TwigFile> {
 	}
 
 	/**
+	 * Gets the number of failures (violations).
+	 *
+	 * @return the number of failures.
+	 */
+	public int getFailures() {
+		return failures;
+	}
+
+	/**
 	 * Gets the parsed files.
 	 *
 	 * @return the parsed files.
 	 */
 	public List<TwigFile> getFiles() {
 		return files;
-	}
-
-	/**
-	 * Gets the number of violations.
-	 *
-	 * @return the number of violations.
-	 */
-	public int getViolations() {
-		return violations;
 	}
 
 	/**
@@ -89,6 +98,16 @@ public class TwigResult implements Iterable<TwigFile> {
 	}
 
 	/**
+	 * Sets the number of failures (violations).
+	 *
+	 * @param failures
+	 *            the number of failures to set.
+	 */
+	public void setFailures(final int failures) {
+		this.failures = failures;
+	}
+
+	/**
 	 * Returns the number of files.
 	 *
 	 * @return the number of files.
@@ -101,7 +120,9 @@ public class TwigResult implements Iterable<TwigFile> {
 	 * Sort files and violations.
 	 */
 	public void sort() {
-		Collections.sort(files);
+		if (files.size() > 1) {
+			Collections.sort(files);
+		}
 		for (final TwigFile file : files) {
 			file.sort();
 		}
@@ -113,7 +134,7 @@ public class TwigResult implements Iterable<TwigFile> {
 	@Override
 	public String toString() {
 		final String name = getClass().getSimpleName();
-		return String.format("%s{files: %d, violations: %d}", //$NON-NLS-1$
-				name, size(), violations);
+		return String.format("%s{files: %d, failures: %d}", //$NON-NLS-1$
+				name, size(), failures);
 	}
 }

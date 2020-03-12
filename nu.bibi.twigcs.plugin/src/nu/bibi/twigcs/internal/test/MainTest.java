@@ -3,11 +3,8 @@ package nu.bibi.twigcs.internal.test;
 import java.io.IOException;
 import java.util.List;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
+import nu.bibi.twigcs.core.TwigResultParser;
 import nu.bibi.twigcs.core.TwigcsProcessor;
-import nu.bibi.twigcs.gson.SeverityDeserializer;
 import nu.bibi.twigcs.io.IOExecutor;
 import nu.bibi.twigcs.model.TwigDisplay;
 import nu.bibi.twigcs.model.TwigFile;
@@ -18,8 +15,8 @@ import nu.bibi.twigcs.model.TwigViolation;
 
 public class MainTest {
 
-	private static final String EXEC_PATH = "C:/Users/bibi/AppData/Roaming/Composer/vendor/bin/twigcs.bat"; //$NON-NLS-1$
-	private static final String TWIG_FILE = "D:/Temp/WorkspaceTestOxygen/TestJS/templates/user/user_comment.html.twig"; //$NON-NLS-1$
+	private static final String EXEC_PATH = "C:/Users/Muller/AppData/Roaming/Composer/vendor/bin/twigcs.bat"; //$NON-NLS-1$
+	private static final String TWIG_FILE = "D:/Temp/Twigcs/about.html.twig"; //$NON-NLS-1$
 
 	public static void main(final String[] args) {
 		int exitCode = 0;
@@ -50,10 +47,8 @@ public class MainTest {
 			// check output
 			final String output = exec.getOutput();
 			if (!output.isEmpty()) {
-				final Gson gson = getGson();
-				final TwigResult result = gson.fromJson(output,
-						TwigResult.class);
-				result.sort();
+				final TwigResultParser parser = new TwigResultParser();
+				final TwigResult result = parser.parse(output);
 
 				System.out.println(result);
 				for (final TwigFile file : result) {
@@ -70,13 +65,6 @@ public class MainTest {
 			System.out.println("Exit Code: " + exitCode); //$NON-NLS-1$
 			// System.exit(exitCode);
 		}
-	}
-
-	private static Gson getGson() {
-		final GsonBuilder gsonBuilder = new GsonBuilder();
-		gsonBuilder.registerTypeAdapter(TwigSeverity.class,
-				new SeverityDeserializer());
-		return gsonBuilder.create();
 	}
 
 	private static TwigcsProcessor getProcessor() {

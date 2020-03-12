@@ -29,6 +29,7 @@ public class TwigViolation implements Comparable<TwigViolation> {
 	 * the column offset (zero index based)
 	 */
 	private int column;
+
 	/*
 	 * the severity
 	 */
@@ -155,6 +156,16 @@ public class TwigViolation implements Comparable<TwigViolation> {
 	 */
 	public void setMessage(final String message) {
 		this.message = message;
+	}
+
+	/**
+	 * Sets the severity.
+	 *
+	 * @param severity
+	 *            the severity to set.
+	 */
+	public void setSeverity(final int severity) {
+		this.severity = TwigSeverity.valueOf(severity, TwigSeverity.error);
 	}
 
 	/**

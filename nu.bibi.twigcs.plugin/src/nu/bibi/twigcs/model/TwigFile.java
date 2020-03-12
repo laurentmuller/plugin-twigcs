@@ -14,8 +14,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 
-import com.google.gson.annotations.SerializedName;
-
 /**
  * Represents a parsed Twig file.
  *
@@ -25,9 +23,8 @@ import com.google.gson.annotations.SerializedName;
 public class TwigFile implements Iterable<TwigViolation>, Comparable<TwigFile> {
 
 	/*
-	 * the parsed file
+	 * the file path
 	 */
-	@SerializedName("file")
 	private String path;
 
 	/*
@@ -40,6 +37,18 @@ public class TwigFile implements Iterable<TwigViolation>, Comparable<TwigFile> {
 	 */
 	public TwigFile() {
 		violations = new ArrayList<>();
+	}
+
+	/**
+	 * Appends the specified violation to the end of this list of violations.
+	 *
+	 * @param violation
+	 *            the violation to be appended.
+	 * @return <tt>true</tt> if this list of violations changed as a result of
+	 *         the call.
+	 */
+	public boolean addViolation(final TwigViolation violation) {
+		return violation != null && violations.add(violation);
 	}
 
 	/**
@@ -134,7 +143,9 @@ public class TwigFile implements Iterable<TwigViolation>, Comparable<TwigFile> {
 	 * Sort violations.
 	 */
 	public void sort() {
-		Collections.sort(violations);
+		if (violations.size() > 1) {
+			Collections.sort(violations);
+		}
 	}
 
 	/**

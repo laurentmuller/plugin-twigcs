@@ -21,11 +21,6 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.osgi.util.NLS;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonSyntaxException;
-
-import nu.bibi.twigcs.gson.SeverityDeserializer;
 import nu.bibi.twigcs.internal.Messages;
 import nu.bibi.twigcs.io.IOExecutor;
 import nu.bibi.twigcs.model.TwigFile;
@@ -78,9 +73,9 @@ public class TwigcsValidationVisitor extends AbstractResouceVisitor
 	private TwigcsProcessor processor;
 
 	/*
-	 * the Gson parser
+	 * the Twig result parser
 	 */
-	private Gson gson;
+	private TwigResultParser parser;
 
 	/*
 	 * the twig version
@@ -237,20 +232,6 @@ public class TwigcsValidationVisitor extends AbstractResouceVisitor
 	}
 
 	/**
-	 * Gets the GSON parser.
-	 *
-	 * @return the GSON parser.
-	 */
-	private Gson getGson() {
-		if (gson == null) {
-			final GsonBuilder builder = new GsonBuilder();
-			gson = builder.registerTypeAdapter(TwigSeverity.class,
-					new SeverityDeserializer()).create();
-		}
-		return gson;
-	}
-
-	/**
 	 * Gets the offset for the given violation message.
 	 *
 	 * @param message
@@ -326,6 +307,18 @@ public class TwigcsValidationVisitor extends AbstractResouceVisitor
 		}
 
 		return Math.max(length, 1);
+	}
+
+	/**
+	 * Gets the Twig result parser.
+	 *
+	 * @return Twig result parser.
+	 */
+	private TwigResultParser getParser() {
+		if (parser == null) {
+			parser = new TwigResultParser();
+		}
+		return parser;
 	}
 
 	/**
@@ -435,19 +428,14 @@ public class TwigcsValidationVisitor extends AbstractResouceVisitor
 	 * @param data
 	 *            the output data of the execution.
 	 * @return the file result, if any; <code>null</code> otherwise.
-	 * @throws JsonSyntaxException
-	 *             if the data output is not a valid representation of
+	 * @throws IOException
+	 *             if the data output is not a valid representation of a
 	 *             {@link TwigResult} type.
 	 */
-	private TwigFile parseResult(final String data) throws JsonSyntaxException {
-		try {
-			final Gson gson = getGson();
-			final TwigResult result = gson.fromJson(data, TwigResult.class);
-			return result.first();
-		} catch (final JsonSyntaxException e) {
-			System.err.println(data);
-			throw e;
-		}
+	private TwigFile parseResult(final String data) throws IOException {
+		final TwigResultParser parser = getParser();
+		final TwigResult result = parser.parse(data);
+		return result.first();
 	}
 
 	/**
@@ -489,7 +477,7 @@ public class TwigcsValidationVisitor extends AbstractResouceVisitor
 						file.getName(), exitCode);
 				handleStatus(createErrorStatus(msg, e));
 			}
-		} catch (final IOException | JsonSyntaxException e) {
+		} catch (final IOException e) {
 			final String msg = NLS.bind(
 					Messages.ValidationVisitor_Error_Validate_Name,
 					file.getName());
