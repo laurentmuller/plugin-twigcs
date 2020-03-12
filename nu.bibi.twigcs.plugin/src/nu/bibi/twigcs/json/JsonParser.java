@@ -73,6 +73,12 @@ public class JsonParser {
 		handler.parser = this;
 	}
 
+	public Location getLocation() {
+		final int offset = bufferOffset + index - 1;
+		final int column = offset - lineOffset + 1;
+		return new Location(offset, line, column);
+	}
+
 	/**
 	 * Reads the entire input from the given reader and parses it as JSON. The
 	 * input must contain a valid JSON value, optionally padded with whitespace.
@@ -157,7 +163,7 @@ public class JsonParser {
 			parse(new StringReader(string), bufferSize);
 		} catch (final IOException exception) {
 			// StringReader does not throw IOException
-			throw new RuntimeException(exception);
+			throw new JsonException(exception);
 		}
 	}
 
@@ -507,12 +513,6 @@ public class JsonParser {
 			captureBuffer = new StringBuilder();
 		}
 		captureStart = index - 1;
-	}
-
-	Location getLocation() {
-		final int offset = bufferOffset + index - 1;
-		final int column = offset - lineOffset + 1;
-		return new Location(offset, line, column);
 	}
 
 }

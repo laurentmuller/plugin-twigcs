@@ -37,11 +37,11 @@ class WritingBuffer extends Writer {
 	private final char[] buffer;
 	private int fill = 0;
 
-	WritingBuffer(final Writer writer) {
+	public WritingBuffer(final Writer writer) {
 		this(writer, 16);
 	}
 
-	WritingBuffer(final Writer writer, final int bufferSize) {
+	public WritingBuffer(final Writer writer, final int bufferSize) {
 		this.writer = writer;
 		buffer = new char[bufferSize];
 	}

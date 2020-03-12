@@ -473,7 +473,7 @@ public abstract class JsonValue implements Serializable {
 			writeTo(writer, config);
 		} catch (final IOException exception) {
 			// StringWriter does not throw IOExceptions
-			throw new RuntimeException(exception);
+			throw new JsonException(exception);
 		}
 		return writer.toString();
 	}
@@ -524,6 +524,6 @@ public abstract class JsonValue implements Serializable {
 		buffer.flush();
 	}
 
-	abstract void write(JsonWriter writer) throws IOException;
+	protected abstract void write(JsonWriter writer) throws IOException;
 
 }

@@ -58,7 +58,7 @@ package nu.bibi.twigcs.json;
  */
 public abstract class JsonHandler<A, O> {
 
-	JsonParser parser;
+	protected JsonParser parser;
 
 	/**
 	 * Indicates the end of an array in the JSON input. This method will be
@@ -223,6 +223,7 @@ public abstract class JsonHandler<A, O> {
 	 * literal.
 	 */
 	public void startNull() {
+		// no-operation
 	}
 
 	/**

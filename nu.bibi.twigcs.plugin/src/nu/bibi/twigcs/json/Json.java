@@ -100,6 +100,10 @@ public final class Json {
 			value = new JsonString(string);
 		}
 
+		public JsonValue getValue() {
+			return value;
+		}
+
 		@Override
 		public JsonArray startArray() {
 			return new JsonArray();
@@ -108,10 +112,6 @@ public final class Json {
 		@Override
 		public JsonObject startObject() {
 			return new JsonObject();
-		}
-
-		JsonValue getValue() {
-			return value;
 		}
 
 	}

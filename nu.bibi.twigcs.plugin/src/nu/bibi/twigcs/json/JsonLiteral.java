@@ -89,7 +89,7 @@ class JsonLiteral extends JsonValue {
 	}
 
 	@Override
-	void write(final JsonWriter writer) throws IOException {
+	protected void write(final JsonWriter writer) throws IOException {
 		writer.writeLiteral(value);
 	}
 

@@ -35,7 +35,7 @@ public abstract class WriterConfig {
 	 */
 	public static WriterConfig MINIMAL = new WriterConfig() {
 		@Override
-		JsonWriter createWriter(final Writer writer) {
+		protected JsonWriter createWriter(final Writer writer) {
 			return new JsonWriter(writer);
 		}
 	};
@@ -46,6 +46,6 @@ public abstract class WriterConfig {
 	 */
 	public static WriterConfig PRETTY_PRINT = PrettyPrint.indentWithSpaces(2);
 
-	abstract JsonWriter createWriter(Writer writer);
+	protected abstract JsonWriter createWriter(Writer writer);
 
 }

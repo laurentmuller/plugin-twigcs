@@ -901,6 +901,25 @@ public class JsonObject extends JsonValue implements Iterable<Member> {
 		return names.size();
 	}
 
+	@Override
+	protected void write(final JsonWriter writer) throws IOException {
+		writer.writeObjectOpen();
+		final Iterator<String> namesIterator = names.iterator();
+		final Iterator<JsonValue> valuesIterator = values.iterator();
+		if (namesIterator.hasNext()) {
+			writer.writeMemberName(namesIterator.next());
+			writer.writeMemberSeparator();
+			valuesIterator.next().write(writer);
+			while (namesIterator.hasNext()) {
+				writer.writeObjectSeparator();
+				writer.writeMemberName(namesIterator.next());
+				writer.writeMemberSeparator();
+				valuesIterator.next().write(writer);
+			}
+		}
+		writer.writeObjectClose();
+	}
+
 	private int indexOf(final String name) {
 		final int index = table.get(name);
 		if (index != -1 && name.equals(names.get(index))) {
@@ -921,25 +940,6 @@ public class JsonObject extends JsonValue implements Iterable<Member> {
 		for (int i = 0; i < size; i++) {
 			table.add(names.get(i), i);
 		}
-	}
-
-	@Override
-	void write(final JsonWriter writer) throws IOException {
-		writer.writeObjectOpen();
-		final Iterator<String> namesIterator = names.iterator();
-		final Iterator<JsonValue> valuesIterator = values.iterator();
-		if (namesIterator.hasNext()) {
-			writer.writeMemberName(namesIterator.next());
-			writer.writeMemberSeparator();
-			valuesIterator.next().write(writer);
-			while (namesIterator.hasNext()) {
-				writer.writeObjectSeparator();
-				writer.writeMemberName(namesIterator.next());
-				writer.writeMemberSeparator();
-				valuesIterator.next().write(writer);
-			}
-		}
-		writer.writeObjectClose();
 	}
 
 }
