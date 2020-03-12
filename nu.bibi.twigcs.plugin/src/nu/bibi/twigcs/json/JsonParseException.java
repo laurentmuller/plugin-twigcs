@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013, 2015 EclipseSource.
+ * Copyright (c) 2013, 2016 EclipseSource.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,73 +21,58 @@
  ******************************************************************************/
 package nu.bibi.twigcs.json;
 
-import java.io.IOException;
-
+/**
+ * An unchecked exception to indicate that an input does not qualify as valid
+ * JSON.
+ */
 @SuppressWarnings("serial") // use default serial UID
-class JsonNumber extends JsonValue {
+public class JsonParseException extends JsonException {
 
-	private final String string;
+	private final Location location;
 
-	JsonNumber(final String string) {
-		if (string == null) {
-			throw new JsonException("string is null");
-		}
-		this.string = string;
+	JsonParseException(final String message, final Location location) {
+		super(message + " at " + location);
+		this.location = location;
 	}
 
-	@Override
-	public double asDouble() {
-		return Double.parseDouble(string);
+	/**
+	 * Returns the column number at which the error occurred, i.e. the number of
+	 * the character in its line. The number of the first character of a line is
+	 * 1.
+	 *
+	 * @return the column in which the error occurred, will be &gt;= 1
+	 */
+	public int getColumn() {
+		return location.column;
 	}
 
-	@Override
-	public float asFloat() {
-		return Float.parseFloat(string);
+	/**
+	 * Returns the line number in which the error occurred. The number of the
+	 * first line is 1.
+	 *
+	 * @return the line in which the error occurred, will be &gt;= 1
+	 */
+	public int getLine() {
+		return location.line;
 	}
 
-	@Override
-	public int asInt() {
-		return Integer.parseInt(string, 10);
+	/**
+	 * Returns the location at which the error occurred.
+	 *
+	 * @return the error location
+	 */
+	public Location getLocation() {
+		return location;
 	}
 
-	@Override
-	public long asLong() {
-		return Long.parseLong(string, 10);
-	}
-
-	@Override
-	public boolean equals(final Object object) {
-		if (this == object) {
-			return true;
-		}
-		if (object == null) {
-			return false;
-		}
-		if (getClass() != object.getClass()) {
-			return false;
-		}
-		final JsonNumber other = (JsonNumber) object;
-		return string.equals(other.string);
-	}
-
-	@Override
-	public int hashCode() {
-		return string.hashCode();
-	}
-
-	@Override
-	public boolean isNumber() {
-		return true;
-	}
-
-	@Override
-	public String toString() {
-		return string;
-	}
-
-	@Override
-	void write(final JsonWriter writer) throws IOException {
-		writer.writeNumber(string);
+	/**
+	 * Returns the absolute character index at which the error occurred. The
+	 * offset of the first character of a document is 0.
+	 *
+	 * @return the character offset at which the error occurred, will be &gt;= 0
+	 */
+	public int getOffset() {
+		return location.offset;
 	}
 
 }

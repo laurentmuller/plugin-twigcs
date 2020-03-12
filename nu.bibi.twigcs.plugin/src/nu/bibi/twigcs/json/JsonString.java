@@ -23,52 +23,51 @@ package nu.bibi.twigcs.json;
 
 import java.io.IOException;
 
-
 @SuppressWarnings("serial") // use default serial UID
 class JsonString extends JsonValue {
 
-  private final String string;
+	private final String string;
 
-  JsonString(String string) {
-    if (string == null) {
-      throw new NullPointerException("string is null");
-    }
-    this.string = string;
-  }
+	JsonString(final String string) {
+		if (string == null) {
+			throw new JsonException("string is null");
+		}
+		this.string = string;
+	}
 
-  @Override
-  void write(JsonWriter writer) throws IOException {
-    writer.writeString(string);
-  }
+	@Override
+	public String asString() {
+		return string;
+	}
 
-  @Override
-  public boolean isString() {
-    return true;
-  }
+	@Override
+	public boolean equals(final Object object) {
+		if (this == object) {
+			return true;
+		}
+		if (object == null) {
+			return false;
+		}
+		if (getClass() != object.getClass()) {
+			return false;
+		}
+		final JsonString other = (JsonString) object;
+		return string.equals(other.string);
+	}
 
-  @Override
-  public String asString() {
-    return string;
-  }
+	@Override
+	public int hashCode() {
+		return string.hashCode();
+	}
 
-  @Override
-  public int hashCode() {
-    return string.hashCode();
-  }
+	@Override
+	public boolean isString() {
+		return true;
+	}
 
-  @Override
-  public boolean equals(Object object) {
-    if (this == object) {
-      return true;
-    }
-    if (object == null) {
-      return false;
-    }
-    if (getClass() != object.getClass()) {
-      return false;
-    }
-    JsonString other = (JsonString)object;
-    return string.equals(other.string);
-  }
+	@Override
+	void write(final JsonWriter writer) throws IOException {
+		writer.writeString(string);
+	}
 
 }

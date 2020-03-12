@@ -13,9 +13,9 @@ import java.io.IOException;
 import nu.bibi.twigcs.internal.Messages;
 import nu.bibi.twigcs.json.Json;
 import nu.bibi.twigcs.json.JsonArray;
+import nu.bibi.twigcs.json.JsonException;
 import nu.bibi.twigcs.json.JsonObject;
 import nu.bibi.twigcs.json.JsonValue;
-import nu.bibi.twigcs.json.ParseException;
 import nu.bibi.twigcs.model.TwigFile;
 import nu.bibi.twigcs.model.TwigResult;
 import nu.bibi.twigcs.model.TwigViolation;
@@ -103,7 +103,7 @@ public class TwigResultParser {
 
 			return result;
 
-		} catch (final ParseException | UnsupportedOperationException e) {
+		} catch (final JsonException e) {
 			throw new IOException(Messages.TwigResultParser_Error, e);
 		}
 	}
