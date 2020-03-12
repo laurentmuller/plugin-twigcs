@@ -51,6 +51,7 @@ class WritingBuffer extends Writer {
 	 */
 	@Override
 	public void close() throws IOException {
+		// no-operation
 	}
 
 	/**
