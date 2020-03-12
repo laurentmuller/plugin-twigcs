@@ -33,6 +33,7 @@ class JsonWriter {
 	private static final char[] LF_CHARS = { '\\', 'n' };
 	private static final char[] CR_CHARS = { '\\', 'r' };
 	private static final char[] TAB_CHARS = { '\\', 't' };
+
 	// In JavaScript, U+2028 and U+2029 characters count as line endings and
 	// must be encoded.
 	// http://stackoverflow.com/questions/2965293/javascript-parse-error-on-u2028-unicode-character
@@ -50,32 +51,29 @@ class JsonWriter {
 				return null;
 			}
 			return ch == '\u2028' ? UNICODE_2028_CHARS : UNICODE_2029_CHARS;
-		}
-		if (ch == '\\') {
+		} else if (ch == '\\') {
 			return BS_CHARS;
-		}
-		if (ch > '"') {
+		} else if (ch > '"') {
 			// This range contains '0' .. '9' and 'A' .. 'Z'. Need 3 checks to
 			// get here.
 			return null;
-		}
-		if (ch == '"') {
+		} else if (ch == '"') {
 			return QUOT_CHARS;
-		}
-		if (ch > CONTROL_CHARACTERS_END) {
+		} else if (ch > CONTROL_CHARACTERS_END) {
 			return null;
 		}
-		if (ch == '\n') {
+
+		switch (ch) {
+		case '\n':
 			return LF_CHARS;
-		}
-		if (ch == '\r') {
+		case '\r':
 			return CR_CHARS;
-		}
-		if (ch == '\t') {
+		case '\t':
 			return TAB_CHARS;
+		default:
+			return new char[] { '\\', 'u', '0', '0',
+					HEX_DIGITS[ch >> 4 & 0x000f], HEX_DIGITS[ch & 0x000f] };
 		}
-		return new char[] { '\\', 'u', '0', '0', HEX_DIGITS[ch >> 4 & 0x000f],
-				HEX_DIGITS[ch & 0x000f] };
 	}
 
 	protected final Writer writer;
