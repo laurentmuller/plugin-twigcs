@@ -148,6 +148,8 @@ public final class Json {
 	 * @param values
 	 *            the values to be included in the new JSON array
 	 * @return a new JSON array that contains the given values
+	 * @throws JsonException
+	 *             if the values are <code>null</code>.
 	 */
 	public static JsonArray array(final boolean... values) {
 		if (values == null) {
@@ -167,6 +169,8 @@ public final class Json {
 	 * @param values
 	 *            the values to be included in the new JSON array
 	 * @return a new JSON array that contains the given values
+	 * @throws JsonException
+	 *             if the values are <code>null</code>.
 	 */
 	public static JsonArray array(final double... values) {
 		if (values == null) {
@@ -186,6 +190,8 @@ public final class Json {
 	 * @param values
 	 *            the values to be included in the new JSON array
 	 * @return a new JSON array that contains the given values
+	 * @throws JsonException
+	 *             if the values are <code>null</code>.
 	 */
 	public static JsonArray array(final float... values) {
 		if (values == null) {
@@ -205,6 +211,8 @@ public final class Json {
 	 * @param values
 	 *            the values to be included in the new JSON array
 	 * @return a new JSON array that contains the given values
+	 * @throws JsonException
+	 *             if the values are <code>null</code>.
 	 */
 	public static JsonArray array(final int... values) {
 		if (values == null) {
@@ -224,6 +232,8 @@ public final class Json {
 	 * @param values
 	 *            the values to be included in the new JSON array
 	 * @return a new JSON array that contains the given values
+	 * @throws JsonException
+	 *             if the values are <code>null</code>.
 	 */
 	public static JsonArray array(final long... values) {
 		if (values == null) {
@@ -240,16 +250,18 @@ public final class Json {
 	 * Creates a new JsonArray that contains the JSON representations of the
 	 * given strings.
 	 *
-	 * @param strings
+	 * @param values
 	 *            the strings to be included in the new JSON array
 	 * @return a new JSON array that contains the given strings
+	 * @throws JsonException
+	 *             if the values are <code>null</code>.
 	 */
-	public static JsonArray array(final String... strings) {
-		if (strings == null) {
+	public static JsonArray array(final String... values) {
+		if (values == null) {
 			throw new JsonException("values is null");
 		}
 		final JsonArray array = new JsonArray();
-		for (final String value : strings) {
+		for (final String value : values) {
 			array.add(value);
 		}
 		return array;
@@ -329,6 +341,8 @@ public final class Json {
 	 * @param value
 	 *            the value to get a JSON representation for
 	 * @return a JSON value that represents the given value
+	 * @throws IllegalArgumentException
+	 *             if value is Infinite or NaN.
 	 */
 	public static JsonValue value(final double value) {
 		if (Double.isInfinite(value) || Double.isNaN(value)) {
@@ -345,6 +359,8 @@ public final class Json {
 	 * @param value
 	 *            the value to get a JSON representation for
 	 * @return a JSON value that represents the given value
+	 * @throws IllegalArgumentException
+	 *             if value is Infinite or NaN.
 	 */
 	public static JsonValue value(final float value) {
 		if (Float.isInfinite(value) || Float.isNaN(value)) {

@@ -268,10 +268,11 @@ public class JsonObject extends JsonValue implements Iterable<Member> {
 	 * @param value
 	 *            the value of the member to add
 	 * @return the object itself, to enable method chaining
+	 * @throws JsonException
+	 *             if the name is <code>null</code>.
 	 */
 	public JsonObject add(final String name, final boolean value) {
-		add(name, Json.value(value));
-		return this;
+		return add(name, Json.value(value));
 	}
 
 	/**
@@ -292,10 +293,11 @@ public class JsonObject extends JsonValue implements Iterable<Member> {
 	 * @param value
 	 *            the value of the member to add
 	 * @return the object itself, to enable method chaining
+	 * @throws JsonException
+	 *             if the name is <code>null</code>.
 	 */
 	public JsonObject add(final String name, final double value) {
-		add(name, Json.value(value));
-		return this;
+		return add(name, Json.value(value));
 	}
 
 	/**
@@ -316,10 +318,11 @@ public class JsonObject extends JsonValue implements Iterable<Member> {
 	 * @param value
 	 *            the value of the member to add
 	 * @return the object itself, to enable method chaining
+	 * @throws JsonException
+	 *             if the name is <code>null</code>.
 	 */
 	public JsonObject add(final String name, final float value) {
-		add(name, Json.value(value));
-		return this;
+		return add(name, Json.value(value));
 	}
 
 	/**
@@ -340,10 +343,11 @@ public class JsonObject extends JsonValue implements Iterable<Member> {
 	 * @param value
 	 *            the value of the member to add
 	 * @return the object itself, to enable method chaining
+	 * @throws JsonException
+	 *             if the name is <code>null</code>.
 	 */
 	public JsonObject add(final String name, final int value) {
-		add(name, Json.value(value));
-		return this;
+		return add(name, Json.value(value));
 	}
 
 	/**
@@ -364,6 +368,8 @@ public class JsonObject extends JsonValue implements Iterable<Member> {
 	 * @param value
 	 *            the value of the member to add, must not be <code>null</code>
 	 * @return the object itself, to enable method chaining
+	 * @throws JsonException
+	 *             if the name or the value is <code>null</code>.
 	 */
 	public JsonObject add(final String name, final JsonValue value) {
 		if (name == null) {
@@ -396,10 +402,11 @@ public class JsonObject extends JsonValue implements Iterable<Member> {
 	 * @param value
 	 *            the value of the member to add
 	 * @return the object itself, to enable method chaining
+	 * @throws JsonException
+	 *             if the name is <code>null</code>.
 	 */
 	public JsonObject add(final String name, final long value) {
-		add(name, Json.value(value));
-		return this;
+		return add(name, Json.value(value));
 	}
 
 	/**
@@ -420,10 +427,11 @@ public class JsonObject extends JsonValue implements Iterable<Member> {
 	 * @param value
 	 *            the value of the member to add
 	 * @return the object itself, to enable method chaining
+	 * @throws JsonException
+	 *             if the name is <code>null</code>.
 	 */
 	public JsonObject add(final String name, final String value) {
-		add(name, Json.value(value));
-		return this;
+		return add(name, Json.value(value));
 	}
 
 	@Override
@@ -469,6 +477,8 @@ public class JsonObject extends JsonValue implements Iterable<Member> {
 	 * @return the value of the last member with the specified name, or
 	 *         <code>null</code> if this object does not contain a member with
 	 *         that name
+	 * @throws JsonException
+	 *             if the name is <code>null</code>.
 	 */
 	public JsonValue get(final String name) {
 		if (name == null) {
@@ -493,6 +503,8 @@ public class JsonObject extends JsonValue implements Iterable<Member> {
 	 * @return the value of the last member with the specified name, or the
 	 *         given default value if this object does not contain a member with
 	 *         that name
+	 * @throws JsonException
+	 *             if the name is <code>null</code>.
 	 */
 	public boolean getBoolean(final String name, final boolean defaultValue) {
 		final JsonValue value = get(name);
@@ -514,6 +526,8 @@ public class JsonObject extends JsonValue implements Iterable<Member> {
 	 * @return the value of the last member with the specified name, or the
 	 *         given default value if this object does not contain a member with
 	 *         that name
+	 * @throws JsonException
+	 *             if the name is <code>null</code>.
 	 */
 	public double getDouble(final String name, final double defaultValue) {
 		final JsonValue value = get(name);
@@ -535,6 +549,8 @@ public class JsonObject extends JsonValue implements Iterable<Member> {
 	 * @return the value of the last member with the specified name, or the
 	 *         given default value if this object does not contain a member with
 	 *         that name
+	 * @throws JsonException
+	 *             if the name is <code>null</code>.
 	 */
 	public float getFloat(final String name, final float defaultValue) {
 		final JsonValue value = get(name);
@@ -556,6 +572,8 @@ public class JsonObject extends JsonValue implements Iterable<Member> {
 	 * @return the value of the last member with the specified name, or the
 	 *         given default value if this object does not contain a member with
 	 *         that name
+	 * @throws JsonException
+	 *             if the name is <code>null</code>.
 	 */
 	public int getInt(final String name, final int defaultValue) {
 		final JsonValue value = get(name);
@@ -577,6 +595,8 @@ public class JsonObject extends JsonValue implements Iterable<Member> {
 	 * @return the value of the last member with the specified name, or the
 	 *         given default value if this object does not contain a member with
 	 *         that name
+	 * @throws JsonException
+	 *             if the name is <code>null</code>.
 	 */
 	public long getLong(final String name, final long defaultValue) {
 		final JsonValue value = get(name);
@@ -597,6 +617,8 @@ public class JsonObject extends JsonValue implements Iterable<Member> {
 	 * @return the value of the last member with the specified name, or the
 	 *         given default value if this object does not contain a member with
 	 *         that name
+	 * @throws JsonException
+	 *             if the name is <code>null</code>.
 	 */
 	public String getString(final String name, final String defaultValue) {
 		final JsonValue value = get(name);
@@ -732,8 +754,7 @@ public class JsonObject extends JsonValue implements Iterable<Member> {
 	 * @return the object itself, to enable method chaining
 	 */
 	public JsonObject set(final String name, final boolean value) {
-		set(name, Json.value(value));
-		return this;
+		return set(name, Json.value(value));
 	}
 
 	/**
@@ -756,8 +777,7 @@ public class JsonObject extends JsonValue implements Iterable<Member> {
 	 * @return the object itself, to enable method chaining
 	 */
 	public JsonObject set(final String name, final double value) {
-		set(name, Json.value(value));
-		return this;
+		return set(name, Json.value(value));
 	}
 
 	/**
@@ -780,8 +800,7 @@ public class JsonObject extends JsonValue implements Iterable<Member> {
 	 * @return the object itself, to enable method chaining
 	 */
 	public JsonObject set(final String name, final float value) {
-		set(name, Json.value(value));
-		return this;
+		return set(name, Json.value(value));
 	}
 
 	/**
@@ -804,8 +823,7 @@ public class JsonObject extends JsonValue implements Iterable<Member> {
 	 * @return the object itself, to enable method chaining
 	 */
 	public JsonObject set(final String name, final int value) {
-		set(name, Json.value(value));
-		return this;
+		return set(name, Json.value(value));
 	}
 
 	/**
@@ -825,6 +843,8 @@ public class JsonObject extends JsonValue implements Iterable<Member> {
 	 * @param value
 	 *            the value of the member to add, must not be <code>null</code>
 	 * @return the object itself, to enable method chaining
+	 * @throws JsonException
+	 *             if the name or the value is <code>null</code>.
 	 */
 	public JsonObject set(final String name, final JsonValue value) {
 		if (name == null) {
@@ -864,8 +884,7 @@ public class JsonObject extends JsonValue implements Iterable<Member> {
 	 * @return the object itself, to enable method chaining
 	 */
 	public JsonObject set(final String name, final long value) {
-		set(name, Json.value(value));
-		return this;
+		return set(name, Json.value(value));
 	}
 
 	/**
@@ -888,8 +907,7 @@ public class JsonObject extends JsonValue implements Iterable<Member> {
 	 * @return the object itself, to enable method chaining
 	 */
 	public JsonObject set(final String name, final String value) {
-		set(name, Json.value(value));
-		return this;
+		return set(name, Json.value(value));
 	}
 
 	/**
