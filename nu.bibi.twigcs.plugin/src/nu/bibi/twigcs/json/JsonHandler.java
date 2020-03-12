@@ -70,6 +70,7 @@ public abstract class JsonHandler<A, O> {
 	 *            <code>null</code> if not provided
 	 */
 	public void endArray(final A array) {
+		// no-operation
 	}
 
 	/**
@@ -84,6 +85,7 @@ public abstract class JsonHandler<A, O> {
 	 *            <code>null</code> if not provided
 	 */
 	public void endArrayValue(final A array) {
+		// no-operation
 	}
 
 	/**
@@ -95,6 +97,7 @@ public abstract class JsonHandler<A, O> {
 	 *            the parsed boolean value
 	 */
 	public void endBoolean(final boolean value) {
+		// no-operation
 	}
 
 	/**
@@ -102,6 +105,7 @@ public abstract class JsonHandler<A, O> {
 	 * method will be called after reading the last character of the literal.
 	 */
 	public void endNull() {
+		// no-operation
 	}
 
 	/**
@@ -112,6 +116,7 @@ public abstract class JsonHandler<A, O> {
 	 *            the parsed number string
 	 */
 	public void endNumber(final String string) {
+		// no-operation
 	}
 
 	/**
@@ -124,6 +129,7 @@ public abstract class JsonHandler<A, O> {
 	 *            null if not provided
 	 */
 	public void endObject(final O object) {
+		// no-operation
 	}
 
 	/**
@@ -138,6 +144,7 @@ public abstract class JsonHandler<A, O> {
 	 *            the parsed member name
 	 */
 	public void endObjectName(final O object, final String name) {
+		// no-operation
 	}
 
 	/**
@@ -154,6 +161,7 @@ public abstract class JsonHandler<A, O> {
 	 *            the parsed member name
 	 */
 	public void endObjectValue(final O object, final String name) {
+		// no-operation
 	}
 
 	/**
@@ -165,6 +173,7 @@ public abstract class JsonHandler<A, O> {
 	 *            the parsed string
 	 */
 	public void endString(final String string) {
+		// no-operation
 	}
 
 	/**
@@ -196,6 +205,7 @@ public abstract class JsonHandler<A, O> {
 	 *            <code>null</code> if not provided
 	 */
 	public void startArrayValue(final A array) {
+		// no-operation
 	}
 
 	/**
@@ -204,6 +214,7 @@ public abstract class JsonHandler<A, O> {
 	 * reading the first character of the literal.
 	 */
 	public void startBoolean() {
+		// no-operation
 	}
 
 	/**
@@ -219,6 +230,7 @@ public abstract class JsonHandler<A, O> {
 	 * be called when reading the first character of the number.
 	 */
 	public void startNumber() {
+		// no-operation
 	}
 
 	/**
@@ -251,6 +263,7 @@ public abstract class JsonHandler<A, O> {
 	 *            <code>null</code> if not provided
 	 */
 	public void startObjectName(final O object) {
+		// no-operation
 	}
 
 	/**
@@ -265,6 +278,7 @@ public abstract class JsonHandler<A, O> {
 	 *            the member name
 	 */
 	public void startObjectValue(final O object, final String name) {
+		// no-operation
 	}
 
 	/**
@@ -273,6 +287,7 @@ public abstract class JsonHandler<A, O> {
 	 * (<code>'&quot;'</code>).
 	 */
 	public void startString() {
+		// no-operation
 	}
 
 	/**
@@ -283,5 +298,4 @@ public abstract class JsonHandler<A, O> {
 	protected Location getLocation() {
 		return parser.getLocation();
 	}
-
 }

@@ -1,7 +1,7 @@
 package nu.bibi.twigcs.json;
 
 /**
- * Generic JSON exception.
+ * A generic unchecked JSON exception.
  *
  * @author Laurent Muller
  * @version 1.0
