@@ -22,6 +22,8 @@
 package nu.bibi.twigcs.json;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Reader;
 
 /**
@@ -45,8 +47,8 @@ import java.io.Reader;
  * String string = Json.object().add("foo", 23).add("bar", true).toString();
  * </pre>
  * <p>
- * To create a JSON array from a given Java array, you can use one of the
- * <code>array()</code> methods with varargs parameters:
+ * To <strong>create</strong> a JSON array from a given Java array, you can use
+ * one of the <code>array()</code> methods with varargs parameters:
  * </p>
  *
  * <pre>
@@ -56,80 +58,20 @@ import java.io.Reader;
  */
 public final class Json {
 
-	static class DefaultHandler extends JsonHandler<JsonArray, JsonObject> {
-
-		protected JsonValue value;
-
-		@Override
-		public void endArray(final JsonArray array) {
-			value = array;
-		}
-
-		@Override
-		public void endArrayValue(final JsonArray array) {
-			array.add(value);
-		}
-
-		@Override
-		public void endBoolean(final boolean bool) {
-			value = bool ? TRUE : FALSE;
-		}
-
-		@Override
-		public void endNull() {
-			value = NULL;
-		}
-
-		@Override
-		public void endNumber(final String string) {
-			value = new JsonNumber(string);
-		}
-
-		@Override
-		public void endObject(final JsonObject object) {
-			value = object;
-		}
-
-		@Override
-		public void endObjectValue(final JsonObject object, final String name) {
-			object.add(name, value);
-		}
-
-		@Override
-		public void endString(final String string) {
-			value = new JsonString(string);
-		}
-
-		public JsonValue getValue() {
-			return value;
-		}
-
-		@Override
-		public JsonArray startArray() {
-			return new JsonArray();
-		}
-
-		@Override
-		public JsonObject startObject() {
-			return new JsonObject();
-		}
-
-	}
-
 	/**
 	 * Represents the JSON literal <code>null</code>.
 	 */
-	public static final JsonValue NULL = new JsonLiteral("null");
+	public static final JsonValue NULL = new JsonLiteral("null"); //$NON-NLS-1$
 
 	/**
 	 * Represents the JSON literal <code>true</code>.
 	 */
-	public static final JsonValue TRUE = new JsonLiteral("true");
+	public static final JsonValue TRUE = new JsonLiteral("true"); //$NON-NLS-1$
 
 	/**
 	 * Represents the JSON literal <code>false</code>.
 	 */
-	public static final JsonValue FALSE = new JsonLiteral("false");
+	public static final JsonValue FALSE = new JsonLiteral("false"); //$NON-NLS-1$
 
 	/**
 	 * Creates a new empty JsonArray. This is equivalent to creating a new
@@ -150,10 +92,11 @@ public final class Json {
 	 * @return a new JSON array that contains the given values
 	 * @throws JsonException
 	 *             if the values are <code>null</code>.
+	 * @see JsonArray#add(boolean)
 	 */
 	public static JsonArray array(final boolean... values) {
 		if (values == null) {
-			throw new JsonException("values is null");
+			throw new JsonException("The values argument is null."); //$NON-NLS-1$
 		}
 		final JsonArray array = new JsonArray();
 		for (final boolean value : values) {
@@ -170,11 +113,13 @@ public final class Json {
 	 *            the values to be included in the new JSON array
 	 * @return a new JSON array that contains the given values
 	 * @throws JsonException
-	 *             if the values are <code>null</code>.
+	 *             if the values are <code>null</code> or or if a value is
+	 *             infinite or not a number (NaN).
+	 * @see JsonArray#add(double)
 	 */
 	public static JsonArray array(final double... values) {
 		if (values == null) {
-			throw new JsonException("values is null");
+			throw new JsonException("The values argument is null."); //$NON-NLS-1$
 		}
 		final JsonArray array = new JsonArray();
 		for (final double value : values) {
@@ -191,11 +136,12 @@ public final class Json {
 	 *            the values to be included in the new JSON array
 	 * @return a new JSON array that contains the given values
 	 * @throws JsonException
-	 *             if the values are <code>null</code>.
+	 *             if the values are <code>null</code> or or if a value is
+	 *             infinite or not a number (NaN).
 	 */
 	public static JsonArray array(final float... values) {
 		if (values == null) {
-			throw new JsonException("values is null");
+			throw new JsonException("The values argument is null."); //$NON-NLS-1$
 		}
 		final JsonArray array = new JsonArray();
 		for (final float value : values) {
@@ -216,7 +162,7 @@ public final class Json {
 	 */
 	public static JsonArray array(final int... values) {
 		if (values == null) {
-			throw new JsonException("values is null");
+			throw new JsonException("The values argument is null."); //$NON-NLS-1$
 		}
 		final JsonArray array = new JsonArray();
 		for (final int value : values) {
@@ -237,7 +183,7 @@ public final class Json {
 	 */
 	public static JsonArray array(final long... values) {
 		if (values == null) {
-			throw new JsonException("values is null");
+			throw new JsonException("The values argument is null."); //$NON-NLS-1$
 		}
 		final JsonArray array = new JsonArray();
 		for (final long value : values) {
@@ -258,7 +204,7 @@ public final class Json {
 	 */
 	public static JsonArray array(final String... values) {
 		if (values == null) {
-			throw new JsonException("values is null");
+			throw new JsonException("The values argument is null."); //$NON-NLS-1$
 		}
 		final JsonArray array = new JsonArray();
 		for (final String value : values) {
@@ -286,6 +232,27 @@ public final class Json {
 	 * reading performance.
 	 * </p>
 	 *
+	 * @param input
+	 *            the input stream to read the JSON value from
+	 * @return a value that represents the parsed JSON
+	 * @throws IOException
+	 *             if an I/O error occurs in the input stream
+	 * @throws JsonParseException
+	 *             if the input is not valid JSON
+	 */
+	public static JsonValue parse(final InputStream input) throws IOException {
+		return parse(new InputStreamReader(input));
+	}
+
+	/**
+	 * Reads the entire input from the given reader and parses it as JSON. The
+	 * input must contain a valid JSON value, optionally padded with whitespace.
+	 * <p>
+	 * Characters are read in chunks into an input buffer. Hence, wrapping a
+	 * reader in an additional <code>BufferedReader</code> likely won't improve
+	 * reading performance.
+	 * </p>
+	 *
 	 * @param reader
 	 *            the reader to read the JSON value from
 	 * @return a value that represents the parsed JSON
@@ -296,10 +263,10 @@ public final class Json {
 	 */
 	public static JsonValue parse(final Reader reader) throws IOException {
 		if (reader == null) {
-			throw new JsonException("reader is null");
+			throw new JsonException("The reader argument is null."); //$NON-NLS-1$
 		}
 		final DefaultHandler handler = new DefaultHandler();
-		new JsonParser(handler).parse(reader);
+		new JsonParser<JsonArray, JsonObject>(handler).parse(reader);
 		return handler.getValue();
 	}
 
@@ -315,10 +282,10 @@ public final class Json {
 	 */
 	public static JsonValue parse(final String string) {
 		if (string == null) {
-			throw new JsonException("string is null");
+			throw new JsonException("The string argument is null."); //$NON-NLS-1$
 		}
 		final DefaultHandler handler = new DefaultHandler();
-		new JsonParser(handler).parse(string);
+		new JsonParser<JsonArray, JsonObject>(handler).parse(string);
 		return handler.getValue();
 	}
 
@@ -342,12 +309,14 @@ public final class Json {
 	 *            the value to get a JSON representation for
 	 * @return a JSON value that represents the given value
 	 * @throws IllegalArgumentException
-	 *             if value is Infinite or NaN.
+	 *             if value is infinite or not a number (NaN).
+	 * @see Double#isInfinite()
+	 * @see Double#isNaN()
 	 */
 	public static JsonValue value(final double value) {
 		if (Double.isInfinite(value) || Double.isNaN(value)) {
 			throw new IllegalArgumentException(
-					"Infinite and NaN values not permitted in JSON");
+					"Infinite and NaN values are not permitted in JSON."); //$NON-NLS-1$
 		}
 		return new JsonNumber(cutOffPointZero(Double.toString(value)));
 	}
@@ -360,12 +329,14 @@ public final class Json {
 	 *            the value to get a JSON representation for
 	 * @return a JSON value that represents the given value
 	 * @throws IllegalArgumentException
-	 *             if value is Infinite or NaN.
+	 *             if value is infinite or not a number (NaN).
+	 * @see Float#isInfinite()
+	 * @see Float#isNaN()
 	 */
 	public static JsonValue value(final float value) {
 		if (Float.isInfinite(value) || Float.isNaN(value)) {
 			throw new IllegalArgumentException(
-					"Infinite and NaN values not permitted in JSON");
+					"Infinite and NaN values are not permitted in JSON."); //$NON-NLS-1$
 		}
 		return new JsonNumber(cutOffPointZero(Float.toString(value)));
 	}
@@ -406,14 +377,14 @@ public final class Json {
 	}
 
 	private static String cutOffPointZero(final String string) {
-		if (string.endsWith(".0")) {
+		if (string.endsWith(".0")) { //$NON-NLS-1$
 			return string.substring(0, string.length() - 2);
 		}
 		return string;
 	}
 
 	private Json() {
-		// not meant to be instantiated
+		throw new AssertionError("No Json instances is allowed."); //$NON-NLS-1$
 	}
 
 }

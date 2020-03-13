@@ -58,7 +58,7 @@ package nu.bibi.twigcs.json;
  */
 public abstract class JsonHandler<A, O> {
 
-	protected JsonParser parser;
+	protected JsonParser<A, O> parser;
 
 	/**
 	 * Indicates the end of an array in the JSON input. This method will be
@@ -174,6 +174,10 @@ public abstract class JsonHandler<A, O> {
 	 */
 	public void endString(final String string) {
 		// no-operation
+	}
+
+	public void setParser(final JsonParser<A, O> parser) {
+		this.parser = parser;
 	}
 
 	/**
@@ -295,8 +299,13 @@ public abstract class JsonHandler<A, O> {
 	 * Returns the current parser location.
 	 *
 	 * @return the current parser location
+	 * @throws JsonParseException
+	 *             if the parser is not set
 	 */
 	protected Location getLocation() {
+		if (parser == null) {
+			throw new JsonException("The parser is not set."); //$NON-NLS-1$
+		}
 		return parser.getLocation();
 	}
 }

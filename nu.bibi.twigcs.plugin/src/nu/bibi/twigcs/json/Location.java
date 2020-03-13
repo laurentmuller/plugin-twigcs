@@ -70,7 +70,7 @@ public class Location {
 
 	@Override
 	public String toString() {
-		return line + ":" + column;
+		return line + ":" + column; //$NON-NLS-1$
 	}
 
 }

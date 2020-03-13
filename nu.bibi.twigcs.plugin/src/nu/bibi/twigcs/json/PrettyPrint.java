@@ -26,14 +26,14 @@ import java.io.Writer;
 import java.util.Arrays;
 
 /**
- * Enables human readable JSON output by inserting whitespace between
- * values.after commas and colons. Example:
+ * Enables human readable JSON output by inserting whitespace between values,
+ * after commas and colons. Example:
  *
  * <pre>
  * jsonValue.writeTo(writer, PrettyPrint.singleLine());
  * </pre>
  */
-public class PrettyPrint extends WriterConfig {
+public class PrettyPrint extends WriterConfiguration {
 
 	private static class PrettyPrintWriter extends JsonWriter {
 
@@ -116,10 +116,13 @@ public class PrettyPrint extends WriterConfig {
 	 * @param number
 	 *            the number of spaces to use
 	 * @return A PrettyPrint instance for wrapped mode with spaces indentation
+	 * @throws IllegalArgumentException
+	 *             if the number of spaces is negative
 	 */
 	public static PrettyPrint indentWithSpaces(final int number) {
 		if (number < 0) {
-			throw new IllegalArgumentException("number is negative");
+			throw new IllegalArgumentException(
+					"The number of space is negative."); //$NON-NLS-1$
 		}
 		final char[] chars = new char[number];
 		Arrays.fill(chars, ' ');

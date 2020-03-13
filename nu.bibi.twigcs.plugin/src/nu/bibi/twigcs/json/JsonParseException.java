@@ -31,7 +31,7 @@ public class JsonParseException extends JsonException {
 	private final Location location;
 
 	JsonParseException(final String message, final Location location) {
-		super(message + " at " + location);
+		super(message + " at " + location); //$NON-NLS-1$
 		this.location = location;
 	}
 

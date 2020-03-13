@@ -77,7 +77,7 @@ import nu.bibi.twigcs.json.JsonObject.Member;
 public class JsonObject extends JsonValue implements Iterable<Member> {
 
 	/**
-	 * Represents a member of a JSON object, a pair of a name and a value.
+	 * Represents a member of a JSON object. A pair of a name and a value.
 	 */
 	public static class Member {
 
@@ -153,10 +153,10 @@ public class JsonObject extends JsonValue implements Iterable<Member> {
 		HashIndexTable() {
 		}
 
-		HashIndexTable(final HashIndexTable original) {
-			System.arraycopy(original.hashTable, 0, hashTable, 0,
-					hashTable.length);
-		}
+		// HashIndexTable(final HashIndexTable original) {
+		// System.arraycopy(original.hashTable, 0, hashTable, 0,
+		// hashTable.length);
+		// }
 
 		private void add(final String name, final int index) {
 			final int slot = hashSlotFor(name);
@@ -168,13 +168,13 @@ public class JsonObject extends JsonValue implements Iterable<Member> {
 			}
 		}
 
-		private int get(final Object name) {
+		private int get(final String name) {
 			final int slot = hashSlotFor(name);
 			// subtract 1, 0 stands for empty
 			return (hashTable[slot] & 0xff) - 1;
 		}
 
-		private int hashSlotFor(final Object element) {
+		private int hashSlotFor(final String element) {
 			return element.hashCode() & hashTable.length - 1;
 		}
 
@@ -203,15 +203,26 @@ public class JsonObject extends JsonValue implements Iterable<Member> {
 	 *            the JsonObject for which an unmodifiable JsonObject is to be
 	 *            returned
 	 * @return an unmodifiable view of the specified JsonObject
+	 * @throws JsonException
+	 *             if the <code>object</code> argument is <code>null</code>.
 	 */
 	public static JsonObject unmodifiableObject(final JsonObject object) {
 		return new JsonObject(object, true);
 	}
 
+	/*
+	 * the names
+	 */
 	private final List<String> names;
 
+	/*
+	 * the values
+	 */
 	private final List<JsonValue> values;
 
+	/*
+	 * the hash table
+	 */
 	private transient HashIndexTable table;
 
 	/**
@@ -230,14 +241,28 @@ public class JsonObject extends JsonValue implements Iterable<Member> {
 	 * @param object
 	 *            the JSON object to get the initial contents from, must not be
 	 *            <code>null</code>
+	 * @throws JsonException
+	 *             if the <code>object</code> argument is <code>null</code>.
 	 */
 	public JsonObject(final JsonObject object) {
 		this(object, false);
 	}
 
+	/**
+	 * Creates a new JsonObject, initialized with the contents of the specified
+	 * JSON object.
+	 *
+	 * @param object
+	 *            the JSON object to get the initial contents from, must not be
+	 *            <code>null</code>
+	 * @param unmodifiable
+	 *            <code>true</code> to create an unmodifiable object.
+	 * @throws JsonException
+	 *             if the <code>object</code> argument is <code>null</code>.
+	 */
 	private JsonObject(final JsonObject object, final boolean unmodifiable) {
 		if (object == null) {
-			throw new JsonException("object is null");
+			throw new JsonException("The object argument is null."); //$NON-NLS-1$
 		}
 		if (unmodifiable) {
 			names = Collections.unmodifiableList(object.names);
@@ -270,6 +295,7 @@ public class JsonObject extends JsonValue implements Iterable<Member> {
 	 * @return the object itself, to enable method chaining
 	 * @throws JsonException
 	 *             if the name is <code>null</code>.
+	 * @see Json#value(boolean)
 	 */
 	public JsonObject add(final String name, final boolean value) {
 		return add(name, Json.value(value));
@@ -294,7 +320,9 @@ public class JsonObject extends JsonValue implements Iterable<Member> {
 	 *            the value of the member to add
 	 * @return the object itself, to enable method chaining
 	 * @throws JsonException
-	 *             if the name is <code>null</code>.
+	 *             if the name is <code>null</code> or if value is infinite or
+	 *             not a number (NaN).
+	 * @see Json#value(double)
 	 */
 	public JsonObject add(final String name, final double value) {
 		return add(name, Json.value(value));
@@ -319,7 +347,9 @@ public class JsonObject extends JsonValue implements Iterable<Member> {
 	 *            the value of the member to add
 	 * @return the object itself, to enable method chaining
 	 * @throws JsonException
-	 *             if the name is <code>null</code>.
+	 *             if the name is <code>null</code> or if value is infinite or
+	 *             not a number (NaN).
+	 * @see Json#value(float)
 	 */
 	public JsonObject add(final String name, final float value) {
 		return add(name, Json.value(value));
@@ -345,6 +375,7 @@ public class JsonObject extends JsonValue implements Iterable<Member> {
 	 * @return the object itself, to enable method chaining
 	 * @throws JsonException
 	 *             if the name is <code>null</code>.
+	 * @see Json#value(int)
 	 */
 	public JsonObject add(final String name, final int value) {
 		return add(name, Json.value(value));
@@ -373,10 +404,10 @@ public class JsonObject extends JsonValue implements Iterable<Member> {
 	 */
 	public JsonObject add(final String name, final JsonValue value) {
 		if (name == null) {
-			throw new JsonException("name is null");
+			throw new JsonException("The name argument is null."); //$NON-NLS-1$
 		}
 		if (value == null) {
-			throw new JsonException("value is null");
+			throw new JsonException("The value argument is null."); //$NON-NLS-1$
 		}
 		table.add(name, names.size());
 		names.add(name);
@@ -404,6 +435,7 @@ public class JsonObject extends JsonValue implements Iterable<Member> {
 	 * @return the object itself, to enable method chaining
 	 * @throws JsonException
 	 *             if the name is <code>null</code>.
+	 * @see Json#value(long)
 	 */
 	public JsonObject add(final String name, final long value) {
 		return add(name, Json.value(value));
@@ -429,6 +461,7 @@ public class JsonObject extends JsonValue implements Iterable<Member> {
 	 * @return the object itself, to enable method chaining
 	 * @throws JsonException
 	 *             if the name is <code>null</code>.
+	 * @see Json#value(string)
 	 */
 	public JsonObject add(final String name, final String value) {
 		return add(name, Json.value(value));
@@ -482,7 +515,7 @@ public class JsonObject extends JsonValue implements Iterable<Member> {
 	 */
 	public JsonValue get(final String name) {
 		if (name == null) {
-			throw new JsonException("name is null");
+			throw new JsonException("The name argument is null."); //$NON-NLS-1$
 		}
 		final int index = indexOf(name);
 		return index != -1 ? values.get(index) : null;
@@ -649,7 +682,9 @@ public class JsonObject extends JsonValue implements Iterable<Member> {
 
 	/**
 	 * Returns an iterator over the members of this object in document order.
-	 * The returned iterator cannot be used to modify this object.
+	 * The returned iterator cannot be used to modify this object. Attempts to
+	 * modify the returned iterator will result in an
+	 * <code>UnsupportedOperationException</code>.
 	 *
 	 * @return an iterator over the members of this object
 	 */
@@ -691,7 +726,7 @@ public class JsonObject extends JsonValue implements Iterable<Member> {
 	 */
 	public JsonObject merge(final JsonObject object) {
 		if (object == null) {
-			throw new JsonException("object is null");
+			throw new JsonException("The object argument is null."); //$NON-NLS-1$
 		}
 		for (final Member member : object) {
 			this.set(member.name, member.value);
@@ -723,7 +758,7 @@ public class JsonObject extends JsonValue implements Iterable<Member> {
 	 */
 	public JsonObject remove(final String name) {
 		if (name == null) {
-			throw new JsonException("name is null");
+			throw new JsonException("The name argument is null."); //$NON-NLS-1$
 		}
 		final int index = indexOf(name);
 		if (index != -1) {
@@ -752,6 +787,8 @@ public class JsonObject extends JsonValue implements Iterable<Member> {
 	 * @param value
 	 *            the value of the member to add
 	 * @return the object itself, to enable method chaining
+	 * @throws JsonException
+	 *             if the name is <code>null</code>.
 	 */
 	public JsonObject set(final String name, final boolean value) {
 		return set(name, Json.value(value));
@@ -775,6 +812,9 @@ public class JsonObject extends JsonValue implements Iterable<Member> {
 	 * @param value
 	 *            the value of the member to add
 	 * @return the object itself, to enable method chaining
+	 * @throws JsonException
+	 *             if the name is <code>null</code> or if value is infinite or
+	 *             not a number (NaN).
 	 */
 	public JsonObject set(final String name, final double value) {
 		return set(name, Json.value(value));
@@ -798,6 +838,9 @@ public class JsonObject extends JsonValue implements Iterable<Member> {
 	 * @param value
 	 *            the value of the member to add
 	 * @return the object itself, to enable method chaining
+	 * @throws JsonException
+	 *             if the name is <code>null</code> or if value is infinite or
+	 *             not a number (NaN).
 	 */
 	public JsonObject set(final String name, final float value) {
 		return set(name, Json.value(value));
@@ -821,6 +864,8 @@ public class JsonObject extends JsonValue implements Iterable<Member> {
 	 * @param value
 	 *            the value to set to the member
 	 * @return the object itself, to enable method chaining
+	 * @throws JsonException
+	 *             if the name is <code>null</code>.
 	 */
 	public JsonObject set(final String name, final int value) {
 		return set(name, Json.value(value));
@@ -848,10 +893,10 @@ public class JsonObject extends JsonValue implements Iterable<Member> {
 	 */
 	public JsonObject set(final String name, final JsonValue value) {
 		if (name == null) {
-			throw new JsonException("name is null");
+			throw new JsonException("The name argument is null."); //$NON-NLS-1$
 		}
 		if (value == null) {
-			throw new JsonException("value is null");
+			throw new JsonException("The value argument is null."); //$NON-NLS-1$
 		}
 		final int index = indexOf(name);
 		if (index != -1) {
@@ -905,6 +950,8 @@ public class JsonObject extends JsonValue implements Iterable<Member> {
 	 * @param value
 	 *            the value of the member to add
 	 * @return the object itself, to enable method chaining
+	 * @throws JsonException
+	 *             if the name is <code>null</code>.
 	 */
 	public JsonObject set(final String name, final String value) {
 		return set(name, Json.value(value));
@@ -922,17 +969,16 @@ public class JsonObject extends JsonValue implements Iterable<Member> {
 	@Override
 	protected void write(final JsonWriter writer) throws IOException {
 		writer.writeObjectOpen();
-		final Iterator<String> namesIterator = names.iterator();
-		final Iterator<JsonValue> valuesIterator = values.iterator();
-		if (namesIterator.hasNext()) {
-			writer.writeMemberName(namesIterator.next());
-			writer.writeMemberSeparator();
-			valuesIterator.next().write(writer);
-			while (namesIterator.hasNext()) {
-				writer.writeObjectSeparator();
-				writer.writeMemberName(namesIterator.next());
+		if (!isEmpty()) {
+			boolean separator = false;
+			for (final Member member : this) {
+				if (separator) {
+					writer.writeObjectSeparator();
+				}
+				writer.writeMemberName(member.getName());
 				writer.writeMemberSeparator();
-				valuesIterator.next().write(writer);
+				member.getValue().write(writer);
+				separator = true;
 			}
 		}
 		writer.writeObjectClose();

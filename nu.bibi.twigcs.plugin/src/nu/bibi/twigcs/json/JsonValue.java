@@ -22,6 +22,8 @@
 package nu.bibi.twigcs.json;
 
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.Serializable;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -77,7 +79,7 @@ public abstract class JsonValue implements Serializable {
 	 *             if this value is not a JSON array
 	 */
 	public JsonArray asArray() {
-		throw new JsonException("Not an array: " + toString());
+		throw new JsonException("Not an array: " + toString()); //$NON-NLS-1$
 	}
 
 	/**
@@ -91,7 +93,7 @@ public abstract class JsonValue implements Serializable {
 	 *             <code>false</code>
 	 */
 	public boolean asBoolean() {
-		throw new JsonException("Not a boolean: " + toString());
+		throw new JsonException("Not a boolean: " + toString()); //$NON-NLS-1$
 	}
 
 	/**
@@ -109,7 +111,7 @@ public abstract class JsonValue implements Serializable {
 	 *             if this value is not a JSON number
 	 */
 	public double asDouble() {
-		throw new JsonException("Not a number: " + toString());
+		throw new JsonException("Not a double: " + toString()); //$NON-NLS-1$
 	}
 
 	/**
@@ -127,7 +129,7 @@ public abstract class JsonValue implements Serializable {
 	 *             if this value is not a JSON number
 	 */
 	public float asFloat() {
-		throw new JsonException("Not a number: " + toString());
+		throw new JsonException("Not a float: " + toString()); //$NON-NLS-1$
 	}
 
 	/**
@@ -148,7 +150,7 @@ public abstract class JsonValue implements Serializable {
 	 *             <code>int</code> value
 	 */
 	public int asInt() {
-		throw new JsonException("Not a number: " + toString());
+		throw new JsonException("Not a integer: " + toString()); //$NON-NLS-1$
 	}
 
 	/**
@@ -169,7 +171,7 @@ public abstract class JsonValue implements Serializable {
 	 *             <code>long</code> value
 	 */
 	public long asLong() {
-		throw new JsonException("Not a number: " + toString());
+		throw new JsonException("Not a long: " + toString()); //$NON-NLS-1$
 	}
 
 	/**
@@ -177,24 +179,25 @@ public abstract class JsonValue implements Serializable {
 	 * represents a JSON object. If this is not the case, an exception is
 	 * thrown.
 	 *
-	 * @return a JSONObject for this value
+	 * @return this value as <code>JSONObject</code>
 	 * @throws JsonException
 	 *             if this value is not a JSON object
 	 */
 	public JsonObject asObject() {
-		throw new JsonException("Not an object: " + toString());
+		throw new JsonException("Not an object: " + toString()); //$NON-NLS-1$
 	}
 
 	/**
-	 * Returns this JSON value as String, assuming that this value represents a
-	 * JSON string. If this is not the case, an exception is thrown.
+	 * Returns this JSON value as <code>String</code>, assuming that this value
+	 * represents a JSON string. If this is not the case, an exception is
+	 * thrown.
 	 *
-	 * @return the string represented by this value
+	 * @return this value as <code>String</code>
 	 * @throws JsonException
 	 *             if this value is not a JSON string
 	 */
 	public String asString() {
-		throw new JsonException("Not a string: " + toString());
+		throw new JsonException("Not a string: " + toString()); //$NON-NLS-1$
 	}
 
 	/**
@@ -311,26 +314,72 @@ public abstract class JsonValue implements Serializable {
 	 */
 	@Override
 	public String toString() {
-		return toString(WriterConfig.MINIMAL);
+		return toString(WriterConfiguration.MINIMAL);
 	}
 
 	/**
 	 * Returns the JSON string for this value using the given formatting.
 	 *
-	 * @param config
+	 * @param configuration
 	 *            a configuration that controls the formatting or
 	 *            <code>null</code> for the minimal form
 	 * @return a JSON string that represents this value
+	 * @throws JsonException
+	 *             if the configuration is <code>null</code>
 	 */
-	public String toString(final WriterConfig config) {
+	public String toString(final WriterConfiguration configuration) {
 		final StringWriter writer = new StringWriter();
 		try {
-			writeTo(writer, config);
-		} catch (final IOException exception) {
+			writeTo(writer, configuration);
+		} catch (final IOException e) {
 			// StringWriter does not throw IOExceptions
-			throw new JsonException(exception);
 		}
 		return writer.toString();
+	}
+
+	/**
+	 * Writes the JSON representation of this value to the given output stream
+	 * in its minimal form, without any additional whitespace.
+	 * <p>
+	 * Writing performance can be improved by using a
+	 * {@link java.io.BufferedOutputStream BufferedOutputStream}.
+	 * </p>
+	 *
+	 * @param output
+	 *            the output to write this value to
+	 * @throws JsonException
+	 *             if the output stream is <code>null</code>
+	 * @throws IOException
+	 *             if an I/O error occurs in the output stream
+	 */
+	public void writeTo(final OutputStream output) throws IOException {
+		writeTo(output, WriterConfiguration.MINIMAL);
+	}
+
+	/**
+	 * Writes the JSON representation of this value to the given output stream
+	 * using the given formatting.
+	 * <p>
+	 * Writing performance can be improved by using a
+	 * {@link java.io.BufferedOutputStream BufferedOutputStream}.
+	 * </p>
+	 *
+	 * @param output
+	 *            the output to write this value to
+	 * @param configuration
+	 *            a configuration that controls the formatting
+	 * @throws JsonException
+	 *             if the output stream or the configuration is
+	 *             <code>null</code>
+	 * @throws IOException
+	 *             if an I/O error occurs in the output stream
+	 */
+	public void writeTo(final OutputStream output,
+			final WriterConfiguration configuration) throws IOException {
+		if (output == null) {
+			throw new JsonException("The output argument is null."); //$NON-NLS-1$
+		}
+		writeTo(new OutputStreamWriter(output), configuration);
 	}
 
 	/**
@@ -347,7 +396,7 @@ public abstract class JsonValue implements Serializable {
 	 *             if an I/O error occurs in the writer
 	 */
 	public void writeTo(final Writer writer) throws IOException {
-		writeTo(writer, WriterConfig.MINIMAL);
+		writeTo(writer, WriterConfiguration.MINIMAL);
 	}
 
 	/**
@@ -360,22 +409,23 @@ public abstract class JsonValue implements Serializable {
 	 *
 	 * @param writer
 	 *            the writer to write this value to
-	 * @param config
-	 *            a configuration that controls the formatting or
-	 *            <code>null</code> for the minimal form
+	 * @param configuration
+	 *            a configuration that controls the formatting
+	 * @throws JsonException
+	 *             if the writer or the configuration is <code>null</code>
 	 * @throws IOException
 	 *             if an I/O error occurs in the writer
 	 */
-	public void writeTo(final Writer writer, final WriterConfig config)
-			throws IOException {
+	public void writeTo(final Writer writer,
+			final WriterConfiguration configuration) throws IOException {
 		if (writer == null) {
-			throw new JsonException("writer is null");
+			throw new JsonException("The writer argument is null."); //$NON-NLS-1$
 		}
-		if (config == null) {
-			throw new JsonException("config is null");
+		if (configuration == null) {
+			throw new JsonException("The configuration argument is null."); //$NON-NLS-1$
 		}
 		final WritingBuffer buffer = new WritingBuffer(writer, 128);
-		write(config.createWriter(buffer));
+		write(configuration.createWriter(buffer));
 		buffer.flush();
 	}
 

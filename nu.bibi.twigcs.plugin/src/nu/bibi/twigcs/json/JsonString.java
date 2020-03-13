@@ -30,7 +30,7 @@ class JsonString extends JsonValue {
 
 	JsonString(final String string) {
 		if (string == null) {
-			throw new JsonException("string is null");
+			throw new JsonException("The string argument is null."); //$NON-NLS-1$
 		}
 		this.string = string;
 	}

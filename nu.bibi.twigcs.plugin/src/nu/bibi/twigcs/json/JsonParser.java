@@ -28,14 +28,19 @@ import java.io.StringReader;
 /**
  * A streaming parser for JSON text. The parser reports all events to a given
  * handler.
+ *
+ * @param <A>
+ *            The type of handlers used for JSON arrays
+ * @param <O>
+ *            The type of handlers used for JSON objects
  */
-public class JsonParser {
+public class JsonParser<A, O> {
 
 	private static final int MAX_NESTING_LEVEL = 1000;
 	private static final int MIN_BUFFER_SIZE = 10;
 	private static final int DEFAULT_BUFFER_SIZE = 1024;
 
-	private final JsonHandler<Object, Object> handler;
+	private final JsonHandler<A, O> handler;
 	private Reader reader;
 	private char[] buffer;
 	private int bufferOffset;
@@ -63,14 +68,15 @@ public class JsonParser {
 	 *
 	 * @param handler
 	 *            the handler to process parser events
+	 * @throws JsonException
+	 *             if the handler is null
 	 */
-	@SuppressWarnings("unchecked")
-	public JsonParser(final JsonHandler<?, ?> handler) {
+	public JsonParser(final JsonHandler<A, O> handler) {
 		if (handler == null) {
-			throw new JsonException("handler is null");
+			throw new JsonException("The handler argument is null."); //$NON-NLS-1$
 		}
-		this.handler = (JsonHandler<Object, Object>) handler;
-		handler.parser = this;
+		this.handler = handler;
+		this.handler.setParser(this);
 	}
 
 	public Location getLocation() {
@@ -93,7 +99,8 @@ public class JsonParser {
 	 * @throws IOException
 	 *             if an I/O error occurs in the reader
 	 * @throws JsonParseException
-	 *             if the input is not valid JSON
+	 *             if the reader is <code>null</code> or if the input is not a
+	 *             valid JSON
 	 */
 	public void parse(final Reader reader) throws IOException {
 		parse(reader, DEFAULT_BUFFER_SIZE);
@@ -110,24 +117,28 @@ public class JsonParser {
 	 *
 	 * @param reader
 	 *            the reader to read the input from
-	 * @param buffersize
+	 * @param bufferSize
 	 *            the size of the input buffer in chars
+	 * @throws JsonParseException
+	 *             if the reader is <code>null</code> or if the input is not a
+	 *             valid JSON
+	 * @throws IllegalArgumentException
+	 *             if the buffer size is smaller than or equal to 0 or if an
+	 *             unexpected character is found
 	 * @throws IOException
 	 *             if an I/O error occurs in the reader
-	 * @throws JsonParseException
-	 *             if the input is not valid JSON
 	 */
-	public void parse(final Reader reader, final int buffersize)
+	public void parse(final Reader reader, final int bufferSize)
 			throws IOException {
 		if (reader == null) {
-			throw new JsonException("reader is null");
+			throw new JsonException("The reader argument is null."); //$NON-NLS-1$
 		}
-		if (buffersize <= 0) {
+		if (bufferSize <= 0) {
 			throw new IllegalArgumentException(
-					"buffersize is zero or negative");
+					"The bufferSize argument is zero or negative."); //$NON-NLS-1$
 		}
 		this.reader = reader;
-		buffer = new char[buffersize];
+		buffer = new char[bufferSize];
 		bufferOffset = 0;
 		index = 0;
 		fill = 0;
@@ -140,7 +151,8 @@ public class JsonParser {
 		readValue();
 		skipWhiteSpace();
 		if (!isEndOfText()) {
-			throw error("Unexpected character");
+			throw new IllegalArgumentException(
+					"An unexpected character was found."); //$NON-NLS-1$
 		}
 	}
 
@@ -151,11 +163,11 @@ public class JsonParser {
 	 * @param string
 	 *            the input string, must be valid JSON
 	 * @throws JsonParseException
-	 *             if the input is not valid JSON
+	 *             if the string <code>null</code> or if is not a valid JSON
 	 */
 	public void parse(final String string) {
 		if (string == null) {
-			throw new JsonException("string is null");
+			throw new JsonException("The string argument is null."); //$NON-NLS-1$
 		}
 		final int bufferSize = Math.max(MIN_BUFFER_SIZE,
 				Math.min(DEFAULT_BUFFER_SIZE, string.length()));
@@ -163,7 +175,6 @@ public class JsonParser {
 			parse(new StringReader(string), bufferSize);
 		} catch (final IOException exception) {
 			// StringReader does not throw IOException
-			throw new JsonException(exception);
 		}
 	}
 
@@ -186,9 +197,9 @@ public class JsonParser {
 
 	private JsonParseException expected(final String expected) {
 		if (isEndOfText()) {
-			return error("Unexpected end of input");
+			return error("Unexpected end of input."); //$NON-NLS-1$
 		}
-		return error("Expected " + expected);
+		return error("Expected " + expected + "."); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
 	private boolean isDigit() {
@@ -239,10 +250,10 @@ public class JsonParser {
 	}
 
 	private void readArray() throws IOException {
-		final Object array = handler.startArray();
+		final A array = handler.startArray();
 		read();
 		if (++nestingLevel > MAX_NESTING_LEVEL) {
-			throw error("Nesting too deep");
+			throw error("Nesting too deep"); //$NON-NLS-1$
 		}
 		skipWhiteSpace();
 		if (readChar(']')) {
@@ -258,7 +269,7 @@ public class JsonParser {
 			skipWhiteSpace();
 		} while (readChar(','));
 		if (!readChar(']')) {
-			throw expected("',' or ']'");
+			throw expected("',' or ']'"); //$NON-NLS-1$
 		}
 		nestingLevel--;
 		handler.endArray(array);
@@ -308,7 +319,7 @@ public class JsonParser {
 			for (int i = 0; i < 4; i++) {
 				read();
 				if (!isHexDigit()) {
-					throw expected("hexadecimal digit");
+					throw expected("hexadecimal digit"); //$NON-NLS-1$
 				}
 				hexChars[i] = (char) current;
 			}
@@ -316,7 +327,7 @@ public class JsonParser {
 					.append((char) Integer.parseInt(new String(hexChars), 16));
 			break;
 		default:
-			throw expected("valid escape sequence");
+			throw expected("valid escape sequence"); //$NON-NLS-1$
 		}
 		read();
 	}
@@ -329,7 +340,7 @@ public class JsonParser {
 			readChar('-');
 		}
 		if (!readDigit()) {
-			throw expected("digit");
+			throw expected("digit"); //$NON-NLS-1$
 		}
 		while (readDigit()) {
 		}
@@ -351,7 +362,7 @@ public class JsonParser {
 			return false;
 		}
 		if (!readDigit()) {
-			throw expected("digit");
+			throw expected("digit"); //$NON-NLS-1$
 		}
 		while (readDigit()) {
 		}
@@ -360,7 +371,7 @@ public class JsonParser {
 
 	private String readName() throws IOException {
 		if (current != '"') {
-			throw expected("name");
+			throw expected("name"); //$NON-NLS-1$
 		}
 		return readStringInternal();
 	}
@@ -380,7 +391,7 @@ public class JsonParser {
 		readChar('-');
 		final int firstDigit = current;
 		if (!readDigit()) {
-			throw expected("digit");
+			throw expected("digit"); //$NON-NLS-1$
 		}
 		if (firstDigit != '0') {
 			while (readDigit()) {
@@ -392,10 +403,10 @@ public class JsonParser {
 	}
 
 	private void readObject() throws IOException {
-		final Object object = handler.startObject();
+		final O object = handler.startObject();
 		read();
 		if (++nestingLevel > MAX_NESTING_LEVEL) {
-			throw error("Nesting too deep");
+			throw error("Nesting too deep"); //$NON-NLS-1$
 		}
 		skipWhiteSpace();
 		if (readChar('}')) {
@@ -410,7 +421,7 @@ public class JsonParser {
 			handler.endObjectName(object, name);
 			skipWhiteSpace();
 			if (!readChar(':')) {
-				throw expected("':'");
+				throw expected("':'"); //$NON-NLS-1$
 			}
 			skipWhiteSpace();
 			handler.startObjectValue(object, name);
@@ -419,7 +430,7 @@ public class JsonParser {
 			skipWhiteSpace();
 		} while (readChar(','));
 		if (!readChar('}')) {
-			throw expected("',' or '}'");
+			throw expected("',' or '}'"); //$NON-NLS-1$
 		}
 		nestingLevel--;
 		handler.endObject(object);
@@ -427,7 +438,7 @@ public class JsonParser {
 
 	private void readRequiredChar(final char ch) throws IOException {
 		if (!readChar(ch)) {
-			throw expected("'" + ch + "'");
+			throw expected("'" + ch + "'"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 	}
 
@@ -445,7 +456,7 @@ public class JsonParser {
 				readEscape();
 				startCapture();
 			} else if (current < 0x20) {
-				throw expected("valid string character");
+				throw expected("valid string character"); //$NON-NLS-1$
 			} else {
 				read();
 			}
@@ -498,7 +509,7 @@ public class JsonParser {
 			readNumber();
 			break;
 		default:
-			throw expected("value");
+			throw expected("value"); //$NON-NLS-1$
 		}
 	}
 
