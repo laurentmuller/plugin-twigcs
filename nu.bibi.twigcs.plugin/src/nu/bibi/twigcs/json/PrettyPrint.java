@@ -116,13 +116,12 @@ public class PrettyPrint extends WriterConfiguration {
 	 * @param number
 	 *            the number of spaces to use
 	 * @return A PrettyPrint instance for wrapped mode with spaces indentation
-	 * @throws IllegalArgumentException
+	 * @throws JsonException
 	 *             if the number of spaces is negative
 	 */
 	public static PrettyPrint indentWithSpaces(final int number) {
 		if (number < 0) {
-			throw new IllegalArgumentException(
-					"The number of space is negative."); //$NON-NLS-1$
+			throw new JsonException("The number of space is negative."); //$NON-NLS-1$
 		}
 		final char[] chars = new char[number];
 		Arrays.fill(chars, ' ');

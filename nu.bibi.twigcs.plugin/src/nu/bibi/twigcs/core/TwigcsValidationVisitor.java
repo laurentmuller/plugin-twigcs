@@ -458,7 +458,7 @@ public class TwigcsValidationVisitor extends AbstractResouceVisitor
 			if (!output.isEmpty()) {
 				// convert
 				final TwigFile result = parseResult(output);
-				if (result != null) {
+				if (result != null && !result.isEmpty()) {
 					// add violations
 					final ResourceText text = new ResourceText(file);
 					for (final TwigViolation violation : result) {

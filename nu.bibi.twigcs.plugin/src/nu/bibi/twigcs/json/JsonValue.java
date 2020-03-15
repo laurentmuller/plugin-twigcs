@@ -79,7 +79,7 @@ public abstract class JsonValue implements Serializable {
 	 *             if this value is not a JSON array
 	 */
 	public JsonArray asArray() {
-		throw new JsonException("Not an array: " + toString()); //$NON-NLS-1$
+		throw new JsonException("This value is not an array: " + toString()); //$NON-NLS-1$
 	}
 
 	/**
@@ -93,7 +93,7 @@ public abstract class JsonValue implements Serializable {
 	 *             <code>false</code>
 	 */
 	public boolean asBoolean() {
-		throw new JsonException("Not a boolean: " + toString()); //$NON-NLS-1$
+		throw new JsonException("This value is not a boolean: " + toString()); //$NON-NLS-1$
 	}
 
 	/**
@@ -111,7 +111,7 @@ public abstract class JsonValue implements Serializable {
 	 *             if this value is not a JSON number
 	 */
 	public double asDouble() {
-		throw new JsonException("Not a double: " + toString()); //$NON-NLS-1$
+		throw new JsonException("This value is not a double: " + toString()); //$NON-NLS-1$
 	}
 
 	/**
@@ -129,7 +129,7 @@ public abstract class JsonValue implements Serializable {
 	 *             if this value is not a JSON number
 	 */
 	public float asFloat() {
-		throw new JsonException("Not a float: " + toString()); //$NON-NLS-1$
+		throw new JsonException("This value is not a float: " + toString()); //$NON-NLS-1$
 	}
 
 	/**
@@ -150,7 +150,7 @@ public abstract class JsonValue implements Serializable {
 	 *             <code>int</code> value
 	 */
 	public int asInt() {
-		throw new JsonException("Not a integer: " + toString()); //$NON-NLS-1$
+		throw new JsonException("This value is not an integer: " + toString()); //$NON-NLS-1$
 	}
 
 	/**
@@ -171,7 +171,7 @@ public abstract class JsonValue implements Serializable {
 	 *             <code>long</code> value
 	 */
 	public long asLong() {
-		throw new JsonException("Not a long: " + toString()); //$NON-NLS-1$
+		throw new JsonException("This value is not a long: " + toString()); //$NON-NLS-1$
 	}
 
 	/**
@@ -184,7 +184,7 @@ public abstract class JsonValue implements Serializable {
 	 *             if this value is not a JSON object
 	 */
 	public JsonObject asObject() {
-		throw new JsonException("Not an object: " + toString()); //$NON-NLS-1$
+		throw new JsonException("This value is not an object: " + toString()); //$NON-NLS-1$
 	}
 
 	/**
@@ -197,33 +197,14 @@ public abstract class JsonValue implements Serializable {
 	 *             if this value is not a JSON string
 	 */
 	public String asString() {
-		throw new JsonException("Not a string: " + toString()); //$NON-NLS-1$
-	}
-
-	/**
-	 * Indicates whether some other object is "equal to" this one according to
-	 * the contract specified in {@link Object#equals(Object)}.
-	 * <p>
-	 * Two JsonValues are considered equal if and only if they represent the
-	 * same JSON text. As a consequence, two given JsonObjects may be different
-	 * even though they contain the same set of names with the same values, but
-	 * in a different order.
-	 * </p>
-	 *
-	 * @param object
-	 *            the reference object with which to compare
-	 * @return true if this object is the same as the object argument; false
-	 *         otherwise
-	 */
-	@Override
-	public boolean equals(final Object object) {
-		return super.equals(object);
+		throw new JsonException("This value is not a string: " + toString()); //$NON-NLS-1$
 	}
 
 	@Override
-	public int hashCode() {
-		return super.hashCode();
-	}
+	public abstract boolean equals(final Object object);
+
+	@Override
+	public abstract int hashCode();
 
 	/**
 	 * Detects whether this value represents a JSON array. If this is the case,
@@ -267,7 +248,8 @@ public abstract class JsonValue implements Serializable {
 	}
 
 	/**
-	 * Detects whether this value represents a JSON number.
+	 * Detects whether this value represents a JSON number. If this is the case,
+	 * this value is an instance of {@link JsonNumber}.
 	 *
 	 * @return <code>true</code> if this value represents a JSON number
 	 */
@@ -286,7 +268,8 @@ public abstract class JsonValue implements Serializable {
 	}
 
 	/**
-	 * Detects whether this value represents a JSON string.
+	 * Detects whether this value represents a JSON string. If this is the case,
+	 * this value is an instance of {@link JsonString}.
 	 *
 	 * @return <code>true</code> if this value represents a JSON string
 	 */
@@ -325,7 +308,8 @@ public abstract class JsonValue implements Serializable {
 	 *            <code>null</code> for the minimal form
 	 * @return a JSON string that represents this value
 	 * @throws JsonException
-	 *             if the configuration is <code>null</code>
+	 *             if the <code>configuration</code> argument is
+	 *             <code>null</code>
 	 */
 	public String toString(final WriterConfiguration configuration) {
 		final StringWriter writer = new StringWriter();
@@ -345,15 +329,15 @@ public abstract class JsonValue implements Serializable {
 	 * {@link java.io.BufferedOutputStream BufferedOutputStream}.
 	 * </p>
 	 *
-	 * @param output
-	 *            the output to write this value to
+	 * @param stream
+	 *            the output stream to write this value to
 	 * @throws JsonException
-	 *             if the output stream is <code>null</code>
+	 *             if the <code>stream</code> argument is <code>null</code>
 	 * @throws IOException
 	 *             if an I/O error occurs in the output stream
 	 */
-	public void writeTo(final OutputStream output) throws IOException {
-		writeTo(output, WriterConfiguration.MINIMAL);
+	public void writeTo(final OutputStream stream) throws IOException {
+		writeTo(stream, WriterConfiguration.MINIMAL);
 	}
 
 	/**
@@ -364,22 +348,25 @@ public abstract class JsonValue implements Serializable {
 	 * {@link java.io.BufferedOutputStream BufferedOutputStream}.
 	 * </p>
 	 *
-	 * @param output
-	 *            the output to write this value to
+	 * @param stream
+	 *            the output stream to write this value to
 	 * @param configuration
 	 *            a configuration that controls the formatting
 	 * @throws JsonException
-	 *             if the output stream or the configuration is
-	 *             <code>null</code>
+	 *             if the <code>stream</code> argument or the
+	 *             <code>configuration</code> argument is <code>null</code>
 	 * @throws IOException
 	 *             if an I/O error occurs in the output stream
 	 */
-	public void writeTo(final OutputStream output,
+	public void writeTo(final OutputStream stream,
 			final WriterConfiguration configuration) throws IOException {
-		if (output == null) {
-			throw new JsonException("The output argument is null."); //$NON-NLS-1$
+		if (stream == null) {
+			throw new JsonException("The output stream argument is null."); //$NON-NLS-1$
 		}
-		writeTo(new OutputStreamWriter(output), configuration);
+		if (configuration == null) {
+			throw new JsonException("The configuration argument is null."); //$NON-NLS-1$
+		}
+		writeTo(new OutputStreamWriter(stream), configuration);
 	}
 
 	/**
@@ -392,6 +379,8 @@ public abstract class JsonValue implements Serializable {
 	 *
 	 * @param writer
 	 *            the writer to write this value to
+	 * @throws JsonException
+	 *             if the <code>writer</code> argument is <code>null</code>
 	 * @throws IOException
 	 *             if an I/O error occurs in the writer
 	 */
@@ -412,7 +401,8 @@ public abstract class JsonValue implements Serializable {
 	 * @param configuration
 	 *            a configuration that controls the formatting
 	 * @throws JsonException
-	 *             if the writer or the configuration is <code>null</code>
+	 *             if the <code>writer</code> argument or the
+	 *             <code>configuration</code> argument is <code>null</code>
 	 * @throws IOException
 	 *             if an I/O error occurs in the writer
 	 */
@@ -429,6 +419,14 @@ public abstract class JsonValue implements Serializable {
 		buffer.flush();
 	}
 
+	/**
+	 * Writes the JSON representation of this value to the given writer.
+	 *
+	 * @param writer
+	 *            the writer to write this value to
+	 * @throws IOException
+	 *             if an I/O error occurs in the writer
+	 */
 	protected abstract void write(JsonWriter writer) throws IOException;
 
 }

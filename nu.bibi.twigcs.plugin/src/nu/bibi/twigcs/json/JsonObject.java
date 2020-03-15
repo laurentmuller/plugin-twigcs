@@ -400,7 +400,8 @@ public class JsonObject extends JsonValue implements Iterable<Member> {
 	 *            the value of the member to add, must not be <code>null</code>
 	 * @return the object itself, to enable method chaining
 	 * @throws JsonException
-	 *             if the name or the value is <code>null</code>.
+	 *             if the <code>name</code> argument or the <code>value</code>
+	 *             argument is <code>null</code>.
 	 */
 	public JsonObject add(final String name, final JsonValue value) {
 		if (name == null) {
@@ -511,7 +512,7 @@ public class JsonObject extends JsonValue implements Iterable<Member> {
 	 *         <code>null</code> if this object does not contain a member with
 	 *         that name
 	 * @throws JsonException
-	 *             if the name is <code>null</code>.
+	 *             if the <code>name</code> argument is <code>null</code>.
 	 */
 	public JsonValue get(final String name) {
 		if (name == null) {
@@ -723,6 +724,8 @@ public class JsonObject extends JsonValue implements Iterable<Member> {
 	 * @param object
 	 *            the object to merge
 	 * @return the object itself, to enable method chaining
+	 * @throws JsonException
+	 *             if the <code>object</code> argument is <code>null</code>.
 	 */
 	public JsonObject merge(final JsonObject object) {
 		if (object == null) {
@@ -755,6 +758,8 @@ public class JsonObject extends JsonValue implements Iterable<Member> {
 	 * @param name
 	 *            the name of the member to remove
 	 * @return the object itself, to enable method chaining
+	 * @throws JsonException
+	 *             if the <code>name</code> argument is <code>null</code>.
 	 */
 	public JsonObject remove(final String name) {
 		if (name == null) {
@@ -889,7 +894,8 @@ public class JsonObject extends JsonValue implements Iterable<Member> {
 	 *            the value of the member to add, must not be <code>null</code>
 	 * @return the object itself, to enable method chaining
 	 * @throws JsonException
-	 *             if the name or the value is <code>null</code>.
+	 *             if the <code>name</code> argument or the <code>value</code>
+	 *             argument is <code>null</code>.
 	 */
 	public JsonObject set(final String name, final JsonValue value) {
 		if (name == null) {

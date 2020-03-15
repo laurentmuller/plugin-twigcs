@@ -300,7 +300,7 @@ public abstract class JsonHandler<A, O> {
 	 *
 	 * @return the current parser location
 	 * @throws JsonParseException
-	 *             if the parser is not set
+	 *             if the <code>parser</code> is not set
 	 */
 	protected Location getLocation() {
 		if (parser == null) {

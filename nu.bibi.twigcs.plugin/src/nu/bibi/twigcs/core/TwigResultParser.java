@@ -86,10 +86,10 @@ public class TwigResultParser {
 	public TwigResult parse(final String input) throws IOException {
 		try {
 			// parse
-			final TwigResult result = new TwigResult();
 			final JsonObject value = Json.parse(input).asObject();
 
 			// parse failures
+			final TwigResult result = new TwigResult();
 			final int failures = value.getInt(KEY_FAILURES, 0);
 			result.setFailures(failures);
 
@@ -146,7 +146,8 @@ public class TwigResultParser {
 	 *
 	 * @param name
 	 *            the name of the member to check for.
-	 * @return true if present and the value is an instance of JsonArray.
+	 * @return <code>true</code> if present and the value is an instance of
+	 *         {@link JsonArray}.
 	 */
 	private boolean isArray(final JsonObject obj, final String name) {
 		return obj.contains(name) && obj.get(name).isArray();

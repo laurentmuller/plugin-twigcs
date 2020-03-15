@@ -135,6 +135,9 @@ public class JsonArray extends JsonValue implements Iterable<JsonValue> {
 	 * @param value
 	 *            the value to add to the array
 	 * @return the array itself, to enable method chaining
+	 * @throws JsonException
+	 *             if the <code>value</code> argument is infinite or not a
+	 *             number (NaN).
 	 * @see Json#value(double)
 	 */
 	public JsonArray add(final double value) {
@@ -148,6 +151,9 @@ public class JsonArray extends JsonValue implements Iterable<JsonValue> {
 	 * @param value
 	 *            the value to add to the array
 	 * @return the array itself, to enable method chaining
+	 * @throws JsonException
+	 *             if the <code>value</code> argument is infinite or not a
+	 *             number (NaN).
 	 * @see Json#value(float)
 	 */
 	public JsonArray add(final float value) {
@@ -175,7 +181,7 @@ public class JsonArray extends JsonValue implements Iterable<JsonValue> {
 	 *            <code>null</code>
 	 * @return the array itself, to enable method chaining
 	 * @throws JsonException
-	 *             if the value is <code>null</code>.
+	 *             if the <code>value</code> argument is <code>null</code>.
 	 */
 	public JsonArray add(final JsonValue value) {
 		if (value == null) {
@@ -352,6 +358,9 @@ public class JsonArray extends JsonValue implements Iterable<JsonValue> {
 	 * @throws IndexOutOfBoundsException
 	 *             if the index is out of range, i.e. <code>index &lt; 0</code>
 	 *             or <code>index &gt;= size</code>
+	 * @throws JsonException
+	 *             if the <code>value</code> argument is infinite or not a
+	 *             number (NaN).
 	 * @see Json#value(double)
 	 */
 	public JsonArray set(final int index, final double value) {
@@ -370,6 +379,9 @@ public class JsonArray extends JsonValue implements Iterable<JsonValue> {
 	 * @throws IndexOutOfBoundsException
 	 *             if the index is out of range, i.e. <code>index &lt; 0</code>
 	 *             or <code>index &gt;= size</code>
+	 * @throws JsonException
+	 *             if the <code>value</code> argument is infinite or not a
+	 *             number (NaN).
 	 * @see Json#value(float)
 	 */
 	public JsonArray set(final int index, final float value) {
@@ -408,7 +420,7 @@ public class JsonArray extends JsonValue implements Iterable<JsonValue> {
 	 *             if the index is out of range, i.e. <code>index &lt; 0</code>
 	 *             or <code>index &gt;= size</code>
 	 * @throws JsonException
-	 *             if the value is <code>null</code>.
+	 *             if the <code>value</code> argument is <code>null</code>.
 	 */
 	public JsonArray set(final int index, final JsonValue value) {
 		if (value == null) {

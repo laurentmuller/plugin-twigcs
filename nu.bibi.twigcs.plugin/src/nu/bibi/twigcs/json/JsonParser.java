@@ -54,12 +54,8 @@ public class JsonParser<A, O> {
 	private int nestingLevel;
 
 	/*
-	 * |                      bufferOffset
-	 *                        v
-	 * [a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t]        < input
-	 *                       [l|m|n|o|p|q|r|s|t|?|?]    < buffer
-	 *                          ^               ^
-	 *                       |  index           fill
+	 * | bufferOffset v [a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t] < input
+	 * [l|m|n|o|p|q|r|s|t|?|?] < buffer ^ ^ | index fill
 	 */
 
 	/**
@@ -69,7 +65,7 @@ public class JsonParser<A, O> {
 	 * @param handler
 	 *            the handler to process parser events
 	 * @throws JsonException
-	 *             if the handler is null
+	 *             if the <code>handler</code> argument is <code>null</code>
 	 */
 	public JsonParser(final JsonHandler<A, O> handler) {
 		if (handler == null) {
@@ -98,9 +94,11 @@ public class JsonParser<A, O> {
 	 *            the reader to read the input from
 	 * @throws IOException
 	 *             if an I/O error occurs in the reader
+	 * @throws JsonException
+	 *             if the <code>reader</code> argument is <code>null</code>
 	 * @throws JsonParseException
-	 *             if the reader is <code>null</code> or if the input is not a
-	 *             valid JSON
+	 *             if the input is not a valid JSON or if an unexpected
+	 *             character is found
 	 */
 	public void parse(final Reader reader) throws IOException {
 		parse(reader, DEFAULT_BUFFER_SIZE);
@@ -119,12 +117,12 @@ public class JsonParser<A, O> {
 	 *            the reader to read the input from
 	 * @param bufferSize
 	 *            the size of the input buffer in chars
+	 * @throws JsonException
+	 *             if the <code>reader</code> argument is <code>null</code> or
+	 *             if the buffer size is smaller than or equal to 0
 	 * @throws JsonParseException
-	 *             if the reader is <code>null</code> or if the input is not a
-	 *             valid JSON
-	 * @throws IllegalArgumentException
-	 *             if the buffer size is smaller than or equal to 0 or if an
-	 *             unexpected character is found
+	 *             if the input is not a valid JSON or if an unexpected
+	 *             character is found
 	 * @throws IOException
 	 *             if an I/O error occurs in the reader
 	 */
@@ -134,7 +132,7 @@ public class JsonParser<A, O> {
 			throw new JsonException("The reader argument is null."); //$NON-NLS-1$
 		}
 		if (bufferSize <= 0) {
-			throw new IllegalArgumentException(
+			throw new JsonException(
 					"The bufferSize argument is zero or negative."); //$NON-NLS-1$
 		}
 		this.reader = reader;
@@ -151,8 +149,7 @@ public class JsonParser<A, O> {
 		readValue();
 		skipWhiteSpace();
 		if (!isEndOfText()) {
-			throw new IllegalArgumentException(
-					"An unexpected character was found."); //$NON-NLS-1$
+			throw new JsonException("An unexpected character was found."); //$NON-NLS-1$
 		}
 	}
 
@@ -162,8 +159,11 @@ public class JsonParser<A, O> {
 	 *
 	 * @param string
 	 *            the input string, must be valid JSON
+	 * @throws JsonException
+	 *             if the <code>string</code> argument is <code>null</code>
 	 * @throws JsonParseException
-	 *             if the string <code>null</code> or if is not a valid JSON
+	 *             if the input is not a valid JSON or if an unexpected
+	 *             character is found
 	 */
 	public void parse(final String string) {
 		if (string == null) {
