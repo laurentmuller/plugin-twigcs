@@ -41,7 +41,7 @@ An Eclipse plugin to validate Twig (*.twig) files with the [Twigcs](https://gith
 
 - Select the newly added repository.
 
-- Check the Twigcs category check box.
+- Check the **Twigcs** category or the **Twigcs Feature** check box (depend if the Group items by category option is checked).
 
   ![Install](docs/images/update.png)
 

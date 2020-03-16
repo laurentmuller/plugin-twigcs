@@ -41,4 +41,9 @@ public interface IConstants {
 	 */
 	String TWIG_EXTENSION = "twig"; //$NON-NLS-1$
 
+	/**
+	 * The PHP project nature identifier.
+	 */
+	String PHP_NATURE = "org.eclipse.php.core.PHPNature"; //$NON-NLS-1$
+
 }

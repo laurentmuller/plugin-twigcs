@@ -61,7 +61,7 @@
 							<outputDirectory>${basedir}</outputDirectory>
 							<resources>
 								<resource>
-									<directory>${project.basedir}/../</directory>
+									<directory>${basedir}/../</directory>
 									<include>LICENSE</include>
 								</resource>
 							</resources>

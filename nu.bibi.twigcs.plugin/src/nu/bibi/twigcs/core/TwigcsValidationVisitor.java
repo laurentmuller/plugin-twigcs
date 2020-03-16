@@ -58,12 +58,12 @@ public class TwigcsValidationVisitor extends AbstractResouceVisitor
 	}
 
 	/*
-	 * the include paths
+	 * the include paths and stream
 	 */
 	private final List<IPath> includePaths;
 
 	/*
-	 * the exclude paths
+	 * the exclude paths and stream
 	 */
 	private final List<IPath> excludePaths;
 
@@ -400,26 +400,20 @@ public class TwigcsValidationVisitor extends AbstractResouceVisitor
 			return false;
 		}
 
-		// predicate
+		// paths
 		final IPath path = file.getProjectRelativePath();
-		final Predicate<IPath> isPrefixOf = p -> p.isPrefixOf(path);
+		final IPath parent = path.removeLastSegments(1);
 
-		// include paths
-		if (includePaths.contains(path)) {
+		// check within the parent
+		if (includePaths.contains(parent)) {
 			return true;
-		} else if (includePaths.stream().anyMatch(isPrefixOf)) {
-			return true;
-		}
-
-		// exclude paths
-		if (excludePaths.contains(path)) {
-			return false;
-		} else if (excludePaths.stream().anyMatch(isPrefixOf)) {
+		} else if (excludePaths.contains(parent)) {
 			return false;
 		}
 
-		// default
-		return false;
+		// check children
+		final Predicate<IPath> predicate = p -> p.isPrefixOf(path);
+		return includePaths.stream().anyMatch(predicate);
 	}
 
 	/**

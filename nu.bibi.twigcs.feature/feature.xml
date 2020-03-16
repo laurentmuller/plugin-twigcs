@@ -3,7 +3,8 @@
       id="nu.bibi.twigcs.feature"
       label="Twigcs Feature"
       version="1.0.0"
-      provider-name="bibi.nu">
+      provider-name="bibi.nu"
+      plugin="nu.bibi.twigcs">
 
    <description>
       An Eclipse plugin to validate Twig (*.twig) files with the Twigcs component.
