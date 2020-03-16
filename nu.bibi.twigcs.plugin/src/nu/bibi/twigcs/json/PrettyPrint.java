@@ -50,19 +50,19 @@ public class PrettyPrint extends WriterConfiguration {
 		protected void writeArrayClose() throws IOException {
 			indent--;
 			writeNewLine();
-			writer.write(']');
+			super.writeArrayClose();
 		}
 
 		@Override
 		protected void writeArrayOpen() throws IOException {
 			indent++;
-			writer.write('[');
+			super.writeArrayOpen();
 			writeNewLine();
 		}
 
 		@Override
 		protected void writeArraySeparator() throws IOException {
-			writer.write(',');
+			super.writeArraySeparator();
 			if (!writeNewLine()) {
 				writer.write(' ');
 			}
@@ -70,7 +70,7 @@ public class PrettyPrint extends WriterConfiguration {
 
 		@Override
 		protected void writeMemberSeparator() throws IOException {
-			writer.write(':');
+			super.writeMemberSeparator();
 			writer.write(' ');
 		}
 
@@ -78,19 +78,19 @@ public class PrettyPrint extends WriterConfiguration {
 		protected void writeObjectClose() throws IOException {
 			indent--;
 			writeNewLine();
-			writer.write('}');
+			super.writeObjectClose();
 		}
 
 		@Override
 		protected void writeObjectOpen() throws IOException {
 			indent++;
-			writer.write('{');
+			super.writeObjectOpen();
 			writeNewLine();
 		}
 
 		@Override
 		protected void writeObjectSeparator() throws IOException {
-			writer.write(',');
+			super.writeObjectSeparator();
 			if (!writeNewLine()) {
 				writer.write(' ');
 			}
@@ -129,19 +129,19 @@ public class PrettyPrint extends WriterConfiguration {
 	}
 
 	/**
-	 * Do not break lines, but still insert whitespace between values.
+	 * Print every value on a separate line. Use tabs (<code>\t</code>) for
+	 * indentation.
 	 *
-	 * @return A PrettyPrint instance for single-line mode
+	 * @return A PrettyPrint instance for wrapped mode with tab indentation
 	 */
 	public static PrettyPrint indentWithTabs() {
 		return new PrettyPrint(new char[] { '\t' });
 	}
 
 	/**
-	 * Print every value on a separate line. Use tabs (<code>\t</code>) for
-	 * indentation.
+	 * Do not break lines, but still insert whitespace between values.
 	 *
-	 * @return A PrettyPrint instance for wrapped mode with tab indentation
+	 * @return A PrettyPrint instance for single-line mode
 	 */
 	public static PrettyPrint singleLine() {
 		return new PrettyPrint(null);

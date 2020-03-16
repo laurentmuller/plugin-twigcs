@@ -23,6 +23,7 @@
 
 		<!-- repositories -->
 		<eclipse.repo>http://download.eclipse.org/releases/latest</eclipse.repo>
+		<pdt.repo>https://download.eclipse.org/tools/pdt/updates/latest/</pdt.repo>
 		<orbit.repo>https://download.eclipse.org/tools/orbit/downloads/drops/R20191126223242/repository</orbit.repo>
 
 		<!-- FTP properties -->
@@ -44,11 +45,20 @@
 			<layout>p2</layout>
 			<url>${eclipse.repo}</url>
 		</repository>
+		<!-- 
 		<repository>
 			<id>orbit</id>
 			<layout>p2</layout>
 			<url>${orbit.repo}</url>
 		</repository>
+		 -->
+		 <!-- 
+		<repository>
+			<id>pdt</id>
+			<layout>p2</layout>
+			<url>${pdt.repo}</url>
+		</repository>
+		 -->
 	</repositories>
 
 	<build>

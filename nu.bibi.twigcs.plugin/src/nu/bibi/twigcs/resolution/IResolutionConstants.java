@@ -86,23 +86,6 @@ public interface IResolutionConstants {
 	}
 
 	/**
-	 * Returns if the character at the given index is the given character.
-	 *
-	 * @param content
-	 *            the content to get character for.
-	 * @param index
-	 *            the index to validate.
-	 * @param ch
-	 *            the character to compare to.
-	 * @return <code>true</code> if same character.
-	 */
-	default boolean isEqualsChar(final String content, final int index,
-			final char ch) {
-		return index >= 0 && index < content.length()
-				&& content.charAt(index) == ch;
-	}
-
-	/**
 	 * Returns if the byte at the given index is a new line character or a
 	 * carriage return character.
 	 *
@@ -118,21 +101,6 @@ public interface IResolutionConstants {
 	}
 
 	/**
-	 * Returns if the character at the given index is a new line character or a
-	 * carriage return character.
-	 *
-	 * @param content
-	 *            the content to get character for.
-	 * @param index
-	 *            the index to validate.
-	 * @return <code>true</code> if new line or carriage return character.
-	 */
-	default boolean isNewLine(final String content, final int index) {
-		return isEqualsChar(content, index, '\n')
-				|| isEqualsChar(content, index, '\r');
-	}
-
-	/**
 	 * Returns if the byte at the given index is a space character.
 	 *
 	 * @param content
@@ -142,19 +110,6 @@ public interface IResolutionConstants {
 	 * @return <code>true</code> if space character.
 	 */
 	default boolean isWhitespace(final byte[] content, final int index) {
-		return isEqualsChar(content, index, ' ');
-	}
-
-	/**
-	 * Returns if the character at the given index is a space character.
-	 *
-	 * @param content
-	 *            the content to get character for.
-	 * @param index
-	 *            the index to validate.
-	 * @return <code>true</code> if space character.
-	 */
-	default boolean isWhitespace(final String content, final int index) {
 		return isEqualsChar(content, index, ' ');
 	}
 }

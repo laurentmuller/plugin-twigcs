@@ -224,7 +224,7 @@ public final class Json {
 	}
 
 	/**
-	 * Reads the entire input from the given reader and parses it as JSON. The
+	 * Reads the entire input from the given stream and parses it as JSON. The
 	 * input must contain a valid JSON value, optionally padded with whitespace.
 	 * <p>
 	 * Characters are read in chunks into an input buffer. Hence, wrapping a

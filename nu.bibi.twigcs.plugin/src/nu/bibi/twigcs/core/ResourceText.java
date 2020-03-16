@@ -9,8 +9,7 @@
 package nu.bibi.twigcs.core;
 
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
+import java.io.InputStream;
 import java.util.Arrays;
 
 import org.eclipse.core.resources.IFile;
@@ -18,7 +17,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.osgi.util.NLS;
 
 import nu.bibi.twigcs.internal.Messages;
-import nu.bibi.twigcs.io.IOStream;
 
 /**
  * Wrapper class for the {@link IFile} content. This class is used to read the
@@ -40,24 +38,14 @@ public class ResourceText implements ICoreException {
 	private static final int CARRIAGE_RETURN = '\r';
 
 	/*
-	 * the number of lines
-	 */
-	private int count;
-
-	/*
 	 * the content
 	 */
-	private byte[] content;
+	private byte[] content = {};
 
 	/*
-	 * the content length
+	 * the line offsets
 	 */
-	private int contentLength;
-
-	/*
-	 * the lines offset
-	 */
-	private int[] offsets = new int[200];
+	private int[] offsets = {};
 
 	/**
 	 * Creates a new instance of this class.
@@ -68,15 +56,15 @@ public class ResourceText implements ICoreException {
 	 *             if the get contents method fails.
 	 */
 	public ResourceText(final IFile file) throws CoreException {
-		try (InputStreamReader reader = new InputStreamReader(
-				file.getContents(), file.getCharset())) {
-
-			read(reader);
-
-		} catch (final IOException e) {
-			final String msg = NLS.bind(Messages.ResourceText_Error_Read,
-					file.getName());
-			throw createCoreException(msg, e);
+		final int contentLength = (int) file.getLocation().toFile().length();
+		if (contentLength > 0) {
+			try (InputStream stream = file.getContents()) {
+				readContent(stream, contentLength);
+			} catch (final IOException e) {
+				final String msg = NLS.bind(Messages.ResourceText_Error_Read,
+						file.getName());
+				throw createCoreException(msg, e);
+			}
 		}
 	}
 
@@ -86,7 +74,7 @@ public class ResourceText implements ICoreException {
 	 * @return the number of lines.
 	 */
 	public int count() {
-		return count;
+		return offsets.length;
 	}
 
 	/**
@@ -99,34 +87,37 @@ public class ResourceText implements ICoreException {
 	}
 
 	/**
-	 * Returns the length of the given line, including line break characters.
+	 * Returns the length for the given line index, including line break
+	 * characters.
 	 *
 	 * @param index
 	 *            the zero-relative line index.
-	 * @return the line length in characters
+	 * @return the line length.
 	 * @throws IndexOutOfBoundsException
-	 *             if the index is smaller than 0 or greater or equal to the
-	 *             lines count.
+	 *             if the index is less than 0 or greater than or equal to the
+	 *             number of this lines.
+	 * @see #count()
 	 */
 	public int getLinelength(final int index) {
 		checkLineIndex(index);
 
-		int nextOffset = contentLength;
-		if (index < count) {
+		int nextOffset = content.length;
+		if (index < count()) {
 			nextOffset = offsets[index + 1];
 		}
 		return nextOffset - offsets[index];
 	}
 
 	/**
-	 * Returns the offset of the given line's first character.
+	 * Returns the offset for the given line index.
 	 *
 	 * @param index
 	 *            the zero-relative line index.
 	 * @return the line offset.
 	 * @throws IndexOutOfBoundsException
-	 *             if the index is smaller than 0 or greater or equal to the
-	 *             lines count.
+	 *             if the index is less than 0 or greater than or equal to the
+	 *             number of this lines.
+	 * @see #count()
 	 */
 	public int getOffset(final int index) {
 		checkLineIndex(index);
@@ -138,26 +129,27 @@ public class ResourceText implements ICoreException {
 	 *
 	 * @param offset
 	 *            the the zero-relative line offset.
+	 * @return the number of lines.
 	 */
-	private void addOffset(final int offset) {
+	private void addOffset(final int offset, final int count) {
 		final int len = offsets.length;
 		if (count >= len) {
 			offsets = Arrays.copyOf(offsets, len + 100);
 		}
-		offsets[count++] = offset;
+		offsets[count] = offset;
 	}
 
 	/**
-	 * Check if the given line is within the line offsets.
+	 * Check if the given line index is within this number of lines.
 	 *
 	 * @param index
-	 *            the zero-relative line index.
+	 *            the zero-relative line index to validate.
 	 * @throws IndexOutOfBoundsException
-	 *             if the index is smaller than 0 or greater or equal to the
-	 *             lines count.
+	 *             if the index is less than 0 or greater than or equal to the
+	 *             number of lines.
 	 */
 	private void checkLineIndex(final int index) {
-		if (index < 0 || index >= count) {
+		if (index < 0 || index >= count()) {
 			throw new IndexOutOfBoundsException(
 					NLS.bind(Messages.ResourceText_Error_Index, index));
 		}
@@ -166,44 +158,42 @@ public class ResourceText implements ICoreException {
 	/**
 	 * Reads all the content.
 	 *
-	 * @param reader
-	 *            the reader to read data from.
+	 * @param stream
+	 *            the input stream to read data from.
+	 * @param contentLength
+	 *            the content length.
 	 * @throws IOException
 	 *             if an I/O exception occurs.
 	 */
-	private void read(final Reader reader) throws IOException {
-		// reset
-		count = 1;
-		contentLength = 0;
-		content = new byte[] {};
+	private void readContent(final InputStream stream, final int contentLength)
+			throws IOException {
+		// read all
+		content = new byte[contentLength];
+		stream.read(content);
 
-		int ch;
-		int previous = 0;
-		final StringBuffer buffer = new StringBuffer(IOStream.BUFFER_SIZE);
+		// compute lines
+		byte ch;
+		byte previous = 0;
+		int count = 1;
 
-		while ((ch = reader.read()) != -1) {
+		for (int i = 0; i < contentLength; i++) {
+			ch = content[i];
 			if (ch == LINE_FEED) {
 				// handle Linux (LF) and Windows (CR+LF)
-				addOffset(contentLength + 1);
+				addOffset(i + 1, count++);
 			} else if (previous == CARRIAGE_RETURN && ch != LINE_FEED) {
 				// handle Mac (CR)
-				addOffset(contentLength);
+				addOffset(i, count++);
 			}
 			previous = ch;
-			contentLength++;
-			buffer.append((char) ch);
 		}
 
 		// check last character (Mac)
 		if (previous == CARRIAGE_RETURN) {
-			addOffset(contentLength);
+			addOffset(contentLength, count++);
 		}
 
-		// content?
-		if (contentLength == 0) {
-			count = 0;
-		} else {
-			content = buffer.toString().getBytes();
-		}
+		// trim
+		offsets = Arrays.copyOf(offsets, count);
 	}
 }

@@ -1,10 +1,12 @@
 /**
  * This file is part of the twigcs-plugin package.
  *
- * (c) Laurent Muller <bibi@bibi.nu>
+ * Copyright (c) 2020 Laurent Muller <bibi@bibi.nu>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
+ *
+ * File: TwigcsPlugin.java
  */
 package nu.bibi.twigcs;
 

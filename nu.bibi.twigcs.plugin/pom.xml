@@ -13,4 +13,62 @@
 		<relativePath>..</relativePath>
 	</parent>
 
+	<build>
+		<plugins>
+			<!--  update copyright -->
+			<plugin>
+				<groupId>com.mycila</groupId>
+				<artifactId>license-maven-plugin</artifactId>
+				<version>3.0</version>
+				<configuration>
+					<header>${basedir}/header.txt</header>
+					<properties>
+						<owner>Laurent Muller</owner>
+						<email>bibi@bibi.nu</email>
+						<year>2020</year>
+					</properties>
+					<includes>
+						<include>src/nu/bibi/twigcs/TwigcsPlugin.java</include>
+					</includes>
+					<excludes>
+						<exclude>src/nu/bibi/twigcs/json/**</exclude>
+						<exclude>src/nu/bibi/twigcs/internal/**</exclude>
+					</excludes>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>format</goal>
+						</goals>
+						<phase>package</phase>
+					</execution>
+				</executions>
+			</plugin>
+			
+			<!-- copy license -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>3.1.0</version>
+				<executions>
+					<execution>
+						<id>copy-resources</id>
+						<phase>validate</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${basedir}</outputDirectory>
+							<resources>
+								<resource>
+									<directory>${project.basedir}/../</directory>
+									<include>LICENSE</include>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 </project>
