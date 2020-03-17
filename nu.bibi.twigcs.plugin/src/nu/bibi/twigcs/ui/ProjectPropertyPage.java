@@ -6,7 +6,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-package nu.bibi.twigcs.preferences;
+package nu.bibi.twigcs.ui;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,10 +33,8 @@ import nu.bibi.twigcs.core.TwigcsBuilder;
 import nu.bibi.twigcs.internal.Messages;
 import nu.bibi.twigcs.model.TwigSeverity;
 import nu.bibi.twigcs.model.TwigVersion;
-import nu.bibi.twigcs.ui.DragDropViewer;
-import nu.bibi.twigcs.ui.EnumComboViewer;
-import nu.bibi.twigcs.ui.FolderSelectionDialog;
-import nu.bibi.twigcs.ui.FolderTableViewer;
+import nu.bibi.twigcs.preferences.PreferencesInitializer;
+import nu.bibi.twigcs.preferences.ProjectPreferences;
 
 /**
  * Properties page for Twigcs project.

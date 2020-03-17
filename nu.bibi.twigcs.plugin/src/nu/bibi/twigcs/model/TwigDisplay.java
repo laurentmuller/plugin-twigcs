@@ -13,23 +13,30 @@ package nu.bibi.twigcs.model;
  * that have violations regardless of whether they match the severity level
  * specified or not. If you only want to see violations that are greater than or
  * equal to the severity level you've specified you can use the
- * {@link TwigDisplay#blocking blocking} value.
+ * {@link TwigDisplay#BLOCKING blocking} value.
  *
  * @author Laurent Muller
  * @version 1.0
  */
-public enum TwigDisplay {
+public enum TwigDisplay implements ICommand {
 
 	/**
 	 * Output all lines that have violations regardless of whether they match
 	 * the severity level specified or not.
 	 */
-	all,
+	ALL,
 
 	/**
 	 * Output all violations that are greater than or equal to the severity
 	 * level.
 	 */
-	blocking
+	BLOCKING;
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String getParameter() {
+		return name().toLowerCase();
+	}
 }

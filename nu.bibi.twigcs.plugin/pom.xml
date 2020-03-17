@@ -23,17 +23,12 @@
 				<configuration>
 					<header>${basedir}/header.txt</header>
 					<properties>
-						<owner>Laurent Muller</owner>
-						<email>bibi@bibi.nu</email>
-						<year>2020</year>
+						<owner>${developer.name}</owner>
+						<email>${developer.email}</email>
 					</properties>
 					<includes>
-						<include>src/nu/bibi/twigcs/TwigcsPlugin.java</include>
+						<include>src/**/*.java</include>
 					</includes>
-					<excludes>
-						<exclude>src/nu/bibi/twigcs/json/**</exclude>
-						<exclude>src/nu/bibi/twigcs/internal/**</exclude>
-					</excludes>
 				</configuration>
 				<executions>
 					<execution>

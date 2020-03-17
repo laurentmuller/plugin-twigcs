@@ -26,7 +26,7 @@ import nu.bibi.twigcs.model.TwigViolation;
  * @author Laurent Muller
  * @version 1.0
  */
-public class TwigResultParser {
+public class TwigcsResultParser {
 
 	/*
 	 * the failures member name
@@ -104,7 +104,7 @@ public class TwigResultParser {
 			return result;
 
 		} catch (final JsonException e) {
-			throw new IOException(Messages.TwigResultParser_Error, e);
+			throw new IOException(Messages.TwigcsResultParser_Error, e);
 		}
 	}
 

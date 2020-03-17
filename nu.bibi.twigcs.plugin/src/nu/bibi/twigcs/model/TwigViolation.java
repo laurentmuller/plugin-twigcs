@@ -165,7 +165,7 @@ public class TwigViolation implements Comparable<TwigViolation> {
 	 *            the severity to set.
 	 */
 	public void setSeverity(final int severity) {
-		this.severity = TwigSeverity.valueOf(severity, TwigSeverity.error);
+		this.severity = TwigSeverity.valueOf(severity, TwigSeverity.ERROR);
 	}
 
 	/**

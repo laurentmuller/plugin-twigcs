@@ -16,8 +16,7 @@ import org.eclipse.core.runtime.CoreException;
 
 /**
  * Abstract resource visitor. Subclass must only implements the
- * {@link AbstractResouceVisitor#doVisit(org.eclipse.core.resources.IResource)}
- * function.
+ * {@link #doVisit(org.eclipse.core.resources.IResource)} function.
  *
  * @author Laurent Muller
  * @version 1.0

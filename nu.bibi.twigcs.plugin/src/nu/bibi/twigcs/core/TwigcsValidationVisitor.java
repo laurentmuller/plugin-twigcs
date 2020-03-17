@@ -75,7 +75,7 @@ public class TwigcsValidationVisitor extends AbstractResouceVisitor
 	/*
 	 * the Twig result parser
 	 */
-	private TwigResultParser parser;
+	private TwigcsResultParser parser;
 
 	/*
 	 * the twig version
@@ -314,9 +314,9 @@ public class TwigcsValidationVisitor extends AbstractResouceVisitor
 	 *
 	 * @return Twig result parser.
 	 */
-	private TwigResultParser getParser() {
+	private TwigcsResultParser getParser() {
 		if (parser == null) {
-			parser = new TwigResultParser();
+			parser = new TwigcsResultParser();
 		}
 		return parser;
 	}
@@ -421,13 +421,13 @@ public class TwigcsValidationVisitor extends AbstractResouceVisitor
 	 *
 	 * @param data
 	 *            the output data of the execution.
-	 * @return the file result, if any; <code>null</code> otherwise.
+	 * @return the first file result, if any; <code>null</code> otherwise.
 	 * @throws IOException
 	 *             if the data output is not a valid representation of a
 	 *             {@link TwigResult} type.
 	 */
 	private TwigFile parseResult(final String data) throws IOException {
-		final TwigResultParser parser = getParser();
+		final TwigcsResultParser parser = getParser();
 		final TwigResult result = parser.parse(data);
 		return result.first();
 	}
@@ -459,7 +459,6 @@ public class TwigcsValidationVisitor extends AbstractResouceVisitor
 						addMarker(file, text, violation);
 					}
 				}
-
 			} else if (exitCode != 0) { // error?
 				IOException e = executor.getErrorException();
 				final String error = executor.getError();

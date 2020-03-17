@@ -1,10 +1,18 @@
+/**
+ * This file is part of the twigcs-plugin package.
+ *
+ * (c) Laurent Muller <bibi@bibi.nu>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 package nu.bibi.twigcs.internal.test;
 
 import java.io.IOException;
 import java.util.List;
 
-import nu.bibi.twigcs.core.TwigResultParser;
 import nu.bibi.twigcs.core.TwigcsProcessor;
+import nu.bibi.twigcs.core.TwigcsResultParser;
 import nu.bibi.twigcs.io.IOExecutor;
 import nu.bibi.twigcs.model.TwigDisplay;
 import nu.bibi.twigcs.model.TwigFile;
@@ -15,8 +23,8 @@ import nu.bibi.twigcs.model.TwigViolation;
 
 public class MainTest {
 
-	private static final String EXEC_PATH = "C:/Users/Muller/AppData/Roaming/Composer/vendor/bin/twigcs.bat"; //$NON-NLS-1$
-	private static final String TWIG_FILE = "D:/Temp/Twigcs/about.html.twig"; //$NON-NLS-1$
+	private static final String EXEC_PATH = "D:/GitHub/twigcs/bin/twigcs.bat"; //$NON-NLS-1$
+	private static final String TWIG_FILE = "D:/GitHub/calculation/templates/about/about.html.twig"; //$NON-NLS-1$
 
 	public static void main(final String[] args) {
 		int exitCode = 0;
@@ -47,7 +55,7 @@ public class MainTest {
 			// check output
 			final String output = exec.getOutput();
 			if (!output.isEmpty()) {
-				final TwigResultParser parser = new TwigResultParser();
+				final TwigcsResultParser parser = new TwigcsResultParser();
 				final TwigResult result = parser.parse(output);
 
 				System.out.println(result);
@@ -63,16 +71,15 @@ public class MainTest {
 			e.printStackTrace();
 		} finally {
 			System.out.println("Exit Code: " + exitCode); //$NON-NLS-1$
-			// System.exit(exitCode);
 		}
 	}
 
 	private static TwigcsProcessor getProcessor() {
 		final TwigcsProcessor processor = new TwigcsProcessor();
 		processor.setProgramPath(EXEC_PATH);
-		processor.setTwigSeverity(TwigSeverity.warning);
+		processor.setTwigSeverity(TwigSeverity.WARNING);
 		processor.setTwigVersion(TwigVersion.VERSION_2);
-		processor.setTwigDisplay(TwigDisplay.all);
+		processor.setTwigDisplay(TwigDisplay.ALL);
 		return processor;
 	}
 }

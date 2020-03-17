@@ -1,24 +1,11 @@
-/*******************************************************************************
- * Copyright (c) 2013, 2015 EclipseSource.
+/**
+ * This file is part of the twigcs-plugin package.
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
+ * (c) Laurent Muller <bibi@bibi.nu>
  *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- ******************************************************************************/
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 package nu.bibi.twigcs.json;
 
 import java.io.IOException;
@@ -788,9 +775,9 @@ public class JsonObject extends JsonValue implements Iterable<Member> {
 	 * </p>
 	 *
 	 * @param name
-	 *            the name of the member to add
+	 *            the name of the member to replace
 	 * @param value
-	 *            the value of the member to add
+	 *            the value to set to the member
 	 * @return the object itself, to enable method chaining
 	 * @throws JsonException
 	 *             if the name is <code>null</code>.
@@ -813,9 +800,9 @@ public class JsonObject extends JsonValue implements Iterable<Member> {
 	 * </p>
 	 *
 	 * @param name
-	 *            the name of the member to add
+	 *            the name of the member to replace
 	 * @param value
-	 *            the value of the member to add
+	 *            the value to set to the member
 	 * @return the object itself, to enable method chaining
 	 * @throws JsonException
 	 *             if the name is <code>null</code> or if value is infinite or
@@ -839,9 +826,9 @@ public class JsonObject extends JsonValue implements Iterable<Member> {
 	 * </p>
 	 *
 	 * @param name
-	 *            the name of the member to add
+	 *            the name of the member to replace
 	 * @param value
-	 *            the value of the member to add
+	 *            the value to set to the member
 	 * @return the object itself, to enable method chaining
 	 * @throws JsonException
 	 *             if the name is <code>null</code> or if value is infinite or
@@ -889,9 +876,9 @@ public class JsonObject extends JsonValue implements Iterable<Member> {
 	 * </p>
 	 *
 	 * @param name
-	 *            the name of the member to add
+	 *            the name of the member to replace
 	 * @param value
-	 *            the value of the member to add, must not be <code>null</code>
+	 *            the value to set to the member, must not be <code>null</code>
 	 * @return the object itself, to enable method chaining
 	 * @throws JsonException
 	 *             if the <code>name</code> argument or the <code>value</code>
@@ -907,12 +894,10 @@ public class JsonObject extends JsonValue implements Iterable<Member> {
 		final int index = indexOf(name);
 		if (index != -1) {
 			values.set(index, value);
+			return this;
 		} else {
-			table.add(name, names.size());
-			names.add(name);
-			values.add(value);
+			return add(name, value);
 		}
-		return this;
 	}
 
 	/**
@@ -952,9 +937,9 @@ public class JsonObject extends JsonValue implements Iterable<Member> {
 	 * </p>
 	 *
 	 * @param name
-	 *            the name of the member to add
+	 *            the name of the member to replace
 	 * @param value
-	 *            the value of the member to add
+	 *            the value to set to the member
 	 * @return the object itself, to enable method chaining
 	 * @throws JsonException
 	 *             if the name is <code>null</code>.

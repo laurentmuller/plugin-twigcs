@@ -90,9 +90,9 @@ public class TwigcsProcessor implements ICoreException {
 	 */
 	public TwigcsProcessor() {
 		version = TwigVersion.VERSION_3;
-		reporter = TwigReporter.json;
-		display = TwigDisplay.blocking;
-		severity = TwigSeverity.warning;
+		reporter = TwigReporter.JSON;
+		display = TwigDisplay.BLOCKING;
+		severity = TwigSeverity.WARNING;
 		searchPaths = new ArrayList<>();
 		excludePaths = new ArrayList<>();
 	}
@@ -118,18 +118,6 @@ public class TwigcsProcessor implements ICoreException {
 	public void addSearchPath(final String path) {
 		if (path != null && !path.isEmpty() && !searchPaths.contains(path)) {
 			searchPaths.add(path);
-		}
-	}
-
-	/**
-	 * Adds paths to search in.
-	 *
-	 * @param paths
-	 *            the paths to add.
-	 */
-	public void addSearchPaths(final String... paths) {
-		for (final String path : paths) {
-			addSearchPath(path);
 		}
 	}
 
@@ -164,29 +152,22 @@ public class TwigcsProcessor implements ICoreException {
 
 		// reporter
 		command.add("-r"); //$NON-NLS-1$
-		command.add(reporter.name());
+		command.add(reporter.getParameter());
 
 		// twig version
 		command.add("-t"); //$NON-NLS-1$
-		command.add(version.version());
+		command.add(version.getParameter());
 
 		// severity
 		command.add("-s"); //$NON-NLS-1$
-		command.add(severity.name());
+		command.add(severity.getParameter());
 
 		// display
 		command.add("-d"); //$NON-NLS-1$
-		command.add(display.name());
+		command.add(display.getParameter());
 
 		return command;
 
-	}
-
-	/**
-	 * Clear the search paths.
-	 */
-	public void clearPaths() {
-		searchPaths.clear();
 	}
 
 	/**
@@ -218,7 +199,7 @@ public class TwigcsProcessor implements ICoreException {
 
 	/**
 	 * Gets how violations are returned. The default value is
-	 * {@link TwigDisplay#blocking blocking}.
+	 * {@link TwigDisplay#BLOCKING blocking}.
 	 *
 	 * @return the display.
 	 */
@@ -276,7 +257,7 @@ public class TwigcsProcessor implements ICoreException {
 
 	/**
 	 * Define how violations are returned. The default value is
-	 * {@link TwigDisplay#blocking blocking}.
+	 * {@link TwigDisplay#BLOCKING blocking}.
 	 *
 	 * @param display
 	 *            the display to set.

@@ -26,7 +26,7 @@ import nu.bibi.twigcs.model.TwigVersion;
  * @version 1.0
  */
 public class PreferencesInitializer extends AbstractPreferenceInitializer
-		implements PreferencesConstants {
+		implements IPreferencesConstants {
 
 	/**
 	 * Gets the Twigcs executable path from the preference store.
@@ -53,7 +53,7 @@ public class PreferencesInitializer extends AbstractPreferenceInitializer
 	 * @return the Twig display.
 	 */
 	public static TwigDisplay getTwigDisplay() {
-		return valueOf(P_DISPLAY, TwigDisplay.class, TwigDisplay.blocking);
+		return valueOf(P_DISPLAY, TwigDisplay.class, DEFAULT_DISPLAY);
 	}
 
 	/**
@@ -62,7 +62,7 @@ public class PreferencesInitializer extends AbstractPreferenceInitializer
 	 * @return the Twig reporter.
 	 */
 	public static TwigReporter getTwigReporter() {
-		return valueOf(P_REPORTER, TwigReporter.class, TwigReporter.json);
+		return valueOf(P_REPORTER, TwigReporter.class, DEFAULT_REPORTER);
 	}
 
 	/**
@@ -71,7 +71,7 @@ public class PreferencesInitializer extends AbstractPreferenceInitializer
 	 * @return the Twig severity.
 	 */
 	public static TwigSeverity getTwigSeverity() {
-		return valueOf(P_SEVERITY, TwigSeverity.class, TwigSeverity.warning);
+		return valueOf(P_SEVERITY, TwigSeverity.class, DEFAULT_SEVERITY);
 	}
 
 	/**
@@ -80,7 +80,7 @@ public class PreferencesInitializer extends AbstractPreferenceInitializer
 	 * @return the Twig version.
 	 */
 	public static TwigVersion getTwigVersion() {
-		return valueOf(P_VERSION, TwigVersion.class, TwigVersion.VERSION_2);
+		return valueOf(P_VERSION, TwigVersion.class, DEFAULT_VERSION);
 	}
 
 	/**
@@ -117,10 +117,10 @@ public class PreferencesInitializer extends AbstractPreferenceInitializer
 	@Override
 	public void initializeDefaultPreferences() {
 		final IPreferenceStore store = getPreferenceStore();
-		store.setDefault(P_DISPLAY, DEFAULT_DISPLAY);
-		store.setDefault(P_VERSION, DEFAULT_VERSION);
-		store.setDefault(P_SEVERITY, DEFAULT_SEVERITY);
-		store.setDefault(P_REPORTER, DEFAULT_REPORTER);
+		store.setDefault(P_DISPLAY, DEFAULT_DISPLAY.name());
+		store.setDefault(P_VERSION, DEFAULT_VERSION.name());
+		store.setDefault(P_SEVERITY, DEFAULT_SEVERITY.name());
+		store.setDefault(P_REPORTER, DEFAULT_REPORTER.name());
 
 		// find path for windows
 		final String home = System.getProperty("user.home"); //$NON-NLS-1$

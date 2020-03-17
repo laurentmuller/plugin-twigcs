@@ -19,27 +19,27 @@ import nu.bibi.twigcs.model.TwigVersion;
  * @author Laurent Muller
  * @version 1.0
  */
-public interface PreferencesConstants {
+public interface IPreferencesConstants {
 
 	/**
-	 * The default display name.
+	 * The default display.
 	 */
-	String DEFAULT_DISPLAY = TwigDisplay.blocking.name();
+	TwigDisplay DEFAULT_DISPLAY = TwigDisplay.BLOCKING;
 
 	/**
-	 * The default output reporter name.
+	 * The default output reporter.
 	 */
-	String DEFAULT_REPORTER = TwigReporter.json.name();
+	TwigReporter DEFAULT_REPORTER = TwigReporter.JSON;
 
 	/**
-	 * The default severity name.
+	 * The default severity.
 	 */
-	String DEFAULT_SEVERITY = TwigSeverity.warning.name();
+	TwigSeverity DEFAULT_SEVERITY = TwigSeverity.WARNING;
 
 	/**
 	 * The default twig version.
 	 */
-	String DEFAULT_VERSION = TwigVersion.VERSION_2.name();
+	TwigVersion DEFAULT_VERSION = TwigVersion.VERSION_2;
 
 	/**
 	 * The Twigcs executable path property.

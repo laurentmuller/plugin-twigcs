@@ -7,7 +7,8 @@
 	<artifactId>nu.bibi.twigcs.parent</artifactId>
 	<version>1.0.0</version>
 	<packaging>pom</packaging>
-
+	<url>https://github.com/laurentmuller/plugin-twigcs</url>
+		
 	<properties>
 		<!--  global properties -->
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -17,7 +18,7 @@
 		<maven.deploy.skip>true</maven.deploy.skip>		
 		<final.name>${project.artifactId}_${unqualifiedVersion}${buildQualifier}</final.name>
 		
-		<!-- versions -->
+		<!-- plugin versions -->
 		<tycho-version>1.6.0</tycho-version>
 		<wagon-version>3.3.4</wagon-version>
 
@@ -31,8 +32,24 @@
 		<ftp.url>ftp://tj8om.ftp.infomaniak.com/web</ftp.url>
 		<ftp.from>${project.basedir}/nu.bibi.twigcs.repository/target/repository</ftp.from>
 		<ftp.to>twigcs/v${project.version}</ftp.to>
+		
+		<!-- developer -->
+		<developer.name>Laurent Muller</developer.name>
+		<developer.email>bibi@bibi.nu</developer.email>
 	</properties>
-
+	
+	<developers>
+		<developer>
+			<id>bibi</id>
+			<name>${developer.name}</name>
+			<email>${developer.email}</email>
+			<url>https://www.bibi.nu</url>
+			<roles>
+				<role>architect</role>
+        		<role>developer</role>
+			</roles>
+		</developer>
+	</developers>
 	<modules>
 		<module>nu.bibi.twigcs.plugin</module>
 		<module>nu.bibi.twigcs.feature</module>
@@ -121,6 +138,14 @@
 				<version>${tycho-version}</version>
 				<configuration>
 					<finalName>${final.name}</finalName>
+					<additionalFileSets>
+						<additionalFileSet>
+							<directory>${basedir}</directory>
+							<includes>
+								<include>LICENSE</include>
+							</includes>
+						</additionalFileSet>
+					</additionalFileSets>
 					<archive>
 						<addMavenDescriptor>${maven.descriptor}</addMavenDescriptor>
 					</archive>

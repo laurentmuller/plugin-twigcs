@@ -102,14 +102,14 @@
     <extension
         point="org.eclipse.ui.preferencePages">
         <page
-            class="nu.bibi.twigcs.preferences.PreferencesPage"
+            class="nu.bibi.twigcs.ui.PreferencesPage"
             id="nu.bibi.twigcs.preferences.PreferencesPage"
             name="%Common_Name" />
     </extension>
     <extension
         point="org.eclipse.ui.propertyPages">
         <page
-            class="nu.bibi.twigcs.preferences.ProjectPropertyPage"
+            class="nu.bibi.twigcs.ui.ProjectPropertyPage"
             id="nu.bibi.twigcs.preferences.ProjectPropertyPage"
             name="%Common_Name">
             <filter

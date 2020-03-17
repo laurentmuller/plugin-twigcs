@@ -6,7 +6,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-package nu.bibi.twigcs.preferences;
+package nu.bibi.twigcs.ui;
 
 import java.io.File;
 import java.io.IOException;
@@ -38,6 +38,7 @@ import nu.bibi.twigcs.model.TwigDisplay;
 import nu.bibi.twigcs.model.TwigReporter;
 import nu.bibi.twigcs.model.TwigSeverity;
 import nu.bibi.twigcs.model.TwigVersion;
+import nu.bibi.twigcs.preferences.IPreferencesConstants;
 
 /**
  * Twigcs preferences page.
@@ -45,8 +46,9 @@ import nu.bibi.twigcs.model.TwigVersion;
  * @author Laurent Muller
  * @version 1.0
  */
-public class PreferencesPage extends FieldEditorPreferencePage implements
-		IWorkbenchPreferencePage, PreferencesConstants, ICoreException {
+public class PreferencesPage extends FieldEditorPreferencePage
+		implements IWorkbenchPreferencePage, IPreferencesConstants,
+		ICoreException, IString {
 
 	/*
 	 * the test button
@@ -272,50 +274,30 @@ public class PreferencesPage extends FieldEditorPreferencePage implements
 		}
 
 		// execute
-		final Runnable runnable = new Runnable() {
-			@Override
-			public void run() {
-				try {
-					// processor
-					final TwigcsProcessor processor = new TwigcsProcessor();
-					processor.setSearchPath(createTemplate());
-					processor.setProgramPath(filePath);
+		final Runnable runnable = () -> {
+			try {
+				// processor
+				final TwigcsProcessor processor = new TwigcsProcessor();
+				processor.setSearchPath(createTemplate());
+				processor.setProgramPath(filePath);
 
-					final List<String> command = processor.buildCommand();
-					final IOExecutor executor = new IOExecutor();
-					final int exitCode = executor.run(command);
+				final List<String> command = processor.buildCommand();
+				final IOExecutor executor = new IOExecutor();
+				final int exitCode = executor.run(command);
 
-					if (exitCode == 0) {
-						MessageDialog.openInformation(getShell(), getTitle(),
-								Messages.PreferencesPage_Test_Success);
-					} else {
-						MessageDialog.openError(getShell(), getTitle(),
-								Messages.PreferencesPage_Test_Error);
-					}
-
-				} catch (final CoreException | IOException e) {
+				if (exitCode == 0) {
+					MessageDialog.openInformation(getShell(), getTitle(),
+							Messages.PreferencesPage_Test_Success);
+				} else {
 					MessageDialog.openError(getShell(), getTitle(),
 							Messages.PreferencesPage_Test_Error);
 				}
+
+			} catch (final CoreException | IOException e) {
+				MessageDialog.openError(getShell(), getTitle(),
+						Messages.PreferencesPage_Test_Error);
 			}
 		};
 		BusyIndicator.showWhile(getShell().getDisplay(), runnable);
-	}
-
-	/**
-	 * Replaces all underscore (<code>'_'</code>) characters by a space
-	 * (<code>' '</code>) character and converts to proper case. For example:
-	 *
-	 * <pre>
-	 * "TWIG_VERSION_1" -> "Twig version 1"
-	 * </pre>
-	 *
-	 * @param text
-	 *            the string to convert.
-	 * @return the converted string.
-	 */
-	private String toProperCase(final String text) {
-		return Character.toUpperCase(text.charAt(0))
-				+ text.substring(1).replace('_', ' ').toLowerCase();
 	}
 }

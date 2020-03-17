@@ -29,8 +29,8 @@ import nu.bibi.twigcs.preferences.ProjectPreferences;
  * Resource listener to update include and exclude paths.
  * <p>
  * This listener must be register with the
- * {@link IResourceChangeEvent#POST_CHANGE} event mask like the following
- * example:
+ * {@link IResourceChangeEvent#POST_CHANGE POST_CHANGE} event mask like the
+ * following example:
  * </p>
  *
  * <pre>

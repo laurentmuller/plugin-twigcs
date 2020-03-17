@@ -36,7 +36,7 @@ import nu.bibi.twigcs.model.TwigVersion;
  * @version 1.0
  */
 public class ProjectPreferences
-		implements IConstants, ICoreException, PreferencesConstants {
+		implements IConstants, ICoreException, IPreferencesConstants {
 
 	/*
 	 * the key to get/set include paths

@@ -14,32 +14,40 @@ package nu.bibi.twigcs.model;
  * @author Laurent Muller
  * @version 1.0
  */
-public enum TwigReporter {
+public enum TwigReporter implements ICommand {
 
 	/**
 	 * Output the Twig result to Symfony console format (1 line per files and
 	 * violations).
 	 */
-	console,
+	CONSOLE,
 
 	/**
 	 * Output the Twig result to as check style format (XML).
 	 */
-	checkstyle,
+	CHECKSTYLE,
 
 	/**
 	 * Output the Twig result to as JUnit format (XML).
 	 */
-	junit,
+	JUNIT,
 
 	/**
 	 * Output the Twig result to as Emacs format (1 line per files and
 	 * violations).
 	 */
-	emacs,
+	EMACS,
 
 	/**
 	 * Output the Twig result to the Json format.
 	 */
-	json
+	JSON;
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String getParameter() {
+		return name().toLowerCase();
+	}
 }

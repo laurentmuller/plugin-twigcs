@@ -71,9 +71,9 @@ public final class Messages extends NLS {
 	public static String TwigcsProcessor_Error_Not_Exist;
 	public static String TwigcsProcessor_Error_Paths_Empty;
 	public static String TwigcsProcessor_Error_Real_Path;
+	public static String TwigcsResultParser_Error;
 	public static String ValidationVisitor_Error_Validate_Code;
 	public static String ValidationVisitor_Error_Validate_Name;
-	public static String TwigResultParser_Error;
 
 	/*
 	 * initialise messages

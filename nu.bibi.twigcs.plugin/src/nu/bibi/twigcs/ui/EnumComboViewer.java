@@ -22,7 +22,8 @@ import org.eclipse.swt.widgets.Composite;
  * @param <E>
  *            the enumeration type.
  */
-public class EnumComboViewer<E extends Enum<E>> extends ComboViewer {
+public class EnumComboViewer<E extends Enum<E>> extends ComboViewer
+		implements IString {
 
 	/*
 	 * the enumeration class
@@ -41,13 +42,13 @@ public class EnumComboViewer<E extends Enum<E>> extends ComboViewer {
 		super(parent);
 		this.clazz = clazz;
 
-		setContentProvider(ArrayContentProvider.getInstance());
 		setLabelProvider(new LabelProvider() {
 			@Override
 			public String getText(final Object element) {
 				return toProperCase(((Enum<?>) element).name());
 			}
 		});
+		setContentProvider(ArrayContentProvider.getInstance());
 		setInput(clazz.getEnumConstants());
 	}
 
@@ -93,23 +94,6 @@ public class EnumComboViewer<E extends Enum<E>> extends ComboViewer {
 		} else {
 			setSelection(new StructuredSelection(value), true);
 		}
-	}
-
-	/**
-	 * Replaces all underscore (<code>'_'</code>) characters by a space
-	 * (<code>' '</code>) character and converts to proper case. For example:
-	 *
-	 * <pre>
-	 * "TWIG_VERSION_1" -> "Twig version 1"
-	 * </pre>
-	 *
-	 * @param text
-	 *            the string to convert.
-	 * @return the converted string.
-	 */
-	private String toProperCase(final String text) {
-		return Character.toUpperCase(text.charAt(0))
-				+ text.substring(1).replace('_', ' ').toLowerCase();
 	}
 
 }

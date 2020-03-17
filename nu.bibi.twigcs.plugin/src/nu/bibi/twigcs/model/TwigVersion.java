@@ -14,7 +14,7 @@ package nu.bibi.twigcs.model;
  * @author Laurent Muller
  * @version 1.0
  */
-public enum TwigVersion {
+public enum TwigVersion implements ICommand {
 
 	/**
 	 * The version 1.0.
@@ -31,18 +31,20 @@ public enum TwigVersion {
 	 */
 	VERSION_3("3"); //$NON-NLS-1$
 
-	private final String version;
+	/*
+	 * the parameter value
+	 */
+	private final String parameter;
 
-	private TwigVersion(final String version) {
-		this.version = version;
+	private TwigVersion(final String parameter) {
+		this.parameter = parameter;
 	}
 
 	/**
-	 * Gets the version.
-	 *
-	 * @return the version.
+	 * {@inheritDoc}
 	 */
-	public String version() {
-		return version;
+	@Override
+	public String getParameter() {
+		return parameter;
 	}
 }

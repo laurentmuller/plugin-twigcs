@@ -16,30 +16,30 @@ import org.eclipse.core.resources.IMarker;
  * @author Laurent Muller
  * @version 1.0
  */
-public enum TwigSeverity {
+public enum TwigSeverity implements ICommand {
 
 	/**
 	 * Severity indicating information only. The corresponding value for marker
 	 * is {@link IMarker#SEVERITY_INFO}.
 	 */
-	info(),
+	INFO(),
 
 	/**
 	 * Severity indicating a warning. The corresponding value for marker is
 	 * {@link IMarker#SEVERITY_WARNING}.
 	 */
-	warning(),
+	WARNING(),
 
 	/**
 	 * Severity indicating an error state. The corresponding value for marker is
 	 * {@link IMarker#SEVERITY_ERROR}.
 	 */
-	error(),
+	ERROR(),
 
 	/**
 	 * Severity to ignore. The corresponding value for marker is not defined.
 	 */
-	ignore();
+	IGNORE();
 
 	/**
 	 * Finds a severity for the given value.
@@ -68,6 +68,7 @@ public enum TwigSeverity {
 	 * @param value
 	 *            the value to be compared for equality with this object.
 	 * @return true if the specified value is equal to this enum constant.
+	 * @see #value()
 	 */
 	public boolean equals(final int value) {
 		return value() == value;
@@ -84,27 +85,35 @@ public enum TwigSeverity {
 	}
 
 	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String getParameter() {
+		return name().toLowerCase();
+	}
+
+	/**
 	 * Returns if this value is above the given severity value.
 	 *
-	 * @param severity
-	 *            the other severity to test.
+	 * @param o
+	 *            the other severity to be compared.
 	 * @return <code>true</code> if above.
-	 * @see #value()
+	 * @see #isBelow(TwigSeverity)
 	 */
-	public boolean isAbove(final TwigSeverity severity) {
-		return value() > severity.value();
+	public boolean isAbove(final TwigSeverity o) {
+		return compareTo(o) > 0;
 	}
 
 	/**
 	 * Returns if this value is below the given severity value.
 	 *
-	 * @param severity
-	 *            the other severity to test.
+	 * @param o
+	 *            the other severity to be compared.
 	 * @return <code>true</code> if below.
-	 * @see #value()
+	 * @see #isAbove(TwigSeverity)
 	 */
-	public boolean isBelow(final TwigSeverity severity) {
-		return value() < severity.value();
+	public boolean isBelow(final TwigSeverity o) {
+		return compareTo(o) < 0;
 	}
 
 	/**
