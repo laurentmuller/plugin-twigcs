@@ -19,6 +19,9 @@ class JsonLiteral extends JsonValue {
 	private final boolean isFalse;
 
 	JsonLiteral(final String value) {
+		if (value == null) {
+			throw new JsonException("The value argument is null."); //$NON-NLS-1$
+		}
 		this.value = value;
 		isNull = "null".equals(value); //$NON-NLS-1$
 		isTrue = "true".equals(value); //$NON-NLS-1$

@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 
 import nu.bibi.twigcs.json.JsonObject.Member;
 
@@ -137,14 +138,6 @@ public class JsonObject extends JsonValue implements Iterable<Member> {
 
 		private final byte[] hashTable = new byte[32]; // must be a power of two
 
-		HashIndexTable() {
-		}
-
-		// HashIndexTable(final HashIndexTable original) {
-		// System.arraycopy(original.hashTable, 0, hashTable, 0,
-		// hashTable.length);
-		// }
-
 		private void add(final String name, final int index) {
 			final int slot = hashSlotFor(name);
 			if (index < 0xff) {
@@ -175,26 +168,6 @@ public class JsonObject extends JsonValue implements Iterable<Member> {
 			}
 		}
 
-	}
-
-	/**
-	 * Returns an unmodifiable JsonObject for the specified one. This method
-	 * allows to provide read-only access to a JsonObject.
-	 * <p>
-	 * The returned JsonObject is backed by the given object and reflect changes
-	 * that happen to it. Attempts to modify the returned JsonObject result in
-	 * an <code>UnsupportedOperationException</code>.
-	 * </p>
-	 *
-	 * @param object
-	 *            the JsonObject for which an unmodifiable JsonObject is to be
-	 *            returned
-	 * @return an unmodifiable view of the specified JsonObject
-	 * @throws JsonException
-	 *             if the <code>object</code> argument is <code>null</code>.
-	 */
-	public static JsonObject unmodifiableObject(final JsonObject object) {
-		return new JsonObject(object, true);
 	}
 
 	/*
@@ -232,32 +205,11 @@ public class JsonObject extends JsonValue implements Iterable<Member> {
 	 *             if the <code>object</code> argument is <code>null</code>.
 	 */
 	public JsonObject(final JsonObject object) {
-		this(object, false);
-	}
-
-	/**
-	 * Creates a new JsonObject, initialized with the contents of the specified
-	 * JSON object.
-	 *
-	 * @param object
-	 *            the JSON object to get the initial contents from, must not be
-	 *            <code>null</code>
-	 * @param unmodifiable
-	 *            <code>true</code> to create an unmodifiable object.
-	 * @throws JsonException
-	 *             if the <code>object</code> argument is <code>null</code>.
-	 */
-	private JsonObject(final JsonObject object, final boolean unmodifiable) {
 		if (object == null) {
 			throw new JsonException("The object argument is null."); //$NON-NLS-1$
 		}
-		if (unmodifiable) {
-			names = Collections.unmodifiableList(object.names);
-			values = Collections.unmodifiableList(object.values);
-		} else {
-			names = new ArrayList<>(object.names);
-			values = new ArrayList<>(object.values);
-		}
+		names = new ArrayList<>(object.names);
+		values = new ArrayList<>(object.values);
 		table = new HashIndexTable();
 		updateHashIndex();
 	}
@@ -269,7 +221,7 @@ public class JsonObject extends JsonValue implements Iterable<Member> {
 	 * This method <strong>does not prevent duplicate names</strong>. Calling
 	 * this method with a name that already exists in the object will append
 	 * another member with the same name. In order to replace existing members,
-	 * use the method <code>set(name, value)</code> instead. However, <strong>
+	 * use the method {@link #set(String, boolean)} instead. However, <strong>
 	 * <em>add</em> is much faster than <em>set</em></strong> (because it does
 	 * not need to search for existing members). Therefore <em>add</em> should
 	 * be preferred when constructing new objects.
@@ -279,7 +231,7 @@ public class JsonObject extends JsonValue implements Iterable<Member> {
 	 *            the name of the member to add
 	 * @param value
 	 *            the value of the member to add
-	 * @return the object itself, to enable method chaining
+	 * @return this instance to enable method chaining
 	 * @throws JsonException
 	 *             if the name is <code>null</code>.
 	 * @see Json#value(boolean)
@@ -295,7 +247,7 @@ public class JsonObject extends JsonValue implements Iterable<Member> {
 	 * This method <strong>does not prevent duplicate names</strong>. Calling
 	 * this method with a name that already exists in the object will append
 	 * another member with the same name. In order to replace existing members,
-	 * use the method <code>set(name, value)</code> instead. However, <strong>
+	 * use the method {@link #set(String, double)} instead. However, <strong>
 	 * <em>add</em> is much faster than <em>set</em></strong> (because it does
 	 * not need to search for existing members). Therefore <em>add</em> should
 	 * be preferred when constructing new objects.
@@ -305,7 +257,7 @@ public class JsonObject extends JsonValue implements Iterable<Member> {
 	 *            the name of the member to add
 	 * @param value
 	 *            the value of the member to add
-	 * @return the object itself, to enable method chaining
+	 * @return this instance to enable method chaining
 	 * @throws JsonException
 	 *             if the name is <code>null</code> or if value is infinite or
 	 *             not a number (NaN).
@@ -322,7 +274,7 @@ public class JsonObject extends JsonValue implements Iterable<Member> {
 	 * This method <strong>does not prevent duplicate names</strong>. Calling
 	 * this method with a name that already exists in the object will append
 	 * another member with the same name. In order to replace existing members,
-	 * use the method <code>set(name, value)</code> instead. However, <strong>
+	 * use the method {@link #set(String, float)} instead. However, <strong>
 	 * <em>add</em> is much faster than <em>set</em></strong> (because it does
 	 * not need to search for existing members). Therefore <em>add</em> should
 	 * be preferred when constructing new objects.
@@ -332,7 +284,7 @@ public class JsonObject extends JsonValue implements Iterable<Member> {
 	 *            the name of the member to add
 	 * @param value
 	 *            the value of the member to add
-	 * @return the object itself, to enable method chaining
+	 * @return this instance to enable method chaining
 	 * @throws JsonException
 	 *             if the name is <code>null</code> or if value is infinite or
 	 *             not a number (NaN).
@@ -349,7 +301,7 @@ public class JsonObject extends JsonValue implements Iterable<Member> {
 	 * This method <strong>does not prevent duplicate names</strong>. Calling
 	 * this method with a name that already exists in the object will append
 	 * another member with the same name. In order to replace existing members,
-	 * use the method <code>set(name, value)</code> instead. However, <strong>
+	 * use the method {@link #set(String, int)} instead. However, <strong>
 	 * <em>add</em> is much faster than <em>set</em></strong> (because it does
 	 * not need to search for existing members). Therefore <em>add</em> should
 	 * be preferred when constructing new objects.
@@ -359,7 +311,7 @@ public class JsonObject extends JsonValue implements Iterable<Member> {
 	 *            the name of the member to add
 	 * @param value
 	 *            the value of the member to add
-	 * @return the object itself, to enable method chaining
+	 * @return this instance to enable method chaining
 	 * @throws JsonException
 	 *             if the name is <code>null</code>.
 	 * @see Json#value(int)
@@ -375,7 +327,7 @@ public class JsonObject extends JsonValue implements Iterable<Member> {
 	 * This method <strong>does not prevent duplicate names</strong>. Calling
 	 * this method with a name that already exists in the object will append
 	 * another member with the same name. In order to replace existing members,
-	 * use the method <code>set(name, value)</code> instead. However, <strong>
+	 * use the method {@link #set(String, JsonValue)} instead. However, <strong>
 	 * <em>add</em> is much faster than <em>set</em></strong> (because it does
 	 * not need to search for existing members). Therefore <em>add</em> should
 	 * be preferred when constructing new objects.
@@ -385,7 +337,7 @@ public class JsonObject extends JsonValue implements Iterable<Member> {
 	 *            the name of the member to add
 	 * @param value
 	 *            the value of the member to add, must not be <code>null</code>
-	 * @return the object itself, to enable method chaining
+	 * @return this instance to enable method chaining
 	 * @throws JsonException
 	 *             if the <code>name</code> argument or the <code>value</code>
 	 *             argument is <code>null</code>.
@@ -410,7 +362,7 @@ public class JsonObject extends JsonValue implements Iterable<Member> {
 	 * This method <strong>does not prevent duplicate names</strong>. Calling
 	 * this method with a name that already exists in the object will append
 	 * another member with the same name. In order to replace existing members,
-	 * use the method <code>set(name, value)</code> instead. However, <strong>
+	 * use the method {@link #set(String, long)} instead. However, <strong>
 	 * <em>add</em> is much faster than <em>set</em></strong> (because it does
 	 * not need to search for existing members). Therefore <em>add</em> should
 	 * be preferred when constructing new objects.
@@ -420,7 +372,7 @@ public class JsonObject extends JsonValue implements Iterable<Member> {
 	 *            the name of the member to add
 	 * @param value
 	 *            the value of the member to add
-	 * @return the object itself, to enable method chaining
+	 * @return this instance to enable method chaining
 	 * @throws JsonException
 	 *             if the name is <code>null</code>.
 	 * @see Json#value(long)
@@ -436,7 +388,7 @@ public class JsonObject extends JsonValue implements Iterable<Member> {
 	 * This method <strong>does not prevent duplicate names</strong>. Calling
 	 * this method with a name that already exists in the object will append
 	 * another member with the same name. In order to replace existing members,
-	 * use the method <code>set(name, value)</code> instead. However, <strong>
+	 * use the method {@link #set(String, String)} instead. However, <strong>
 	 * <em>add</em> is much faster than <em>set</em></strong> (because it does
 	 * not need to search for existing members). Therefore <em>add</em> should
 	 * be preferred when constructing new objects.
@@ -446,7 +398,7 @@ public class JsonObject extends JsonValue implements Iterable<Member> {
 	 *            the name of the member to add
 	 * @param value
 	 *            the value of the member to add
-	 * @return the object itself, to enable method chaining
+	 * @return this instance to enable method chaining
 	 * @throws JsonException
 	 *             if the name is <code>null</code>.
 	 * @see Json#value(string)
@@ -648,10 +600,7 @@ public class JsonObject extends JsonValue implements Iterable<Member> {
 
 	@Override
 	public int hashCode() {
-		int result = 1;
-		result = 31 * result + names.hashCode();
-		result = 31 * result + values.hashCode();
-		return result;
+		return Objects.hash(names, values);
 	}
 
 	/**
@@ -710,7 +659,7 @@ public class JsonObject extends JsonValue implements Iterable<Member> {
 	 *
 	 * @param object
 	 *            the object to merge
-	 * @return the object itself, to enable method chaining
+	 * @return this instance to enable method chaining
 	 * @throws JsonException
 	 *             if the <code>object</code> argument is <code>null</code>.
 	 */
@@ -744,7 +693,7 @@ public class JsonObject extends JsonValue implements Iterable<Member> {
 	 *
 	 * @param name
 	 *            the name of the member to remove
-	 * @return the object itself, to enable method chaining
+	 * @return this instance to enable method chaining
 	 * @throws JsonException
 	 *             if the <code>name</code> argument is <code>null</code>.
 	 */
@@ -770,7 +719,7 @@ public class JsonObject extends JsonValue implements Iterable<Member> {
 	 * <p>
 	 * This method should <strong>only be used to modify existing
 	 * objects</strong>. To fill a new object with members, the method
-	 * <code>add(name, value)</code> should be preferred which is much faster
+	 * {@link #add(String, boolean)} should be preferred which is much faster
 	 * (as it does not need to search for existing members).
 	 * </p>
 	 *
@@ -778,7 +727,7 @@ public class JsonObject extends JsonValue implements Iterable<Member> {
 	 *            the name of the member to replace
 	 * @param value
 	 *            the value to set to the member
-	 * @return the object itself, to enable method chaining
+	 * @return this instance to enable method chaining
 	 * @throws JsonException
 	 *             if the name is <code>null</code>.
 	 */
@@ -795,15 +744,15 @@ public class JsonObject extends JsonValue implements Iterable<Member> {
 	 * <p>
 	 * This method should <strong>only be used to modify existing
 	 * objects</strong>. To fill a new object with members, the method
-	 * <code>add(name, value)</code> should be preferred which is much faster
-	 * (as it does not need to search for existing members).
+	 * {@link #add(String, double)} should be preferred which is much faster (as
+	 * it does not need to search for existing members).
 	 * </p>
 	 *
 	 * @param name
 	 *            the name of the member to replace
 	 * @param value
 	 *            the value to set to the member
-	 * @return the object itself, to enable method chaining
+	 * @return this instance to enable method chaining
 	 * @throws JsonException
 	 *             if the name is <code>null</code> or if value is infinite or
 	 *             not a number (NaN).
@@ -821,15 +770,15 @@ public class JsonObject extends JsonValue implements Iterable<Member> {
 	 * <p>
 	 * This method should <strong>only be used to modify existing
 	 * objects</strong>. To fill a new object with members, the method
-	 * <code>add(name, value)</code> should be preferred which is much faster
-	 * (as it does not need to search for existing members).
+	 * {@link #add(String, float)} should be preferred which is much faster (as
+	 * it does not need to search for existing members).
 	 * </p>
 	 *
 	 * @param name
 	 *            the name of the member to replace
 	 * @param value
 	 *            the value to set to the member
-	 * @return the object itself, to enable method chaining
+	 * @return this instance to enable method chaining
 	 * @throws JsonException
 	 *             if the name is <code>null</code> or if value is infinite or
 	 *             not a number (NaN).
@@ -847,15 +796,15 @@ public class JsonObject extends JsonValue implements Iterable<Member> {
 	 * <p>
 	 * This method should <strong>only be used to modify existing
 	 * objects</strong>. To fill a new object with members, the method
-	 * <code>add(name, value)</code> should be preferred which is much faster
-	 * (as it does not need to search for existing members).
+	 * {@link #add(String, int)} should be preferred which is much faster (as it
+	 * does not need to search for existing members).
 	 * </p>
 	 *
 	 * @param name
 	 *            the name of the member to replace
 	 * @param value
 	 *            the value to set to the member
-	 * @return the object itself, to enable method chaining
+	 * @return this instance to enable method chaining
 	 * @throws JsonException
 	 *             if the name is <code>null</code>.
 	 */
@@ -871,7 +820,7 @@ public class JsonObject extends JsonValue implements Iterable<Member> {
 	 * <p>
 	 * This method should <strong>only be used to modify existing
 	 * objects</strong>. To fill a new object with members, the method
-	 * <code>add(name, value)</code> should be preferred which is much faster
+	 * {@link #add(String, JsonValue)} should be preferred which is much faster
 	 * (as it does not need to search for existing members).
 	 * </p>
 	 *
@@ -879,7 +828,7 @@ public class JsonObject extends JsonValue implements Iterable<Member> {
 	 *            the name of the member to replace
 	 * @param value
 	 *            the value to set to the member, must not be <code>null</code>
-	 * @return the object itself, to enable method chaining
+	 * @return this instance to enable method chaining
 	 * @throws JsonException
 	 *             if the <code>name</code> argument or the <code>value</code>
 	 *             argument is <code>null</code>.
@@ -909,15 +858,15 @@ public class JsonObject extends JsonValue implements Iterable<Member> {
 	 * <p>
 	 * This method should <strong>only be used to modify existing
 	 * objects</strong>. To fill a new object with members, the method
-	 * <code>add(name, value)</code> should be preferred which is much faster
-	 * (as it does not need to search for existing members).
+	 * {@link #add(String, long)} should be preferred which is much faster (as
+	 * it does not need to search for existing members).
 	 * </p>
 	 *
 	 * @param name
 	 *            the name of the member to replace
 	 * @param value
 	 *            the value to set to the member
-	 * @return the object itself, to enable method chaining
+	 * @return this instance to enable method chaining
 	 */
 	public JsonObject set(final String name, final long value) {
 		return set(name, Json.value(value));
@@ -932,15 +881,15 @@ public class JsonObject extends JsonValue implements Iterable<Member> {
 	 * <p>
 	 * This method should <strong>only be used to modify existing
 	 * objects</strong>. To fill a new object with members, the method
-	 * <code>add(name, value)</code> should be preferred which is much faster
-	 * (as it does not need to search for existing members).
+	 * {@link #add(String, String)} should be preferred which is much faster (as
+	 * it does not need to search for existing members).
 	 * </p>
 	 *
 	 * @param name
 	 *            the name of the member to replace
 	 * @param value
 	 *            the value to set to the member
-	 * @return the object itself, to enable method chaining
+	 * @return this instance to enable method chaining
 	 * @throws JsonException
 	 *             if the name is <code>null</code>.
 	 */

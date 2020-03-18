@@ -125,6 +125,7 @@ public final class Json {
 	 * @throws JsonException
 	 *             if the <code>values</code> argument are <code>null</code> or
 	 *             if one of the values is infinite or not a number (NaN).
+	 * @see JsonArray#add(float)
 	 */
 	public static JsonArray array(final float... values) {
 		if (values == null) {
@@ -146,6 +147,7 @@ public final class Json {
 	 * @return a new JSON array that contains the given values
 	 * @throws JsonException
 	 *             if the <code>values</code> argument are <code>null</code>.
+	 * @see JsonArray#add(int)
 	 */
 	public static JsonArray array(final int... values) {
 		if (values == null) {
@@ -167,6 +169,7 @@ public final class Json {
 	 * @return a new JSON array that contains the given values
 	 * @throws JsonException
 	 *             if the <code>values</code> argument are <code>null</code>.
+	 * @see JsonArray#add(long)
 	 */
 	public static JsonArray array(final long... values) {
 		if (values == null) {
@@ -188,6 +191,7 @@ public final class Json {
 	 * @return a new JSON array that contains the given strings
 	 * @throws JsonException
 	 *             if the <code>values</code> argument are <code>null</code>.
+	 * @see JsonArray#add(String)
 	 */
 	public static JsonArray array(final String... values) {
 		if (values == null) {

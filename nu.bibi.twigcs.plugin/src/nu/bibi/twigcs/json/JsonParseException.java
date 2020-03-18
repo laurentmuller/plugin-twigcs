@@ -17,7 +17,16 @@ public class JsonParseException extends JsonException {
 
 	private final Location location;
 
-	JsonParseException(final String message, final Location location) {
+	/**
+	 * Constructs a new JSON parse exception with the specified detail message
+	 * and error location.
+	 *
+	 * @param message
+	 *            the detail message.
+	 * @param location
+	 *            the error location.
+	 */
+	public JsonParseException(final String message, final Location location) {
 		super(message + " at " + location); //$NON-NLS-1$
 		this.location = location;
 	}

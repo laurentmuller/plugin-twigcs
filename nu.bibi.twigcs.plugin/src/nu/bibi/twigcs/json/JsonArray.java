@@ -50,24 +50,6 @@ import java.util.List;
 @SuppressWarnings("serial") // use default serial UID
 public class JsonArray extends JsonValue implements Iterable<JsonValue> {
 
-	/**
-	 * Returns an unmodifiable wrapper for the specified JsonArray. This method
-	 * allows to provide read-only access to a JsonArray.
-	 * <p>
-	 * The returned JsonArray is backed by the given array and reflects
-	 * subsequent changes. Attempts to modify the returned JsonArray result in
-	 * an <code>UnsupportedOperationException</code>.
-	 * </p>
-	 *
-	 * @param array
-	 *            the JsonArray for which an unmodifiable JsonArray is to be
-	 *            returned
-	 * @return an unmodifiable view of the specified JsonArray
-	 */
-	public static JsonArray unmodifiableArray(final JsonArray array) {
-		return new JsonArray(array, true);
-	}
-
 	/*
 	 * the values
 	 */
@@ -88,18 +70,7 @@ public class JsonArray extends JsonValue implements Iterable<JsonValue> {
 	 *            <code>null</code>
 	 */
 	public JsonArray(final JsonArray array) {
-		this(array, false);
-	}
-
-	private JsonArray(final JsonArray array, final boolean unmodifiable) {
-		if (array == null) {
-			throw new JsonException("The array argument is null."); //$NON-NLS-1$
-		}
-		if (unmodifiable) {
-			values = Collections.unmodifiableList(array.values);
-		} else {
-			values = new ArrayList<>(array.values);
-		}
+		values = new ArrayList<>(array.values);
 	}
 
 	/**
@@ -490,5 +461,4 @@ public class JsonArray extends JsonValue implements Iterable<JsonValue> {
 		}
 		writer.writeArrayClose();
 	}
-
 }
