@@ -39,7 +39,7 @@ public class TwigcsNature implements IProjectNature, IConstants {
 		ICommand[] cmds = desc.getBuildSpec();
 
 		// add if not already set?
-		if (!Arrays.stream(cmds).anyMatch(this::isBuilderId)) {
+		if (Arrays.stream(cmds).noneMatch(this::isBuilderId)) {
 			final int len = cmds.length;
 			cmds = Arrays.copyOf(cmds, len + 1);
 			cmds[len] = createCommand(desc);

@@ -111,7 +111,7 @@ public class IOExecutor {
 	public int run(final List<String> command) throws IOException {
 		// clear
 		exitCode = 0;
-		output = error = ""; //$NON-NLS-1$ ;
+		output = error = null;
 		outputException = errorException = null;
 
 		// start
@@ -147,6 +147,7 @@ public class IOExecutor {
 			return exitCode;
 
 		} catch (final InterruptedException e) {
+			Thread.currentThread().interrupt();
 			throw new IOException(Messages.IOExecutor_Error_Interrupted, e);
 		}
 	}

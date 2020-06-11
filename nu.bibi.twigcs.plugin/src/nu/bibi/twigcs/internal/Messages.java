@@ -64,6 +64,7 @@ public final class Messages extends NLS {
 	public static String ResourceListener_Update;
 	public static String ResourceText_Error_Index;
 	public static String ResourceText_Error_Read;
+	public static String ResourceText_Error_Content;
 	public static String SeverityDeserializer_Error;
 	public static String TwigcsBuilder_Process_Files;
 	public static String TwigcsNatureHandler_Error_Execute;

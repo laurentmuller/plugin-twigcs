@@ -152,7 +152,7 @@ public class ProjectPreferences
 
 	/**
 	 * Gets the project.
-	 * 
+	 *
 	 * @return the project.
 	 */
 	public IProject getProject() {

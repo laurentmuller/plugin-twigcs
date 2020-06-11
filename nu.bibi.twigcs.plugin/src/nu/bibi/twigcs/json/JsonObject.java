@@ -134,7 +134,7 @@ public class JsonObject extends JsonValue implements Iterable<Member> {
 
 	}
 
-	static class HashIndexTable {
+	private static class HashIndexTable {
 
 		private final byte[] hashTable = new byte[32]; // must be a power of two
 
@@ -169,6 +169,11 @@ public class JsonObject extends JsonValue implements Iterable<Member> {
 		}
 
 	}
+
+	/*
+	 * the name null message
+	 */
+	private static final String ARGUMENT_NULL = "The name argument is null."; //$NON-NLS-1$
 
 	/*
 	 * the names
@@ -344,7 +349,7 @@ public class JsonObject extends JsonValue implements Iterable<Member> {
 	 */
 	public JsonObject add(final String name, final JsonValue value) {
 		if (name == null) {
-			throw new JsonException("The name argument is null."); //$NON-NLS-1$
+			throw new JsonException(ARGUMENT_NULL);
 		}
 		if (value == null) {
 			throw new JsonException("The value argument is null."); //$NON-NLS-1$
@@ -455,7 +460,7 @@ public class JsonObject extends JsonValue implements Iterable<Member> {
 	 */
 	public JsonValue get(final String name) {
 		if (name == null) {
-			throw new JsonException("The name argument is null."); //$NON-NLS-1$
+			throw new JsonException(ARGUMENT_NULL);
 		}
 		final int index = indexOf(name);
 		return index != -1 ? values.get(index) : null;
@@ -699,7 +704,7 @@ public class JsonObject extends JsonValue implements Iterable<Member> {
 	 */
 	public JsonObject remove(final String name) {
 		if (name == null) {
-			throw new JsonException("The name argument is null."); //$NON-NLS-1$
+			throw new JsonException(ARGUMENT_NULL);
 		}
 		final int index = indexOf(name);
 		if (index != -1) {
@@ -835,7 +840,7 @@ public class JsonObject extends JsonValue implements Iterable<Member> {
 	 */
 	public JsonObject set(final String name, final JsonValue value) {
 		if (name == null) {
-			throw new JsonException("The name argument is null."); //$NON-NLS-1$
+			throw new JsonException(ARGUMENT_NULL);
 		}
 		if (value == null) {
 			throw new JsonException("The value argument is null."); //$NON-NLS-1$
@@ -932,7 +937,7 @@ public class JsonObject extends JsonValue implements Iterable<Member> {
 		return names.lastIndexOf(name);
 	}
 
-	private synchronized void readObject(final ObjectInputStream inputStream)
+	private void readObject(final ObjectInputStream inputStream)
 			throws IOException, ClassNotFoundException {
 		inputStream.defaultReadObject();
 		table = new HashIndexTable();

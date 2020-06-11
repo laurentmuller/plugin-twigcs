@@ -54,7 +54,7 @@ public enum TwigSeverity implements ICommand {
 			final TwigSeverity defaultValue) {
 		final TwigSeverity[] severities = TwigSeverity.values();
 		for (final TwigSeverity severity : severities) {
-			if (severity.equals(value)) {
+			if (severity.equalsValue(value)) {
 				return severity;
 			}
 		}
@@ -70,7 +70,7 @@ public enum TwigSeverity implements ICommand {
 	 * @return true if the specified value is equal to this enum constant.
 	 * @see #value()
 	 */
-	public boolean equals(final int value) {
+	public boolean equalsValue(final int value) {
 		return value() == value;
 	}
 

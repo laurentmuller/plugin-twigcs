@@ -11,13 +11,13 @@ package nu.bibi.twigcs.resolution;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
@@ -196,39 +196,24 @@ public abstract class AbstractResolution extends WorkbenchMarkerResolution
 	}
 
 	/**
-	 * Gets a map grouping the markers by their file.
+	 * Gets a map grouping the markers by their file resource.
 	 *
 	 * @return the map.
 	 */
 	private Map<IFile, List<IMarker>> createMarkerMap(final IMarker[] markers) {
-		// sort markers in reverse position
-		if (markers.length > 1) {
-			Arrays.sort(markers, (o1, o2) -> {
-				int result = 0;
-				for (final String name : ATTRIBUTE_NAMES) {
-					result = compareAttributes(o1, o2, name);
-					if (result != 0) {
-						return result;
-					}
+		final Comparator<IMarker> comparator = (o1, o2) -> {
+			int result = 0;
+			for (final String name : ATTRIBUTE_NAMES) {
+				result = compareAttributes(o1, o2, name);
+				if (result != 0) {
+					return result;
 				}
-				return 0;
-			});
-		}
-
-		// create map
-		final Map<IFile, List<IMarker>> map = new HashMap<>(markers.length);
-		for (final IMarker marker : markers) {
-			final IFile key = getFile(marker);
-			if (key != null) {
-				List<IMarker> value = map.get(key);
-				if (value == null) {
-					value = new ArrayList<>();
-					map.put(key, value);
-				}
-				value.add(marker);
 			}
-		}
-		return map;
+			return 0;
+		};
+
+		return Arrays.stream(markers).sorted(comparator).filter(this::isFile)
+				.collect(Collectors.groupingBy(m -> (IFile) m.getResource()));
 	}
 
 	/**
@@ -338,6 +323,17 @@ public abstract class AbstractResolution extends WorkbenchMarkerResolution
 					file.getName());
 			throw createCoreException(msg, e);
 		}
+	}
+
+	/**
+	 * Returns if the given marker has a valid file resource.
+	 *
+	 * @param marker
+	 *            the marker to be tested.
+	 * @return <code>true</code> if valid, <code>false</code> otherwise.
+	 */
+	private boolean isFile(final IMarker marker) {
+		return getFile(marker) != null;
 	}
 
 	/**

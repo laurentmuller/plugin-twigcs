@@ -14,6 +14,7 @@ import java.io.OutputStreamWriter;
 import java.io.Serializable;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Represents a JSON value. This can be a JSON <strong>object</strong>, an
@@ -310,7 +311,8 @@ public abstract class JsonValue implements Serializable {
 
 	/**
 	 * Writes the JSON representation of this value to the given output stream
-	 * in its minimal form, without any additional whitespace.
+	 * in its minimal form, without any additional whitespace. The output is
+	 * encoded with the <code>"UTF-8"</code> charset.
 	 * <p>
 	 * Writing performance can be improved by using a
 	 * {@link java.io.BufferedOutputStream BufferedOutputStream}.
@@ -329,7 +331,8 @@ public abstract class JsonValue implements Serializable {
 
 	/**
 	 * Writes the JSON representation of this value to the given output stream
-	 * using the given formatting.
+	 * using the given formatting. The output is encoded with the
+	 * <code>"UTF-8"</code> charset.
 	 * <p>
 	 * Writing performance can be improved by using a
 	 * {@link java.io.BufferedOutputStream BufferedOutputStream}.
@@ -353,7 +356,8 @@ public abstract class JsonValue implements Serializable {
 		if (configuration == null) {
 			throw new JsonException("The configuration argument is null."); //$NON-NLS-1$
 		}
-		writeTo(new OutputStreamWriter(stream), configuration);
+		writeTo(new OutputStreamWriter(stream, StandardCharsets.UTF_8),
+				configuration);
 	}
 
 	/**
@@ -401,9 +405,8 @@ public abstract class JsonValue implements Serializable {
 		if (configuration == null) {
 			throw new JsonException("The configuration argument is null."); //$NON-NLS-1$
 		}
-		final WritingBuffer buffer = new WritingBuffer(writer, 128);
-		write(configuration.createWriter(buffer));
-		buffer.flush();
+		write(configuration.createWriter(writer));
+		writer.flush();
 	}
 
 	/**

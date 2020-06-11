@@ -11,6 +11,7 @@ package nu.bibi.twigcs.json;
 import java.io.IOException;
 import java.io.Writer;
 
+/* package */
 class JsonWriter {
 
 	private static final int CONTROL_CHARACTERS_END = 0x001f;
@@ -35,7 +36,7 @@ class JsonWriter {
 		if (ch > '\\') {
 			if (ch < '\u2028' || ch > '\u2029') {
 				// The lower range contains 'a' .. 'z'. Only 2 checks required.
-				return null;
+				return new char[] {};
 			}
 			return ch == '\u2028' ? UNICODE_2028_CHARS : UNICODE_2029_CHARS;
 		} else if (ch == '\\') {
@@ -43,11 +44,11 @@ class JsonWriter {
 		} else if (ch > '"') {
 			// This range contains '0' .. '9' and 'A' .. 'Z'. Need 3 checks to
 			// get here.
-			return null;
+			return new char[] {};
 		} else if (ch == '"') {
 			return QUOT_CHARS;
 		} else if (ch > CONTROL_CHARACTERS_END) {
-			return null;
+			return new char[] {};
 		}
 
 		switch (ch) {
@@ -87,7 +88,7 @@ class JsonWriter {
 		for (int index = 0; index < length; index++) {
 			final char[] replacement = getReplacementChars(
 					string.charAt(index));
-			if (replacement != null) {
+			if (replacement.length > 0) {
 				writer.write(string, start, index - start);
 				writer.write(replacement);
 				start = index + 1;

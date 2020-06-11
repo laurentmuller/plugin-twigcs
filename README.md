@@ -1,9 +1,6 @@
 # Plugin-Twigcs
 
-[![Build Status](https://travis-ci.org/laurentmuller/plugin-twigcs.svg?branch=master)](https://travis-ci.org/laurentmuller/plugin-twigcs)
-[![Codacy Status](https://api.codacy.com/project/badge/Grade/077fd37074f1488abc18fa43fd05d651)](https://www.codacy.com/manual/laurentmuller/plugin-twigcs?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=laurentmuller/plugin-twigcs&amp;utm_campaign=Badge_Grade)
-[![Branch Master](https://img.shields.io/badge/branch-master-blue.svg)](https://github.com/laurentmuller/plugin-twigcs/tree/master)
-[![MIT License](https://img.shields.io/badge/License-MIT-yellow.svg)](https://raw.githubusercontent.com/laurentmuller/plugin-twigcs/master/LICENSE)
+[![Build Status](https://travis-ci.org/laurentmuller/plugin-twigcs.svg?branch=master)](https://travis-ci.org/laurentmuller/plugin-twigcs) [![Codacy Status](https://api.codacy.com/project/badge/Grade/077fd37074f1488abc18fa43fd05d651)](https://www.codacy.com/manual/laurentmuller/plugin-twigcs?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=laurentmuller/plugin-twigcs&amp;utm_campaign=Badge_Grade) [![Branch Master](https://img.shields.io/badge/branch-master-blue.svg)](https://github.com/laurentmuller/plugin-twigcs/tree/master) [![MIT License](https://img.shields.io/badge/License-MIT-yellow.svg)](https://raw.githubusercontent.com/laurentmuller/plugin-twigcs/master/LICENSE)
 
 An Eclipse plugin to validate Twig (*.twig) files with the [Twigcs](https://github.com/friendsoftwig/twigcs) component.
 

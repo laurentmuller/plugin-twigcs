@@ -10,6 +10,7 @@ package nu.bibi.twigcs.ui;
 
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.stream.Stream;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFolder;
@@ -53,10 +54,8 @@ public class FolderContentProvider implements ITreeContentProvider {
 	@Override
 	public Object[] getChildren(final Object element) {
 		if (element instanceof IContainer) {
-			final IResource[] children = getMembers((IContainer) element);
-			if (children.length > 0) {
-				return Arrays.stream(children).filter(this::select).toArray();
-			}
+			return getResourceStream((IContainer) element).filter(this::select)
+					.toArray();
 		}
 		return EMPTY_ARRAY;
 	}
@@ -69,7 +68,7 @@ public class FolderContentProvider implements ITreeContentProvider {
 		if (element instanceof IWorkspaceRoot) {
 			return new IResource[] { project };
 		}
-		return null;
+		return EMPTY_ARRAY;
 	}
 
 	/**
@@ -89,30 +88,24 @@ public class FolderContentProvider implements ITreeContentProvider {
 	@Override
 	public boolean hasChildren(final Object element) {
 		if (element instanceof IContainer) {
-			final IResource[] children = getMembers((IContainer) element);
-			if (children.length > 0) {
-				for (final IResource child : children) {
-					if (select(child)) {
-						return true;
-					}
-				}
-			}
+			return getResourceStream((IContainer) element)
+					.anyMatch(this::select);
 		}
 		return false;
 	}
 
 	/**
-	 * Returns a list of existing member resources.
+	 * Returns a stream of existing member resources.
 	 *
 	 * @param container
 	 *            the container to get members for.
-	 * @return an array, maybe empty, of members of the container.
+	 * @return a stream, maybe empty, of members of the container.
 	 */
-	private IResource[] getMembers(final IContainer container) {
+	private Stream<IResource> getResourceStream(final IContainer container) {
 		try {
-			return container.members();
+			return Arrays.stream(container.members());
 		} catch (final CoreException e) {
-			return EMPTY_ARRAY;
+			return Stream.of();
 		}
 	}
 

@@ -123,7 +123,7 @@ public class LowerCaseResolution extends AbstractResolution {
 	 */
 	private String convertVariable(final String variable) {
 		char ch;
-		final StringBuffer buffer = new StringBuffer();
+		final StringBuilder buffer = new StringBuilder();
 		for (int i = 0, len = variable.length(); i < len; i++) {
 			ch = variable.charAt(i);
 			if (Character.isUpperCase(ch)) {

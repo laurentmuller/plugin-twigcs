@@ -158,9 +158,7 @@ public class PreferencesPage extends FieldEditorPreferencePage
 		btnTest = new Button(parent, SWT.PUSH);
 		btnTest.setText(Messages.PreferencesPage_Test);
 		btnTest.setEnabled(isValid());
-		btnTest.addListener(SWT.Selection, e -> {
-			testCommand();
-		});
+		btnTest.addListener(SWT.Selection, e -> testCommand());
 		setButtonLayoutData(btnTest);
 	}
 
@@ -192,9 +190,8 @@ public class PreferencesPage extends FieldEditorPreferencePage
 			@Override
 			protected Text createTextWidget(final Composite parent) {
 				final Text text = super.createTextWidget(parent);
-				text.addListener(SWT.FocusIn, e -> {
-					((Text) e.widget).selectAll();
-				});
+				text.addListener(SWT.FocusIn,
+						e -> ((Text) e.widget).selectAll());
 				return text;
 			}
 		};
@@ -232,10 +229,9 @@ public class PreferencesPage extends FieldEditorPreferencePage
 	 * @return an array with the enumeration names.
 	 */
 	private String[][] getEnumNames(final Class<? extends Enum<?>> clazz) {
-		final Enum<?>[] values = clazz.getEnumConstants();
-		return Arrays.stream(values).map(e -> {
-			return new String[] { toProperCase(e.name()), e.name() };
-		}).toArray(String[][]::new);
+		return Arrays.stream(clazz.getEnumConstants())
+				.map(e -> new String[] { toProperCase(e.name()), e.name() })
+				.toArray(String[][]::new);
 	}
 
 	/**

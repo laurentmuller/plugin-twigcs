@@ -101,7 +101,7 @@ public class TwigcsValidationVisitor extends AbstractResouceVisitor
 	 *            the progress monitor to display activity.
 	 */
 	public TwigcsValidationVisitor(final IProject project,
-			final IProgressMonitor monitor) throws CoreException {
+			final IProgressMonitor monitor) {
 		this.monitor = monitor;
 
 		// get preferences
@@ -154,7 +154,7 @@ public class TwigcsValidationVisitor extends AbstractResouceVisitor
 
 		// get values
 		final String message = violation.getMessage();
-		final int severity = violation.getMarkerSeverity();
+		final int markerSeverity = violation.getMarkerSeverity();
 		final int line = violation.getLine();
 		final int column = violation.getColumn();
 		final int offset = getOffset(message, text, line, column);
@@ -164,7 +164,7 @@ public class TwigcsValidationVisitor extends AbstractResouceVisitor
 		// create
 		final IMarker marker = file.createMarker(MARKER_TYPE);
 		marker.setAttribute(IMarker.MESSAGE, message);
-		marker.setAttribute(IMarker.SEVERITY, severity);
+		marker.setAttribute(IMarker.SEVERITY, markerSeverity);
 		marker.setAttribute(IMarker.LINE_NUMBER, line);
 		marker.setAttribute(IMarker.CHAR_START, offset);
 		marker.setAttribute(IMarker.CHAR_END, offset + length);
@@ -290,14 +290,7 @@ public class TwigcsValidationVisitor extends AbstractResouceVisitor
 				end++;
 			}
 			length = end - offset;
-		} else if (isOneSpace(message)) {
-			int end = offset + 1;
-			final byte[] content = text.getContent();
-			while (isWhitespace(content, end)) {
-				end++;
-			}
-			length = end - offset;
-		} else if (isEndLineSpace(message)) {
+		} else if (isOneSpace(message) || isEndLineSpace(message)) {
 			int end = offset + 1;
 			final byte[] content = text.getContent();
 			while (isWhitespace(content, end)) {
@@ -427,8 +420,7 @@ public class TwigcsValidationVisitor extends AbstractResouceVisitor
 	 *             {@link TwigResult} type.
 	 */
 	private TwigFile parseResult(final String data) throws IOException {
-		final TwigcsResultParser parser = getParser();
-		final TwigResult result = parser.parse(data);
+		final TwigResult result = getParser().parse(data);
 		return result.first();
 	}
 

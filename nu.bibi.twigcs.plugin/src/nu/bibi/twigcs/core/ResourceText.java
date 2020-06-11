@@ -169,7 +169,11 @@ public class ResourceText implements ICoreException {
 			throws IOException {
 		// read all
 		content = new byte[contentLength];
-		stream.read(content);
+		if (contentLength != stream.read(content)) {
+			final String msg = NLS.bind(Messages.ResourceText_Error_Content,
+					contentLength);
+			throw new IOException(msg);
+		}
 
 		// compute lines
 		byte ch;
@@ -181,7 +185,7 @@ public class ResourceText implements ICoreException {
 			if (ch == LINE_FEED) {
 				// handle Linux (LF) and Windows (CR+LF)
 				addOffset(i + 1, count++);
-			} else if (previous == CARRIAGE_RETURN && ch != LINE_FEED) {
+			} else if (previous == CARRIAGE_RETURN) { // && ch != LINE_FEED
 				// handle Mac (CR)
 				addOffset(i, count++);
 			}

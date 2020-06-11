@@ -63,51 +63,6 @@ public abstract class UnusedValueResolution extends AbstractResolution {
 				len - endOffset);
 
 		return newContents;
-
-		// final int len = contents.length;
-		//
-		// // find open bracket
-		// while (start != -1 && !isEqualsChar(contents, start, '{')) {
-		// start--;
-		// }
-		//
-		// // find spaces before
-		// while (start > 1 && isWhitespace(contents, start - 1)) {
-		// start--;
-		// }
-		//
-		// // find end line before
-		// if (start > 1 && isNewLine(contents, start - 1)) {
-		// start--;
-		// }
-		//
-		// // find close bracket
-		// while (end < len && !isEqualsChar(contents, end, '}')) {
-		// end++;
-		// }
-		// end++;
-		//
-		// // find spaces after
-		// while (end < len - 1 && isWhitespace(contents, end + 1)) {
-		// end++;
-		// }
-		//
-		// // find end line after
-		// if (end < len - 1 && isNewLine(contents, end + 1)) {
-		// end++;
-		// }
-		//
-		// // validate range
-		// if (start < 0 || end >= len) {
-		// return contents;
-		// }
-		//
-		// // remove line
-		// final byte[] newContents = new byte[len - (end - start) + 1];
-		// System.arraycopy(contents, 0, newContents, 0, start);
-		// System.arraycopy(contents, end, newContents, start, len - end);
-		//
-		// return newContents;
 	}
 
 	/**

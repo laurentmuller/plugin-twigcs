@@ -95,7 +95,7 @@ public class TwigcsBuilder extends IncrementalProjectBuilder
 				incrementalBuild(delta, monitor);
 			}
 		}
-		return null;
+		return new IProject[] {};
 	}
 
 	/**

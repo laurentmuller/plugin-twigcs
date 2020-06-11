@@ -58,7 +58,7 @@ public class TwigcsPlugin extends AbstractUIPlugin implements IConstants {
 	/**
 	 * Gets the shared instance.
 	 *
-	 * @return the shared instance.
+	 * @return the shared instance or <code>null</code> if none.
 	 */
 	public static TwigcsPlugin getDefault() {
 		return plugin;
@@ -98,6 +98,16 @@ public class TwigcsPlugin extends AbstractUIPlugin implements IConstants {
 		if (message != null) {
 			log(new Status(IStatus.INFO, PLUGIN_ID, message));
 		}
+	}
+
+	/**
+	 * Sets the shared instance.
+	 *
+	 * @param plugin
+	 *            the shared instance to set or <code>null</code> if none.
+	 */
+	private static void setDefault(final TwigcsPlugin plugin) {
+		TwigcsPlugin.plugin = plugin;
 	}
 
 	/*
@@ -159,7 +169,7 @@ public class TwigcsPlugin extends AbstractUIPlugin implements IConstants {
 	@Override
 	public void start(final BundleContext context) throws Exception {
 		super.start(context);
-		plugin = this;
+		setDefault(this);
 
 		if (listener == null) {
 			listener = new ResourceListener();
@@ -174,7 +184,7 @@ public class TwigcsPlugin extends AbstractUIPlugin implements IConstants {
 	 */
 	@Override
 	public void stop(final BundleContext context) throws Exception {
-		plugin = null;
+		setDefault(null);
 		super.stop(context);
 
 		if (listener != null) {

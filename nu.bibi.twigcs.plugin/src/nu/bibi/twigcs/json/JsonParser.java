@@ -189,6 +189,10 @@ public class JsonParser<A, O> {
 		return error("Expected " + expected + "."); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
+	private JsonParseException expectedDigit() {
+		return expected("digit"); //$NON-NLS-1$
+	}
+
 	private boolean isDigit() {
 		return current >= '0' && current <= '9';
 	}
@@ -327,9 +331,10 @@ public class JsonParser<A, O> {
 			readChar('-');
 		}
 		if (!readDigit()) {
-			throw expected("digit"); //$NON-NLS-1$
+			throw expectedDigit();
 		}
 		while (readDigit()) {
+			// NO OP
 		}
 		return true;
 	}
@@ -349,9 +354,10 @@ public class JsonParser<A, O> {
 			return false;
 		}
 		if (!readDigit()) {
-			throw expected("digit"); //$NON-NLS-1$
+			throw expectedDigit();
 		}
 		while (readDigit()) {
+			// NO OP
 		}
 		return true;
 	}
@@ -378,10 +384,11 @@ public class JsonParser<A, O> {
 		readChar('-');
 		final int firstDigit = current;
 		if (!readDigit()) {
-			throw expected("digit"); //$NON-NLS-1$
+			throw expectedDigit();
 		}
 		if (firstDigit != '0') {
 			while (readDigit()) {
+				// NO OP
 			}
 		}
 		readFraction();

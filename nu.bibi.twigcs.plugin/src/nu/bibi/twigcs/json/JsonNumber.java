@@ -10,6 +10,7 @@ package nu.bibi.twigcs.json;
 
 import java.io.IOException;
 
+/* package */
 @SuppressWarnings("serial") // use default serial UID
 class JsonNumber extends JsonValue {
 

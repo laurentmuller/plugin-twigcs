@@ -67,11 +67,6 @@ public class MainTest {
 				}
 			}
 
-			// final JsonObject value = Json.object().add("test", true);
-			// System.out.println(value.toString(WriterConfiguration.PRETTY_PRINT));
-			// value.writeTo(System.out);
-			// WriterConfiguration.PRETTY_PRINT);
-
 		} catch (final Exception e) {
 			e.printStackTrace();
 		} finally {

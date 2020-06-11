@@ -160,11 +160,9 @@ public class ResourceListener implements IResourceChangeListener,
 	 *            the from path (old path).
 	 * @param pathTo
 	 *            the to path (new path).
-	 * @throws CoreException
-	 *             if an error occurs while updating the project.
 	 */
 	private void process(final IProject project, final IPath pathFrom,
-			final IPath pathTo) throws CoreException {
+			final IPath pathTo) {
 		// get paths
 		final ProjectPreferences preferences = new ProjectPreferences(project);
 		final List<IPath> includes = preferences.getIncludeRawPaths();

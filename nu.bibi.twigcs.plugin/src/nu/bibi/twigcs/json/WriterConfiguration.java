@@ -20,7 +20,7 @@ public abstract class WriterConfiguration {
 	 * Write JSON in its minimal form, without any additional whitespace. This
 	 * is the default.
 	 */
-	public static WriterConfiguration MINIMAL = new WriterConfiguration() {
+	public static final WriterConfiguration MINIMAL = new WriterConfiguration() {
 		@Override
 		protected JsonWriter createWriter(final Writer writer) {
 			return new JsonWriter(writer);
@@ -31,11 +31,12 @@ public abstract class WriterConfiguration {
 	 * Write JSON in pretty-print, with each value on a separate line and an
 	 * indentation of two spaces.
 	 */
-	public static WriterConfiguration PRETTY_PRINT = PrettyPrint.indentWithSpaces(2);
+	public static final WriterConfiguration PRETTY_PRINT = WriterConfigurationPrettyPrint
+			.indentWithSpaces(2);
 
 	/**
 	 * Creates a JSON writer.
-	 * 
+	 *
 	 * @param writer
 	 *            the writer to write to.
 	 * @return a JSON writer.

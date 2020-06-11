@@ -60,6 +60,11 @@ public final class Json {
 	 */
 	public static final JsonValue FALSE = new JsonLiteral("false"); //$NON-NLS-1$
 
+	/*
+	 * the null values message
+	 */
+	private static final String ARGUMENT_NULL = "The values argument is null."; //$NON-NLS-1$
+
 	/**
 	 * Creates a new empty JsonArray. This is equivalent to creating a new
 	 * JsonArray using the constructor.
@@ -83,7 +88,7 @@ public final class Json {
 	 */
 	public static JsonArray array(final boolean... values) {
 		if (values == null) {
-			throw new JsonException("The values argument is null."); //$NON-NLS-1$
+			throw new JsonException(ARGUMENT_NULL);
 		}
 		final JsonArray array = new JsonArray();
 		for (final boolean value : values) {
@@ -106,7 +111,7 @@ public final class Json {
 	 */
 	public static JsonArray array(final double... values) {
 		if (values == null) {
-			throw new JsonException("The values argument is null."); //$NON-NLS-1$
+			throw new JsonException(ARGUMENT_NULL);
 		}
 		final JsonArray array = new JsonArray();
 		for (final double value : values) {
@@ -129,7 +134,7 @@ public final class Json {
 	 */
 	public static JsonArray array(final float... values) {
 		if (values == null) {
-			throw new JsonException("The values argument is null."); //$NON-NLS-1$
+			throw new JsonException(ARGUMENT_NULL);
 		}
 		final JsonArray array = new JsonArray();
 		for (final float value : values) {
@@ -151,7 +156,7 @@ public final class Json {
 	 */
 	public static JsonArray array(final int... values) {
 		if (values == null) {
-			throw new JsonException("The values argument is null."); //$NON-NLS-1$
+			throw new JsonException(ARGUMENT_NULL);
 		}
 		final JsonArray array = new JsonArray();
 		for (final int value : values) {
@@ -173,7 +178,7 @@ public final class Json {
 	 */
 	public static JsonArray array(final long... values) {
 		if (values == null) {
-			throw new JsonException("The values argument is null."); //$NON-NLS-1$
+			throw new JsonException(ARGUMENT_NULL);
 		}
 		final JsonArray array = new JsonArray();
 		for (final long value : values) {
@@ -195,7 +200,7 @@ public final class Json {
 	 */
 	public static JsonArray array(final String... values) {
 		if (values == null) {
-			throw new JsonException("The values argument is null."); //$NON-NLS-1$
+			throw new JsonException(ARGUMENT_NULL);
 		}
 		final JsonArray array = new JsonArray();
 		for (final String value : values) {

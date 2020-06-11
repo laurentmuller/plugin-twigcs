@@ -273,7 +273,7 @@ public class ProjectPropertyPage extends PropertyPage
 			label.setText(text);
 		}
 
-		final GridData gd = new GridData();// GridData.FILL_HORIZONTAL);
+		final GridData gd = new GridData();
 		gd.horizontalSpan = Math.max(columns, 1);
 		label.setLayoutData(gd);
 
@@ -361,15 +361,9 @@ public class ProjectPropertyPage extends PropertyPage
 		GridLayoutFactory.fillDefaults().applyTo(buttonsBar);
 
 		// button listeners
-		final Listener addListener = e -> {
-			addResources(viewer, list);
-		};
-		final Listener deleteListener = e -> {
-			deleteResource(viewer, list);
-		};
-		final Listener editListener = e -> {
-			editResources(viewer, list);
-		};
+		final Listener addListener = e -> addResources(viewer, list);
+		final Listener deleteListener = e -> deleteResource(viewer, list);
+		final Listener editListener = e -> editResources(viewer, list);
 
 		// buttons
 		createViewerButton(buttonsBar, Messages.ProjectPropertyPage_Add,

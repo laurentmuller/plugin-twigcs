@@ -81,11 +81,6 @@ public class OneSpaceResolution extends AbstractResolution {
 		final int len = contents.length;
 
 		if (isWhitespace(contents, start)) {
-			// more than one space -> trim
-			// while (end < len && isWhitespace(contents, end)) {
-			// end++;
-			// }
-
 			// remove spaces
 			final int newLength = len - (end - start);
 			newContents = Arrays.copyOf(contents, newLength);
