@@ -11,7 +11,7 @@ body {
 .footer {
   bottom: 0;
   width: 100%;
-  font-size: .8rem;
+  font-size: 0.8rem;
   padding: 3px 10px;
   position: absolute;
   background-color: var(--gray);
