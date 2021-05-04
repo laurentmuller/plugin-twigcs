@@ -1,14 +1,11 @@
-/*******************************************************************************
- * Copyright (c) 2011 HaslerRail AG and others.
+/**
+ * This file is part of the twigcs-plugin package.
  *
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * (c) Laurent Muller <bibi@bibi.nu>
  *
- * Contributors:
- *     HaslerRail AG - initial API and implementation
- *******************************************************************************/
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 package nu.bibi.twigcs.internal;
 
 import org.eclipse.osgi.util.NLS;

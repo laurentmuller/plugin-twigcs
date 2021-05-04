@@ -62,20 +62,6 @@
 			<layout>p2</layout>
 			<url>${eclipse.repo}</url>
 		</repository>
-		<!-- 
-		<repository>
-			<id>orbit</id>
-			<layout>p2</layout>
-			<url>${orbit.repo}</url>
-		</repository>
-		 -->
-		 <!-- 
-		<repository>
-			<id>pdt</id>
-			<layout>p2</layout>
-			<url>${pdt.repo}</url>
-		</repository>
-		 -->
 	</repositories>
 
 	<build>
